@@ -127,6 +127,12 @@ input,select,textarea{font-family:var(--ui);font-size:16px;-webkit-user-select:t
 .set label{font-weight:700}
 .set select{border:2px solid #dfe3f2;border-radius:10px;padding:6px}
 table{width:100%;border-collapse:collapse;font-size:15px}td,th{padding:6px 4px;border-bottom:1px solid #eee;text-align:left}
+.lbrow{display:flex;align-items:center;gap:10px;background:var(--card);border-radius:20px;padding:8px 12px;box-shadow:0 4px 0 #0003;font-weight:800}
+.lbrow .rk{font-size:30px;width:44px;text-align:center}
+.lbrow .nm{flex:1;font-size:22px}
+.lbrow .wd{font-size:24px;background:#e1efff;border-radius:14px;padding:2px 12px}
+.lbrow.me{background:#fff6cf;box-shadow:0 4px 0 #0003,0 0 0 4px var(--yellow)}
+.lblist{display:flex;flex-direction:column;gap:10px}
 .toast{position:fixed;left:50%;bottom:30px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 18px;border-radius:14px;font-weight:700;z-index:60;opacity:0;transition:opacity .3s;pointer-events:none}
 .toast.on{opacity:1}
 .confetti{position:fixed;top:-20px;width:12px;height:16px;z-index:40;pointer-events:none;animation:fall 1.4s ease-in forwards;border-radius:3px}
@@ -168,6 +174,11 @@ table{width:100%;border-collapse:collapse;font-size:15px}td,th{padding:6px 4px;b
 
 <section id="results" class="screen"><div id="resBody"></div></section>
 
+<section id="board" class="screen">
+  <div class="top"><button class="iconbtn" id="boardBack" aria-label="Home">🏠</button><div style="font-size:28px;font-weight:800;flex:1">🏆 Done today</div><button class="iconbtn" id="boardRefresh" aria-label="Refresh">🔄</button></div>
+  <div id="boardBody"></div>
+</section>
+
 <section id="parent" class="screen">
   <div class="top"><button class="iconbtn" id="parentBack">←</button><div style="font-size:26px;font-weight:800">Grown-ups</div></div>
   <div class="tabs" id="ptabs"><button data-t="homework" class="on">Homework</button><button data-t="progress">Progress</button><button data-t="settings">Settings</button></div>
@@ -180,7 +191,7 @@ table{width:100%;border-collapse:collapse;font-size:15px}td,th{padding:6px 4px;b
 <script>
 const AUDIO = {};
 const AUDIO_PACKS = ["core", "w1", "w2", "w3", "w4"];
-const PHRASES = {"read_word": "Read the word!", "read_sentence": "Read the sentence!", "what_sound": "What sound is this?", "pit": "Pit stop! This one came back. Can you read it?", "pit_sound": "Pit stop! What sound is this?", "fred_word": "Not quite. Fred Talk it! Say the sounds, then blend them.", "fred_sentence": "Not quite. Fred Talk the orange words, then read it again.", "again": "Nearly! Have another go.", "fred_again": "Fred Talk it again, then blend!", "sound_again": "Nearly! Say the sound again.", "sounds_intro": "Let's go sound by sound. Say each sound when it lights up.", "blend_now": "Now blend them! Tap and say the word.", "listen": "Listen to me.", "your_turn_word": "Your turn! Say the word.", "your_turn_sentence": "Your turn! Read it to me.", "your_turn_sound": "Now you say it!", "didnt_hear": "I didn't hear you. Tap and try again!", "didnt_hear2": "Say it nice and loud, close to the phone!", "good_try": "Good try! We'll come back to it.", "great_job": "Great job!", "pr1": "Brilliant!", "pr2": "Super reader!", "pr3": "Zoom zoom! Yes!", "pr4": "Fantastic!", "pr5": "You did it!", "pr6": "Amazing!", "pr7": "Turbo reading!", "pr8": "Wow, great blending!", "spr1": "Yes! That's the sound!", "spr2": "Great sound!", "spr3": "Perfect!", "turbo": "Turbo boost! Three in a row!", "race_done": "Race complete! You beat the truck!", "race_lost": "Race complete! Great driving!", "goal_done": "Amazing! You finished all your races today! Your streak is growing!", "new_car": "Wow! You unlocked a new car!", "start_home": "Tap a race to start!", "leave_q": "Do you want to stop racing?", "no_mic": "I can't use the microphone. Ask a grown-up for help.", "tap_mic": "Tap the microphone, then read!", "garage": "Pick your car!", "all_done": "All races done! Try a bonus lap for extra points!", "lets_race": "Ready, steady, go!", "finish_line": "Last one! Read it to cross the finish line!", "welcome": "Hello racer! Tap a race to start!", "hello": "Hello", "well_done": "Well done", "setup_hi": "Hello racer!", "red_word": "This is a red word. We can't Fred Talk it. Listen!"};
+const PHRASES = {"read_word": "Read the word!", "read_sentence": "Read the sentence!", "what_sound": "What sound is this?", "pit": "Pit stop! This one came back. Can you read it?", "pit_sound": "Pit stop! What sound is this?", "fred_word": "Not quite. Fred Talk it! Say the sounds, then blend them.", "fred_sentence": "Not quite. Fred Talk the orange words, then read it again.", "again": "Nearly! Have another go.", "fred_again": "Fred Talk it again, then blend!", "sound_again": "Nearly! Say the sound again.", "sounds_intro": "Let's go sound by sound. Say each sound when it lights up.", "blend_now": "Now blend them! Tap and say the word.", "listen": "Listen to me.", "your_turn_word": "Your turn! Say the word.", "your_turn_sentence": "Your turn! Read it to me.", "your_turn_sound": "Now you say it!", "didnt_hear": "I didn't hear you. Tap and try again!", "didnt_hear2": "Say it nice and loud, close to the phone!", "good_try": "Good try! We'll come back to it.", "great_job": "Great job!", "pr1": "Brilliant!", "pr2": "Super reader!", "pr3": "Zoom zoom! Yes!", "pr4": "Fantastic!", "pr5": "You did it!", "pr6": "Amazing!", "pr7": "Turbo reading!", "pr8": "Wow, great blending!", "spr1": "Yes! That's the sound!", "spr2": "Great sound!", "spr3": "Perfect!", "turbo": "Turbo boost! Three in a row!", "race_done": "Race complete! You beat the truck!", "race_lost": "Race complete! Great driving!", "goal_done": "Amazing! You finished all your races today! Your streak is growing!", "new_car": "Wow! You unlocked a new car!", "start_home": "Tap a race to start!", "leave_q": "Do you want to stop racing?", "no_mic": "I can't use the microphone. Ask a grown-up for help.", "tap_mic": "Tap the microphone, then read!", "garage": "Pick your car!", "all_done": "All races done! Try a bonus lap for extra points!", "lets_race": "Ready, steady, go!", "finish_line": "Last one! Read it to cross the finish line!", "welcome": "Hello racer! Tap a race to start!", "hello": "Hello", "well_done": "Well done", "setup_hi": "Hello racer!", "red_word": "This is a red word. We can't Fred Talk it. Listen!", "cups_look": "Look who finished their reading today!", "cup_done": "Well done! You finished today's reading. Here's your cup!", "cup_todo": "Finish all your races today to get your cup!", "cup_none": "Nobody has finished yet. Be the first to get a cup!"};
 </script>
 <script>
 "use strict";
@@ -218,7 +229,7 @@ const CARS = [
   { name: 'Gold Champion', body: '#f4c430', accent: '#8b5a00', emblem: 'crown', at: 2500 },
 ];
 function fresh() {
-  return { homework: '', name: '', nameRec: null, setupDone: false, review: [],
+  return { homework: '', name: '', nameRec: null, setupDone: false, review: [], lb: { cls: '', on: true, player: Math.random().toString(36).slice(2, 12) },
     settings: { tries: { read: 1, fred: 1, sounds: 1, sound: 2 }, comebacks: 2, goal: 'all', useMic: true, dots: true },
     coins: 0, streak: 0, best: 0, lastGoalDay: null, days: {}, stats: {}, car: 0 };
 }
@@ -227,6 +238,7 @@ function load() {
   return fresh();
 }
 let S = load();
+if (!S.lb || !S.lb.player) S.lb = { cls: '', on: true, player: Math.random().toString(36).slice(2, 12), ...(S.lb || {}) };
 function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
 try { navigator.storage && navigator.storage.persist && navigator.storage.persist(); } catch (e) {}
 const today = () => dayKey();
@@ -400,28 +412,42 @@ const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
 let micBlocked = false;
 const micOn = () => !!SR && !micBlocked && S.settings.useMic;
 let currentRec = null;
-function listen(maxMs, isDone, onPartial) {
+// One listening session at a time. iPhone needs the previous session fully closed before a new one starts.
+let recEnded = Promise.resolve();
+async function listen(maxMs, isDone, onReady) {
+  await Promise.race([recEnded, sleep(1500)]);
+  try { if (actx && actx.state === 'running') await actx.suspend(); } catch (e) {} // game sounds off while the mic is on
+  await sleep(200);
+  let rec; try { rec = new SR(); } catch (e) { return { error: 'unsupported', texts: [] }; }
+  currentRec = rec; rec.lang = 'en-GB'; rec.interimResults = true; rec.continuous = false; rec.maxAlternatives = 5;
+  let endDone; recEnded = new Promise(r => endDone = r);
   return new Promise(resolve => {
-    let rec; try { rec = new SR(); } catch (e) { return resolve({ error: 'unsupported', texts: [] }); }
-    currentRec = rec; rec.lang = 'en-GB'; rec.interimResults = true; rec.continuous = false; rec.maxAlternatives = 5;
-    let texts = [], finished = false, timer;
-    const finish = r => { if (finished) return; finished = true; clearTimeout(timer); currentRec = null; try { rec.abort(); } catch (e) {} resolve(r); };
+    let texts = [], finished = false, ready = false, timer, safety;
+    const finish = r => { if (finished) return; finished = true; clearTimeout(timer); clearTimeout(safety); try { rec.stop(); } catch (e) {} resolve(r); };
+    const goReady = () => {
+      if (ready) return; ready = true; onReady && onReady();
+      timer = setTimeout(() => { try { rec.stop(); } catch (e) {} setTimeout(() => finish(texts.length ? { texts } : { error: 'no-speech', texts }), 1200); }, maxMs);
+    };
+    rec.onstart = () => setTimeout(goReady, 350);
+    rec.onaudiostart = goReady;
     rec.onresult = e => {
       texts = []; const first = [];
       for (let i = 0; i < e.results.length; i++) { first.push(e.results[i][0].transcript); for (let j = 0; j < e.results[i].length; j++) texts.push(e.results[i][j].transcript); }
-      texts.unshift(first.join(' ')); onPartial && onPartial(texts[0]);
+      texts.unshift(first.join(' '));
       if (isDone(texts) || e.results[e.results.length - 1].isFinal) finish({ texts });
     };
     rec.onerror = e => finish({ error: e.error, texts });
-    rec.onend = () => finish(texts.length ? { texts } : { error: 'no-speech', texts });
-    timer = setTimeout(() => { try { rec.stop(); } catch (e) {} setTimeout(() => finish(texts.length ? { texts } : { error: 'no-speech', texts }), 900); }, maxMs);
-    try { rec.start(); } catch (e) { finish({ error: 'start-failed', texts: [] }); }
+    rec.onend = () => { currentRec = null; endDone(); finish(texts.length ? { texts } : { error: ready ? 'no-speech' : 'no-audio', texts }); };
+    safety = setTimeout(() => { try { rec.abort(); } catch (e) {} endDone(); finish(texts.length ? { texts } : { error: 'no-audio', texts }); }, maxMs + 5000);
+    try { rec.start(); } catch (e) { endDone(); finish({ error: 'start-failed', texts: [] }); }
   });
 }
 const norm = s => String(s).toLowerCase().replace(/[^a-z' ]+/g, ' ').replace(/'/g, '').replace(/\s+/g, ' ').trim();
 const squash = w => w.replace(/(.)\1+/g, '$1');
+// spelling-blind compare: "kat" = "cat", "hil" = "hill", "phox" = "fox"
+const sp = w => squash(w.replace(/ph/g, 'f').replace(/ck/g, 'k').replace(/c(?=[aou]|$)/g, 'k').replace(/q/g, 'k').replace(/x/g, 'ks').replace(/wh/g, 'w').replace(/([^aeiou])e$/, '$1'));
 const ALIAS = { red: ['read'], web: ['webb'], bell: ['belle'], jet: ['jett'], pen: ['penn'], yap: ['yapp'], jam: ['jamb'], win: ['wynn', 'wyn'], vet: ['vette'], doll: ['dahl'], box: ['bocks'], cat: ['kat'], mix: ['micks'], fix: ['ficks'], hen: ['hens'], son: ['sun'], sun: ['son'], to: ['two', 'too'], no: ['know'], be: ['bee'], see: ['sea'], i: ['eye'] };
-function wordOk(target, heard) { const t = norm(plain(target)), h = norm(heard); return h === t || squash(h) === squash(t) || (ALIAS[t] || []).includes(h); }
+function wordOk(target, heard) { const t = norm(plain(target)), h = norm(heard); return !!h && (h === t || squash(h) === squash(t) || sp(h) === sp(t) || (ALIAS[t] || []).includes(h)); }
 const LENIENT = ['a', 'an', 'the'];
 function check(it, texts) {
   texts = (texts || []).filter(Boolean);
@@ -508,9 +534,10 @@ function renderHome() {
   $('#tiles').innerHTML = plan.map((r, i) => {
     const m = d.done[i];
     return `<button class="tile ${m ? 'done' : ''} ${i === nextIdx ? 'next' : ''}" data-r="${i}" style="${m ? '' : `background:${RACE_BG[i % RACE_BG.length]}`}"><span class="num">${i + 1}</span>${m ? MEDAL[m] : RACE_ICONS[i % RACE_ICONS.length]}</button>`;
-  }).join('') + (plan.length ? '' : `<div class="tile" style="font-size:16px;padding:8px;text-align:center;grid-column:span 3;aspect-ratio:auto;min-height:90px">Grown-ups: tap ⚙️ and add the homework words.</div>`) + `<button class="tile bonus" id="bonusTile" aria-label="Bonus">⭐</button><button class="tile garage" id="garageTile" aria-label="Garage">🚗</button>`;
+  }).join('') + (plan.length ? '' : `<div class="tile" style="font-size:16px;padding:8px;text-align:center;grid-column:span 3;aspect-ratio:auto;min-height:90px">Grown-ups: tap ⚙️ and add the homework words.</div>`) + `<button class="tile bonus" id="bonusTile" aria-label="Bonus">⭐</button><button class="tile garage" id="garageTile" aria-label="Garage">🚗</button>${lbActive() ? '<button class="tile" id="boardTile" aria-label="Leaderboard" style="background:#fff1c2">🏆</button>' : ''}`;
   document.querySelectorAll('[data-r]').forEach(b => b.onclick = () => { const i = +b.dataset.r; startRace(todayPlan()[i], { race: i }); });
   $('#bonusTile').onclick = bonusLap; $('#garageTile').onclick = garage;
+  const bt = $('#boardTile'); if (bt) bt.onclick = openBoard;
 }
 document.getElementById('home').addEventListener('click', e => { if (!welcomed && !e.target.closest('button')) { welcomed = true; welcome(); } });
 async function welcome() { await loadPack('core'); if (S.name && hasNameVoice()) { await playKey('p_hello'); await sayName(); await playKey('p_start_home'); } else await playKey('p_welcome'); }
@@ -607,20 +634,24 @@ async function nextItem() {
   if (!S.firstMicDone && micOn()) { S.firstMicDone = true; save(); await say('tap_mic'); }
   setBusy(false);
 }
+let micFails = 0;
+function logHeard(target, heard, ok) { (S.heard = S.heard || []).unshift({ t: target, h: heard, ok, at: new Date().toTimeString().slice(0, 5) }); S.heard = S.heard.slice(0, 40); save(); }
 async function onMic() {
   setBusy(true); stopAudio();
   const it = R.cur.it, btn = $('#micBtn');
-  if (btn) { btn.classList.add('listening'); btn.textContent = '👂'; btn.disabled = false; }
-  const r = await listen(it.type === 'sentence' ? 9000 : 5500, texts => check(it, texts).ok);
+  if (btn) { btn.textContent = '⏳'; btn.disabled = false; btn.classList.remove('ready'); }
+  const r = await listen(it.type === 'sentence' ? 9000 : 6000, texts => check(it, texts).ok,
+    () => { if (btn) { btn.classList.add('listening'); btn.textContent = '👂'; } });   // turns green only when the mic is really on
   if (btn) { btn.classList.remove('listening'); btn.textContent = '🎤'; }
   if (r.error && !(r.texts && r.texts.length)) {
-    if (['not-allowed', 'service-not-allowed', 'unsupported', 'audio-capture', 'start-failed'].includes(r.error)) { micBlocked = true; renderControls(); await say('no_mic'); setBusy(false); return; }
-    noHear++;
-    if (noHear >= 3) { noHear = 0; setBusy(false); return handleResult(false, {}); } // can't hear: treat as needing help so he is never stuck
-    await say(noHear >= 2 ? 'didnt_hear2' : 'didnt_hear'); setBusy(false); return;
+    logHeard(it.text, '(' + r.error + ')', false);
+    if (['not-allowed', 'service-not-allowed'].includes(r.error)) { micBlocked = true; renderControls(); await say('no_mic'); setBusy(false); return; }
+    if (['start-failed', 'no-audio', 'audio-capture', 'aborted', 'network'].includes(r.error)) { micFails++; await sleep(600); } // a hiccup: just try again
+    await say(noHear++ >= 1 ? 'didnt_hear2' : 'didnt_hear'); setBusy(false); return;  // never counts as a wrong answer
   }
-  noHear = 0;
+  noHear = 0; micFails = 0;
   const res = check(it, r.texts);
+  logHeard(it.text, r.texts[0] || '', res.ok);
   setBusy(false);
   handleResult(res.ok, res);
 }
@@ -630,8 +661,8 @@ async function handleResult(ok, res) {
   if (ok) return correct();
   setBusy(true);
   if (c.modeled) {
-    stat(c.it, false, true); addMissed(c.it); if (!c.it.comeback) R.scored++; save();
-    await say('good_try'); setBusy(false); return advance();
+    stat(c.it, false, true); addMissed(c.it); countRead(c.it); if (!c.it.comeback) R.scored++; save();
+    await say('good_try'); return advance();
   }
   sfxOops(); bump('bad'); R.combo = 0; $('#runner').classList.remove('turbo');
   if (c.it.type === 'sentence') c.missing = (res.missing && res.missing.length) ? res.missing : norm(plain(c.it.text)).split(' ').filter(w => !LENIENT.includes(w));
@@ -702,7 +733,7 @@ async function correct() {
   setBusy(true);
   const c = R.cur, it = c.it, st = stageName();
   let n = COINS[kindOf(it)][st] || 0; if (it.comeback && !c.modeled) n += 2;
-  award(n); stat(it, c.stage === 0, c.stage > 0);
+  award(n); stat(it, c.stage === 0, c.stage > 0); countRead(it);
   if (c.stage > 0) addMissed(it);
   if (!it.comeback) { R.scored++; if (c.stage === 0) R.firstTry++; }
   sfxWin(); confetti(c.stage === 0 ? 30 : 14); bump('good');
@@ -712,9 +743,9 @@ async function correct() {
   if (c.modeled) await say('great_job');
   else if (turbo) { $('#runner').classList.add('turbo'); flash('TURBO!'); award(3); await say('turbo'); }
   else { await say(pick(['pr1', 'pr2', 'pr3', 'pr4', 'pr5', 'pr6', 'pr7', 'pr8'])); if (Math.random() < .35) await sayName(); }
-  setBusy(false); advance();
+  advance();
 }
-function advance() { R.idx++; R.rival += .6; moveCars(); setTimeout(nextItem, 350); }
+function advance() { setBusy(true); R.idx++; R.rival += .6; moveCars(); setTimeout(nextItem, 350); }
 async function finishRace() {
   const m = R.meta; let bonus = 0, goalNow = false;
   const ratio = R.scored ? R.firstTry / R.scored : 1;
@@ -730,7 +761,7 @@ async function finishRace() {
       S.lastGoalDay = t; S.best = Math.max(S.best, S.streak);
     }
   } else bonus = 3;
-  award(bonus); save();
+  award(bonus); save(); if (goalNow) lbSubmit();
   sfxWin(); confetti(60);
   const plan = todayPlan(), d = dayRec();
   const next = plan.findIndex((_, i) => !d.done[i]);
@@ -805,6 +836,9 @@ function pProgress() {
     <div style="display:flex;gap:8px;flex-wrap:wrap"><div class="chip" style="color:var(--ink);background:#fff4cc;font-size:17px">🔥 Streak ${currentStreak()}</div><div class="chip" style="color:var(--ink);background:#e1efff;font-size:17px">Best ${S.best}</div><div class="chip" style="color:var(--ink);background:#eafbf1;font-size:17px">🪙 ${S.coins}</div></div>
     <h3 style="margin:6px 0 0">Tricky ones</h3>
     ${tricky.length ? `<table><tr><th>Item</th><th>Read alone</th><th>Needed help</th></tr>${tricky.map(t => `<tr><td style="font-family:var(--read);font-size:18px">${esc(t.w)}</td><td>${t.first}/${t.seen}</td><td>${t.miss}</td></tr>`).join('')}</table>` : '<p class="hint">Nothing tricky yet.</p>'}
+    <h3 style="margin:6px 0 0">What the microphone heard</h3>
+    <p class="hint">The last 40 tries. If he read a word right but it shows ✗, the phone misheard him. "(no-speech)" means it heard nothing.</p>
+    ${(S.heard || []).length ? `<table><tr><th>Time</th><th>Word</th><th>Heard</th><th></th></tr>${S.heard.map(x => `<tr><td>${x.at}</td><td style="font-family:var(--read)">${esc(x.t)}</td><td>${esc(x.h)}</td><td>${x.ok ? '✓' : '✗'}</td></tr>`).join('')}</table>` : '<p class="hint">Nothing yet.</p>'}
     <h3 style="margin:6px 0 0">Last 14 days</h3>
     ${rows.length ? `<table><tr><th>Day</th><th>Races</th><th>Coins</th><th>Goal</th></tr>${rows.join('')}</table>` : '<p class="hint">No races yet.</p>'}
   </div>`;
@@ -814,6 +848,7 @@ function pSettings() {
   const opt = (v, cur, label) => `<option value="${v}" ${String(cur) === String(v) ? 'selected' : ''}>${label ?? v}</option>`;
   $('#pbody').innerHTML = `<div class="panel">
     ${nameBlock()}
+    ${classBlock()}
     <h3 style="margin:0">Help steps (tries at each step)</h3>
     <div class="set"><label>Words 1: read it alone</label><select id="tRead">${[1, 2, 3].map(v => opt(v, t.read)).join('')}</select></div>
     <div class="set"><label>Words 2: "Fred Talk it" (no hints)</label><select id="tFred">${[1, 2, 3].map(v => opt(v, t.fred)).join('')}</select></div>
@@ -823,13 +858,13 @@ function pSettings() {
     <div class="set"><label>Daily goal (for the streak)</label><select id="sGoal">${opt('all', S.settings.goal, 'All races')}${Array.from({ length: Math.max(0, n - 1) }, (_, i) => opt(i + 1, S.settings.goal, `${i + 1} race${i ? 's' : ''}`)).join('')}</select></div>
     <div class="set"><label>Sound dots under words</label><select id="sDots">${opt('1', S.settings.dots ? 1 : 0, 'Always')}${opt('0', S.settings.dots ? 1 : 0, 'Only when helping')}</select></div>
     <div class="set"><label>Microphone</label><select id="sMic">${opt('1', S.settings.useMic ? 1 : 0, 'On')}${opt('0', S.settings.useMic ? 1 : 0, 'Off (grown-up taps ✓ ✗)')}</select></div>
-    <div class="note">${SR ? 'This browser can listen to him.' : '<b>This browser can’t listen.</b> On iPhone, open the game in Safari.'}${micBlocked ? ' The microphone was blocked on this page.' : ''}</div>
+    <div class="note">${SR ? 'This browser can listen to your child.' : '<b>This browser can’t listen.</b> On iPhone, open the game in Safari.'}${micBlocked ? ' The microphone was blocked on this page.' : ''}</div>
     <button class="btn r" id="resetAll" style="margin-top:6px">Reset coins, streak and stats</button>
   </div>`;
   const bind = (id, fn) => $(id).onchange = e => { fn(e.target.value); save(); toast('Saved ✓'); };
   bind('#tRead', v => t.read = +v); bind('#tFred', v => t.fred = +v); bind('#tSounds', v => t.sounds = +v);
   bind('#sCome', v => S.settings.comebacks = +v); bind('#sGoal', v => S.settings.goal = v === 'all' ? 'all' : +v);
-  bindName(pSettings);
+  bindName(pSettings); bindClass();
   bind('#sDots', v => S.settings.dots = v === '1'); bind('#sMic', v => { S.settings.useMic = v === '1'; if (S.settings.useMic) micBlocked = false; });
   $('#resetAll').onclick = () => {
     modal(`<h2>Reset coins, streak, cars and stats?</h2><p class="hint">The homework stays.</p><div style="display:flex;gap:10px"><button class="btn w" style="flex:1" onclick="closeModal()">Cancel</button><button class="btn r" style="flex:1" id="rsYes">Reset</button></div>`);
@@ -878,6 +913,7 @@ function setupWizard() {
   modal(`<h2>🏎️ Welcome to Word Racer</h2>
     <p class="hint">A quick setup for grown-ups. You can change this later with ⚙️.</p>
     <div class="panel" style="padding:0">${nameBlock()}
+    ${classBlock()}
     <label style="font-weight:700">This week's homework words and sentences</label>
     <textarea class="hw" id="suHw" style="min-height:150px" spellcheck="false" autocapitalize="off" placeholder="Words: cat, hen, zip, fox
 Sentences:
@@ -885,9 +921,51 @@ get a hat
 get a pen">${esc(S.homework)}</textarea>
     <div class="hint">Commas between words. Each sentence on its own line. Extra red words: start a line with "Red words:".</div>
     <button class="btn g" id="suGo">Let's race! 🏁</button></div>`);
-  bindName();
+  bindName(); bindClass();
   $('#suGo').onclick = () => {
     S.homework = $('#suHw').value; S.setupDone = true; refreshRed(); save(); closeModal(); renderHome();
+  };
+}
+
+/* ---- class leaderboard (Google Sheet) ---- */
+const LB_URL = '';
+const lbActive = () => !!(LB_URL.startsWith('https://') && S.lb.cls);
+function countRead(it) { const d = dayRec(); d.words = (d.words || 0) + (it.type === 'sentence' ? norm(plain(it.text)).split(' ').length : 1); }
+async function lbCall(params) {
+  const q = new URLSearchParams({ class: S.lb.cls, day: today(), player: S.lb.player, ...params });
+  const ctl = new AbortController(); const t = setTimeout(() => ctl.abort(), 15000);
+  try { const r = await fetch(LB_URL + '?' + q.toString(), { signal: ctl.signal }); return await r.json(); } catch (e) { return null; } finally { clearTimeout(t); }
+}
+// Sends "finished today" only when the daily goal is done and the parent allows it.
+function lbSubmit() {
+  if (!lbActive() || !S.lb.on || !dayRec().goal) return Promise.resolve(null);
+  return lbCall({ action: 'done', name: S.name || 'Racer', car: S.car });
+}
+async function openBoard() {
+  show('board'); stopAudio();
+  $('#boardBody').innerHTML = '<div style="text-align:center;font-size:60px;padding:40px" class="bounce">🏎️</div>';
+  const res = (await lbSubmit()) || await lbCall({ action: 'list' });
+  if (!res || !res.ok) { $('#boardBody').innerHTML = '<div style="text-align:center;font-size:70px;padding:40px">📶❌</div>'; return; }
+  const list = res.list || [], d = dayRec(), plan = todayPlan(), done = doneToday(), need = goalNeeded();
+  const meDone = !!d.goal;
+  const mine = meDone ? '' : `<div class="lbrow me">${carSVG(S.car, 70)}<div class="nm">${esc(S.name || '')}</div><div style="font-size:24px">${Array.from({ length: need }, (_, i) => i < done ? '🏁' : '⬜').join('')}</div></div>`;
+  $('#boardBody').innerHTML = `<div class="lblist">${mine}${list.map(x => `<div class="lbrow ${x.player === S.lb.player ? 'me' : ''}"><div class="rk">🏆</div>${carSVG(x.car, 70)}<div class="nm">${esc(x.name)}</div></div>`).join('')}</div>`;
+  if (meDone) await say('cup_done');
+  else { await say(list.length ? 'cups_look' : 'cup_none'); await say('cup_todo'); }
+}
+$('#boardBack').onclick = () => { stopAudio(); renderHome(); show('home'); };
+$('#boardRefresh').onclick = openBoard;
+function classBlock() {
+  return `<div class="set" style="flex-wrap:wrap"><label>Class code (for the "done today" list)</label><input type="text" id="clsIn" value="${esc(S.lb.cls)}" placeholder="optional" autocapitalize="characters" style="width:150px;border:2px solid #dfe3f2;border-radius:10px;padding:8px;font-size:18px"></div>
+    <div class="set"><label>Show my child on the list</label><select id="clsOn"><option value="1" ${S.lb.on ? 'selected' : ''}>Yes</option><option value="0" ${S.lb.on ? '' : 'selected'}>No</option></select></div>
+    <div class="hint">When your child finishes all of today's races, their first name and car appear on the class list with a 🏆. No scores and no ranking. Choose "No" to stay off the list (your child can still see who finished).</div>`;
+}
+function bindClass() {
+  $('#clsIn').onchange = e => { S.lb.cls = e.target.value.trim().toUpperCase(); save(); };
+  $('#clsOn').onchange = e => {
+    const on = e.target.value === '1';
+    if (!on && S.lb.on && S.lb.cls && LB_URL.startsWith('https://')) lbCall({ action: 'leave' });
+    S.lb.on = on; save(); toast(on ? 'On the list ✓' : 'Removed from the list');
   };
 }
 
