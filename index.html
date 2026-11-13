@@ -481,9 +481,25 @@ const squash = w => w.replace(/(.)\1+/g, '$1');
 // spelling-blind compare: "kat" = "cat", "hil" = "hill", "phox" = "fox"
 const sp = w => squash(w.replace(/ph/g, 'f').replace(/ck/g, 'k').replace(/c(?=[aou]|$)/g, 'k').replace(/q/g, 'k').replace(/x/g, 'ks').replace(/wh/g, 'w').replace(/([^aeiou])e$/, '$1'));
 const ALIAS = { red: ['read'], web: ['webb'], bell: ['belle'], jet: ['jett'], pen: ['penn'], yap: ['yapp'], jam: ['jamb'], win: ['wynn', 'wyn'], vet: ['vette'], doll: ['dahl'], box: ['bocks'], cat: ['kat'], mix: ['micks'], fix: ['ficks'], hen: ['hens'], son: ['sun'], sun: ['son'], to: ['two', 'too'], no: ['know'], be: ['bee'], see: ['sea'], i: ['eye'] };
-function wordOk(target, heard) { const t = norm(plain(target)), h = norm(heard); return !!h && (h === t || squash(h) === squash(t) || sp(h) === sp(t) || (ALIAS[t] || []).includes(h)); }
+// Consonant outline of a word: hill / hell / heal / he'll -> "hl", yap / yup / yep -> "yp", egg -> "eg".
+// Phones often swap a child's vowel for a more common word, so the relaxed check compares outlines.
+const skel = w => { const s = sp(w); return s[0] + s.slice(1).replace(/[aeiouy]/g, '').replace(/(.)\1+/g, '$1'); };
+let hwWords = new Set();   // today's homework words: hearing one of THESE instead is a real mistake
+function exactOk(t, h) { return h === t || squash(h) === squash(t) || sp(h) === sp(t) || (ALIAS[t] || []).includes(h); }
+function wordOk(target, heard) {
+  const t = norm(plain(target)), h = norm(heard);
+  if (!h) return false;
+  if (exactOk(t, h)) return true;
+  if (S.settings.strict || h.length < 2 || hwWords.has(h) || t.length < 2) return false;
+  if (h === t + 's') return true;                                              // "hills" for hill
+  if (h.length <= t.length + 2 && skel(h) === skel(t)) return true;            // "hell", "heal" for hill; "yup" for yap
+  const cons = w => sp(w).replace(/[aeiouy]/g, '');
+  if (t[0] === 'h' && h[0] !== 'h' && cons(h) === cons(t).slice(1) && h.length >= t.length - 1) return true;  // "ill" for hill (soft h)
+  return false;
+}
 const LENIENT = ['a', 'an', 'the'];
 function check(it, texts) {
+  hwWords = new Set(parseHomework(S.homework).words);
   texts = (texts || []).filter(Boolean);
   if (it.type === 'sentence') {
     const tw = norm(plain(it.text)).split(' '); let best = null;
@@ -907,6 +923,8 @@ function pSettings() {
     <p class="hint">After that the game says the sounds and the word, your child repeats it, and it comes back a few items later.</p>
     <div class="set"><label>Times a missed item comes back</label><select id="sCome">${[0, 1, 2, 3].map(v => opt(v, S.settings.comebacks)).join('')}</select></div>
     <div class="set"><label>Daily goal (for the streak)</label><select id="sGoal">${opt('all', S.settings.goal, 'All races')}${Array.from({ length: Math.max(0, n - 1) }, (_, i) => opt(i + 1, S.settings.goal, `${i + 1} race${i ? 's' : ''}`)).join('')}</select></div>
+    <div class="set"><label>Microphone checking</label><select id="sStrict"><option value="0" ${S.settings.strict ? '' : 'selected'}>Relaxed (recommended)</option><option value="1" ${S.settings.strict ? 'selected' : ''}>Strict</option></select></div>
+    <p class="hint">Relaxed: if the phone mishears a vowel (e.g. writes “hell” or “heal” for <i>hill</i>), it still counts, unless the word it heard is also on the homework list.</p>
     <div class="set"><label>Sound dots under words</label><select id="sDots">${opt('1', S.settings.dots ? 1 : 0, 'Always')}${opt('0', S.settings.dots ? 1 : 0, 'Only when helping')}</select></div>
     <div class="note">${SR ? 'This browser can listen to your child.' : '<b>This browser can’t listen.</b> On iPhone, open the game in Safari.'}${micBlocked ? ' The microphone was blocked on this page.' : ''}</div>
     <button class="btn r" id="resetAll" style="margin-top:6px">Reset coins, streak and stats</button>
@@ -915,7 +933,7 @@ function pSettings() {
   bind('#tRead', v => t.read = +v); bind('#tFred', v => t.fred = +v); bind('#tSounds', v => t.sounds = +v);
   bind('#sCome', v => S.settings.comebacks = +v); bind('#sGoal', v => S.settings.goal = v === 'all' ? 'all' : +v);
   bindName(pSettings); bindClass();
-  bind('#sDots', v => S.settings.dots = v === '1');
+  bind('#sDots', v => S.settings.dots = v === '1'); bind('#sStrict', v => S.settings.strict = v === '1');
   $('#resetAll').onclick = () => {
     modal(`<h2>Reset coins, streak, cars and stats?</h2><p class="hint">The homework stays.</p><div style="display:flex;gap:10px"><button class="btn w" style="flex:1" onclick="closeModal()">Cancel</button><button class="btn r" style="flex:1" id="rsYes">Reset</button></div>`);
     $('#rsYes').onclick = () => { const keep = { homework: S.homework, review: S.review, settings: S.settings }; S = { ...fresh(), ...keep }; save(); closeModal(); toast('Reset'); pSettings(); };
