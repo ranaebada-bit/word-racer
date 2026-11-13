@@ -928,7 +928,7 @@ get a pen">${esc(S.homework)}</textarea>
 }
 
 /* ---- class leaderboard (Google Sheet) ---- */
-const LB_URL = '';
+const LB_URL = 'https://script.google.com/macros/s/AKfycby9VJJwcEd1syIe-3SuG4LYih2gHZfXIzFmFPTwpIZqtkqADomYTDlBNttWQ4srIDk/exec';
 const lbActive = () => !!(LB_URL.startsWith('https://') && S.lb.cls);
 function countRead(it) { const d = dayRec(); d.words = (d.words || 0) + (it.type === 'sentence' ? norm(plain(it.text)).split(' ').length : 1); }
 async function lbCall(params) {
