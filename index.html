@@ -75,6 +75,12 @@ input,select,textarea{font-family:var(--ui);font-size:16px;-webkit-user-select:t
 #runner{top:1px}#rival{top:42px}
 .runner.turbo::before{content:'🔥';position:absolute;left:-22px;top:6px;font-size:22px;animation:flick .2s infinite alternate}
 @keyframes flick{to{transform:scale(1.25)}}
+.racebar .track{flex:none;width:100%}
+.pdots{display:flex;justify-content:center;gap:5px;flex-wrap:wrap}
+.pdots b{width:12px;height:12px;border-radius:50%;background:#ffffff33}
+.pdots b.on{background:var(--yellow)}
+.pdots b.cur{background:#fff;box-shadow:0 0 0 3px #ffd23f99;animation:pop 1s infinite}
+.pdots b.pit{background:#ff8c1a55}.pdots b.pit.on{background:var(--orange)}
 .coins{min-width:64px;text-align:center;background:var(--yellow);color:var(--ink);border-radius:14px;padding:4px 8px;font-weight:800;font-size:20px}
 .bubble-row{display:flex;align-items:flex-end;gap:6px;min-height:76px}
 .mascot{width:90px;flex:none}
@@ -84,6 +90,9 @@ input,select,textarea{font-family:var(--ui);font-size:16px;-webkit-user-select:t
 @keyframes goodflash{30%{background:#d7f8e5;transform:scale(1.03)}}
 @keyframes shake{20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
 .tag{position:absolute;top:10px;left:14px;font-size:22px}
+.card.final{padding-top:40px}
+.card.final::before{content:'';position:absolute;left:0;right:0;top:0;height:26px;border-radius:28px 28px 0 0;background:repeating-conic-gradient(#1b1b3a 0 25%,#fff 0 50%) 0 0/26px 26px}
+.card.final::after{content:'🏁 FINISH 🏁';position:absolute;top:30px;left:50%;transform:translateX(-50%);font-size:15px;font-weight:800;color:var(--ink);letter-spacing:2px;white-space:nowrap}
 .word{font-family:var(--read);font-size:clamp(64px,20vw,100px);font-weight:700;display:flex;gap:2px;line-height:1.1}
 .g{position:relative;padding:0 2px 22px;border-radius:12px;transition:background .2s}
 .g i{position:absolute;left:50%;bottom:4px;transform:translateX(-50%)}
@@ -100,7 +109,14 @@ input,select,textarea{font-family:var(--ui);font-size:16px;-webkit-user-select:t
 @keyframes invite{50%{box-shadow:0 8px 0 #9e1d18,0 0 0 18px #ffffff22}}
 .mic:active{transform:translateY(4px)}
 .mic.listening{animation:pulse 1s infinite;background:radial-gradient(circle at 35% 30%,#7dffb5,var(--green));box-shadow:0 8px 0 #157a48,0 0 0 8px #ffffff55}
-.mic:disabled{opacity:.45;animation:none}
+.mic:disabled{animation:none}
+.mic.talking{background:radial-gradient(circle at 35% 30%,#b9c6ff,#6f82e8);box-shadow:0 8px 0 #3d4fa8,0 0 0 8px #ffffff22;position:relative;overflow:visible}
+.mic.talking .ear{font-size:58px}
+.mic.talking i{position:absolute;inset:-6px;border-radius:50%;border:4px solid #ffffff99;animation:wave 1.4s ease-out infinite}
+.mic.talking i.w2{animation-delay:.7s}
+@keyframes wave{from{transform:scale(.85);opacity:1}to{transform:scale(1.35);opacity:0}}
+.mascot.talking{animation:talk .35s ease-in-out infinite alternate}
+@keyframes talk{to{transform:translateY(-5px) rotate(-3deg)}}
 @keyframes pulse{50%{box-shadow:0 8px 0 #157a48,0 0 0 22px #ffffff22}}
 .round{width:76px;height:76px;border-radius:50%;background:#fff;font-size:36px;box-shadow:0 6px 0 #0003;display:grid;place-items:center}
 .round:disabled{opacity:.4}
@@ -125,7 +141,12 @@ input,select,textarea{font-family:var(--ui);font-size:16px;-webkit-user-select:t
 .garage{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .gcar{border-radius:18px;background:#f1f3ff;padding:6px;text-align:center;font-weight:800;font-size:18px;border:4px solid transparent}
 .gcar.sel{border-color:var(--blue);background:#e1efff}
-.gcar.locked{opacity:.5;filter:grayscale(.9)}
+.gcar.locked{opacity:.6;position:relative}
+.gcar.locked::after{content:'🔒';position:absolute;top:6px;right:8px;font-size:22px}
+.nextcar{display:flex;align-items:center;gap:8px;margin:8px auto 0;max-width:330px}
+.nextcar .bar{flex:1;height:16px;border-radius:999px;background:#ffffff26;overflow:hidden;border:2px solid #ffffff44}
+.nextcar .bar i{display:block;height:100%;background:linear-gradient(90deg,#ffd23f,#ff8c1a);border-radius:999px}
+.nextcar .nc{opacity:.75}
 /* parent */
 .panel{background:#fff;border-radius:22px;padding:14px;display:flex;flex-direction:column;gap:10px}
 .tabs{display:flex;gap:6px}
@@ -177,6 +198,7 @@ table{width:100%;border-collapse:collapse;font-size:15px}td,th{padding:6px 4px;b
   </div>
   <div class="hero">
     <div class="bounce" id="heroCar" style="display:flex;justify-content:center"></div>
+    <div class="nextcar" id="nextCar"></div>
     <div class="week" id="week"></div>
   </div>
   <div id="tiles" style="display:flex;flex-direction:column;gap:14px"></div>
@@ -185,7 +207,7 @@ table{width:100%;border-collapse:collapse;font-size:15px}td,th{padding:6px 4px;b
 <section id="race" class="screen">
   <div class="racebar">
     <button class="iconbtn" id="exitRace" aria-label="Stop">✕</button>
-    <div class="track"><div class="lane"></div><div class="finish"></div><div class="runner" id="runner"></div><div class="runner" id="rival"></div></div>
+    <div style="flex:1;display:flex;flex-direction:column;gap:6px"><div class="track"><div class="lane"></div><div class="finish"></div><div class="runner" id="runner"></div><div class="runner" id="rival"></div></div><div class="pdots" id="pdots"></div></div>
     <div class="coins" id="raceCoins"></div>
   </div>
   <div class="bubble-row"><div class="mascot" id="mascot"></div><div class="bubble" id="bubble"></div></div>
@@ -212,7 +234,7 @@ table{width:100%;border-collapse:collapse;font-size:15px}td,th{padding:6px 4px;b
 <script>
 const AUDIO = {};
 const AUDIO_PACKS = ["core", "w1", "w2", "w3", "w4"];
-const PHRASES = {"read_word": "Read the word!", "read_sentence": "Read the sentence!", "what_sound": "What sound is this?", "pit": "Pit stop! This one came back. Can you read it?", "pit_sound": "Pit stop! What sound is this?", "fred_word": "Not quite. Fred Talk it! Say the sounds, then blend them.", "fred_sentence": "Not quite. Fred Talk the orange words, then read it again.", "again": "Nearly! Have another go.", "fred_again": "Fred Talk it again, then blend!", "sound_again": "Nearly! Say the sound again.", "sounds_intro": "Let's go sound by sound. Say each sound when it lights up.", "blend_now": "Now blend them! Tap and say the word.", "listen": "Listen to me.", "your_turn_word": "Your turn! Say the word.", "your_turn_sentence": "Your turn! Read it to me.", "your_turn_sound": "Now you say it!", "didnt_hear": "I didn't hear you. Tap and try again!", "didnt_hear2": "Say it nice and loud, close to the phone!", "good_try": "Good try! We'll come back to it.", "great_job": "Great job!", "pr1": "Brilliant!", "pr2": "Super reader!", "pr3": "Zoom zoom! Yes!", "pr4": "Fantastic!", "pr5": "You did it!", "pr6": "Amazing!", "pr7": "Turbo reading!", "pr8": "Wow, great blending!", "spr1": "Yes! That's the sound!", "spr2": "Great sound!", "spr3": "Perfect!", "turbo": "Turbo boost! Three in a row!", "race_done": "Race complete! You beat the truck!", "race_lost": "Race complete! Great driving!", "goal_done": "Amazing! You finished all your races today! Your streak is growing!", "new_car": "Wow! You unlocked a new car!", "start_home": "Tap a race to start!", "leave_q": "Do you want to stop racing?", "no_mic": "I can't use the microphone. Ask a grown-up for help.", "tap_mic": "Tap the microphone, then read!", "garage": "Pick your car!", "all_done": "All races done! Try a bonus lap for extra points!", "lets_race": "Ready, steady, go!", "finish_line": "Last one! Read it to cross the finish line!", "welcome": "Hello racer! Tap a race to start!", "hello": "Hello", "well_done": "Well done", "setup_hi": "Hello racer!", "red_word": "This is a red word. We can't Fred Talk it. Listen!", "cups_look": "Look who finished their reading today!", "cup_done": "Well done! You finished today's reading. Here's your cup!", "cup_todo": "Finish all your races today to get your cup!", "cup_none": "Nobody has finished yet. Be the first to get a cup!", "race0": "Rocket Race!", "race1": "Lightning Lap!", "race2": "Superhero Sprint!", "race3": "Police Chase!", "race4": "Dino Dash!", "race5": "Space Speedway!", "race6": "Fire Truck Rescue!", "race7": "Grand Prix!", "race8": "Moto Madness!", "race9": "Sky Rally!", "bonus_lap": "Bonus lap! Extra coins!"};
+const PHRASES = {"read_word": "Read the word!", "read_sentence": "Read the sentence!", "what_sound": "What sound is this?", "pit": "Pit stop! This one came back. Can you read it?", "pit_sound": "Pit stop! What sound is this?", "fred_word": "Not quite. Fred Talk it! Say the sounds, then blend them.", "fred_sentence": "Not quite. Fred Talk the orange words, then read it again.", "again": "Nearly! Have another go.", "fred_again": "Fred Talk it again, then blend!", "sound_again": "Nearly! Say the sound again.", "sounds_intro": "Let's go sound by sound. Say each sound when it lights up.", "blend_now": "Now blend them! Tap and say the word.", "listen": "Listen to me.", "your_turn_word": "Your turn! Say the word.", "your_turn_sentence": "Your turn! Read it to me.", "your_turn_sound": "Now you say it!", "didnt_hear": "I didn't hear you. Tap and try again!", "didnt_hear2": "Say it nice and loud, close to the phone!", "good_try": "Good try! We'll come back to it.", "great_job": "Great job!", "pr1": "Brilliant!", "pr2": "Super reader!", "pr3": "Zoom zoom! Yes!", "pr4": "Fantastic!", "pr5": "You did it!", "pr6": "Amazing!", "pr7": "Turbo reading!", "pr8": "Wow, great blending!", "spr1": "Yes! That's the sound!", "spr2": "Great sound!", "spr3": "Perfect!", "turbo": "Turbo boost! Three in a row!", "race_done": "Race complete! You beat the truck!", "race_lost": "Race complete! Great driving!", "goal_done": "Amazing! You finished all your races today! Your streak is growing!", "new_car": "Wow! You unlocked a new car!", "start_home": "Tap a race to start!", "leave_q": "Do you want to stop racing?", "no_mic": "I can't use the microphone. Ask a grown-up for help.", "tap_mic": "Tap the microphone, then read!", "garage": "Pick your car!", "all_done": "All races done! Try a bonus lap for extra points!", "lets_race": "Ready, steady, go!", "finish_line": "Last one! Read it to cross the finish line!", "welcome": "Hello racer! Tap a race to start!", "hello": "Hello", "well_done": "Well done", "setup_hi": "Hello racer!", "red_word": "This is a red word. We can't Fred Talk it. Listen!", "cups_look": "Look who finished their reading today!", "cup_done": "Well done! You finished today's reading. Here's your cup!", "cup_todo": "Finish all your races today to get your cup!", "cup_none": "Nobody has finished yet. Be the first to get a cup!", "race0": "Rocket Race!", "race1": "Lightning Lap!", "race2": "Superhero Sprint!", "race3": "Police Chase!", "race4": "Dino Dash!", "race5": "Space Speedway!", "race6": "Fire Truck Rescue!", "race7": "Grand Prix!", "race8": "Moto Madness!", "race9": "Sky Rally!", "bonus_lap": "Bonus lap! Extra coins!", "fred_word_s": "Fred Talk it!", "fred_sentence_s": "Fred Talk the orange words!", "sounds_intro_s": "Sound by sound!", "blend_now_s": "Now blend!", "your_turn_s": "Your turn!", "didnt_hear_s": "Try again!", "good_try_s": "Good try!", "again_s": "Have another go!", "red_word_s": "Red word! Listen!", "pit_s": "Pit stop!", "fred_again_s": "Again! Fred Talk it!", "listen_s": "Listen!"};
 </script>
 <script>
 "use strict";
@@ -454,7 +476,16 @@ async function saySentence(t) {
   if (ws.every(hasWord)) { for (const w of ws) { await playKey('w_' + w); await sleep(90); } return; }
   await deviceSpeak(plain(t), .8);
 }
-async function say(id) { $('#bubble').textContent = PHRASES[id] || ''; await playKey('p_' + id); }
+// After a prompt has been heard once today, use its short version (keeps the game quick, stops nagging).
+const SHORT = { fred_word: 'fred_word_s', fred_sentence: 'fred_sentence_s', sounds_intro: 'sounds_intro_s', blend_now: 'blend_now_s',
+  your_turn_word: 'your_turn_s', your_turn_sentence: 'your_turn_s', didnt_hear: 'didnt_hear_s', good_try: 'good_try_s', again: 'again_s',
+  red_word: 'red_word_s', pit: 'pit_s', fred_again: 'fred_again_s', listen: 'listen_s', finish_line: null };
+async function say(id) {
+  if (SHORT[id]) { const d = dayRec(); d.said = d.said || {}; if (d.said[id]) id = SHORT[id]; else { d.said[id] = 1; save(); } }
+  $('#bubble').textContent = PHRASES[id] || '';
+  const m = $('#mascot'); m && m.classList.add('talking');
+  try { await playKey('p_' + id); } finally { m && m.classList.remove('talking'); }
+}
 const nameKey = n => norm(n || '').split(' ')[0] || '';
 function hasNameVoice() { return !!(S.nameRec || AUDIO['n_' + nameKey(S.name)]); }
 async function sayName() {
@@ -620,6 +651,11 @@ function renderHome() {
   const nc = $('#nameChip'); nc.style.display = S.name ? '' : 'none'; nc.textContent = S.name;
   if (!S.setupDone) setTimeout(setupWizard, 50);
   $('#heroCar').innerHTML = carSVG(S.car, 200);
+  const ni = CARS.findIndex(c => c.at > S.coins);
+  if (ni >= 0) {
+    const prev = ni > 0 ? CARS[ni - 1].at : 0, pct = Math.max(4, Math.min(100, (S.coins - prev) / (CARS[ni].at - prev) * 100));
+    $('#nextCar').innerHTML = `${coin(22)}<div class="bar"><i style="width:${pct}%"></i></div><span class="nc">${carSVG(ni, 64)}</span>🔒`;
+  } else $('#nextCar').innerHTML = '';
   const wk = [];
   const L = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
   for (let i = 6; i >= 0; i--) {
@@ -697,11 +733,15 @@ function moveCars() {
   const r = $('#runner'); r.style.left = `calc(${p} * (100% - 64px))`;
   $('#rival').style.left = `calc(${q} * (100% - 64px))`;
   r.classList.add('driving'); setTimeout(() => r.classList.remove('driving'), 900);
+  $('#pdots').innerHTML = R.queue.map((it, i) => `<b class="${i < R.idx ? 'on' : ''} ${i === R.idx ? 'cur' : ''} ${it.comeback ? 'pit' : ''}"></b>`).join('');
 }
+
 const stageName = () => STAGES[kindOf(R.cur.it)][R.cur.stage];
 function renderCard() {
   const c = R.cur, it = c.it, card = $('#card');
-  const tag = it.comeback ? `<div class="tag">🔧</div>` : (R.idx === R.queue.length - 1 ? `<div class="tag">🏁</div>` : '');
+  const final = R.idx === R.queue.length - 1 && R.queue.length > 1;
+  card.classList.toggle('final', final);
+  const tag = it.comeback ? `<div class="tag">🔧</div>` : '';
   card.classList.toggle('redcard', !!it.red);
   if (it.type === 'word') {
     card.innerHTML = tag + wordHTML(it.text, S.settings.dots || stageName() !== 'read');
@@ -718,7 +758,7 @@ function renderCard() {
 function renderControls() {
   const st = stageName(), box = $('#controls');
   const hear = st === 'model' ? `<button class="round" data-a="hear" aria-label="Hear again">🔊</button>` : '';
-  const light = st === 'sounds' ? `<button class="round" data-a="light" aria-label="Light sounds">💡</button>` : '';
+  const light = st === 'sounds' ? `<button class="round" data-a="light" aria-label="Light the sounds again">🔁</button>` : '';
   if (micOn()) box.innerHTML = `${light}${hear}<button class="mic" id="micBtn" data-a="mic" aria-label="Read">🎤</button>`;
   else box.innerHTML = `<div style="display:flex;flex-direction:column;align-items:center;gap:10px;color:#fff;text-align:center">
     <div style="display:flex;gap:14px;align-items:center">${hear}<button class="mic" data-a="retry" aria-label="Try the microphone again">🔄</button></div>
@@ -736,7 +776,12 @@ $('#race').addEventListener('click', e => {
   if (a === 'light') return lightSounds(false);
   if (a === 'retry') { micBlocked = false; renderControls(); return onMic(); }
 });
-function setBusy(v) { busy = v; document.querySelectorAll('#controls button').forEach(b => { if (b.dataset.a !== 'hear') b.disabled = v; }); const m = $('#micBtn'); if (m) m.classList.toggle('ready', !v); }
+function setBusy(v) {
+  busy = v;
+  document.querySelectorAll('#controls button').forEach(b => { if (b.dataset.a !== 'hear') b.disabled = v; });
+  const m = $('#micBtn');
+  if (m) { m.classList.toggle('ready', !v); m.classList.toggle('talking', v); if (!m.classList.contains('listening')) m.innerHTML = v ? '<span class="ear">👂</span><i class="w1"></i><i class="w2"></i>' : '🎤'; }
+}
 
 async function nextItem() {
   if (R.idx >= R.queue.length) return finishRace();
@@ -746,7 +791,7 @@ async function nextItem() {
   const prev = R.queue[R.idx - 1], last = R.idx === R.queue.length - 1;
   let id = null;
   if (it.comeback) id = 'pit';
-  else if (last && it.type === 'sentence') id = 'finish_line';
+  else if (last && R.queue.length > 1) id = 'finish_line';
   else if (!prev || prev.type !== it.type) id = it.type === 'sentence' ? 'read_sentence' : 'read_word';
   if (id) await say(id); else $('#bubble').textContent = '';
   if (!S.firstMicDone && micOn()) { S.firstMicDone = true; save(); await say('tap_mic'); }
@@ -758,13 +803,14 @@ function onMic() {   // stays synchronous until the mic has started (iPhone rule
   if (busy) return;
   setBusy(true); stopAudio();
   const it = R.cur.it, btn = $('#micBtn');
-  if (btn) { btn.textContent = '⏳'; btn.disabled = false; btn.classList.remove('ready'); }
+  if (btn) { btn.classList.remove('talking'); btn.textContent = '⏳'; btn.disabled = false; btn.classList.remove('ready'); }
   const p = listen(it.type === 'sentence' ? 9000 : 6000, texts => check(it, texts).ok,
-    () => { if (btn) { btn.classList.add('listening'); btn.textContent = '👂'; } });   // turns green only when the mic is really on
+    () => { if (btn) { btn.classList.add('listening'); btn.textContent = '🗣️'; } });   // green: "speak now"   // turns green only when the mic is really on
   p.then(r => afterListen(it, btn, r));
 }
 async function afterListen(it, btn, r) {
-  if (btn) { btn.classList.remove('listening'); btn.textContent = '🎤'; }
+  if (btn) btn.classList.remove('listening');
+  setBusy(true);   // show the "game is talking" look while it answers
   await Promise.race([recEnded, sleep(1500)]);   // let the iPhone close this listening session before the next tap
   if (r.error && !(r.texts && r.texts.length)) {
     logHeard(it.text, '(' + r.error + ')', false);
