@@ -2,7 +2,7 @@
 // It keeps one row per child per day when they finish all their races: first name and car only.
 // No scores and no ranking.
 
-const CLASSES = ['HOE2021'];   // class codes that may use the list
+const CLASSES = ['2021'];   // class codes that may use the list
 const SHEET = 'Finished';
 
 function sheet_() {
