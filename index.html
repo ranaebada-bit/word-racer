@@ -36,6 +36,27 @@ input,select,textarea{font-family:var(--ui);font-size:16px;-webkit-user-select:t
 .week b.ok{background:var(--yellow);border-color:#fff}
 .week b.today{box-shadow:0 0 0 3px #ffffff99}
 .tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.races{display:flex;flex-direction:column;gap:12px}
+.rcard{display:flex;align-items:center;gap:12px;border-radius:24px;padding:10px 14px 10px 10px;box-shadow:0 6px 0 #0004;color:#fff;text-align:left;position:relative;overflow:hidden;width:100%}
+.rcard::after{content:'';position:absolute;right:-10px;top:0;bottom:0;width:46px;opacity:.18;background:repeating-conic-gradient(#fff 0 25%,#000 0 50%) 0 0/16px 16px}
+.rcard:active{transform:translateY(4px);box-shadow:0 2px 0 #0004}
+.rcard .badge{width:74px;height:74px;flex:none;border-radius:50%;background:#00000022;border:3px solid #ffffff88;display:grid;place-items:center;font-size:42px;position:relative}
+.rcard .badge .n{position:absolute;top:-4px;left:-4px;width:28px;height:28px;border-radius:50%;background:#fff;color:var(--ink);font-size:16px;font-weight:800;display:grid;place-items:center;box-shadow:0 2px 0 #0003}
+.rcard .info{flex:1;min-width:0;z-index:1}
+.rcard .nm{font-size:23px;font-weight:800;line-height:1.05;text-shadow:0 2px 0 #0003}
+.rcard .sub{font-size:15px;font-weight:700;opacity:.92;margin-top:3px}
+.rcard .go{font-size:34px;z-index:1;width:54px;text-align:center}
+.rcard.done .badge,.rcard.done .info{opacity:.6}
+.rcard.done .go{font-size:42px}
+.rcard.next{animation:glow2 1.4s infinite}
+@keyframes glow2{50%{box-shadow:0 6px 0 #0004,0 0 0 7px #ffd23faa}}
+.mini{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.mtile{border-radius:20px;background:var(--card);box-shadow:0 5px 0 #0003;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px 4px;font-size:38px;line-height:1.1;color:var(--ink)}
+.mtile b{font-size:15px;margin-top:4px}
+.mtile:active{transform:translateY(3px)}
+.week{align-items:flex-end}
+.wd{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:12px;font-weight:800;color:#fffc}
+.coin{display:inline-block;vertical-align:-.15em;flex:none}
 .tile{aspect-ratio:1;border-radius:24px;background:var(--card);box-shadow:0 6px 0 #0003;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;position:relative;font-weight:800;font-size:40px;color:var(--ink)}
 .tile:active{transform:translateY(4px);box-shadow:0 2px 0 #0003}
 .tile .num{font-size:22px;line-height:1;background:var(--ink);color:#fff;border-radius:999px;width:32px;height:32px;display:grid;place-items:center;position:absolute;top:8px;left:8px}
@@ -149,7 +170,7 @@ table{width:100%;border-collapse:collapse;font-size:15px}td,th{padding:6px 4px;b
 <section id="home" class="screen">
   <div class="top">
     <div class="chip fire" id="streakChip">🔥 0</div>
-    <div class="chip" id="coinChip">🪙 0</div>
+    <div class="chip" id="coinChip"></div>
     <div class="chip" id="nameChip" style="font-size:20px;display:none"></div>
     <div class="spacer"></div>
     <button class="gear" id="parentBtn" aria-label="Grown-ups">⚙️</button>
@@ -158,14 +179,14 @@ table{width:100%;border-collapse:collapse;font-size:15px}td,th{padding:6px 4px;b
     <div class="bounce" id="heroCar" style="display:flex;justify-content:center"></div>
     <div class="week" id="week"></div>
   </div>
-  <div class="tiles" id="tiles"></div>
+  <div id="tiles" style="display:flex;flex-direction:column;gap:14px"></div>
 </section>
 
 <section id="race" class="screen">
   <div class="racebar">
     <button class="iconbtn" id="exitRace" aria-label="Stop">✕</button>
     <div class="track"><div class="lane"></div><div class="finish"></div><div class="runner" id="runner"></div><div class="runner" id="rival"></div></div>
-    <div class="coins" id="raceCoins">🪙 0</div>
+    <div class="coins" id="raceCoins"></div>
   </div>
   <div class="bubble-row"><div class="mascot" id="mascot"></div><div class="bubble" id="bubble"></div></div>
   <div class="card" id="card"></div>
@@ -191,7 +212,7 @@ table{width:100%;border-collapse:collapse;font-size:15px}td,th{padding:6px 4px;b
 <script>
 const AUDIO = {};
 const AUDIO_PACKS = ["core", "w1", "w2", "w3", "w4"];
-const PHRASES = {"read_word": "Read the word!", "read_sentence": "Read the sentence!", "what_sound": "What sound is this?", "pit": "Pit stop! This one came back. Can you read it?", "pit_sound": "Pit stop! What sound is this?", "fred_word": "Not quite. Fred Talk it! Say the sounds, then blend them.", "fred_sentence": "Not quite. Fred Talk the orange words, then read it again.", "again": "Nearly! Have another go.", "fred_again": "Fred Talk it again, then blend!", "sound_again": "Nearly! Say the sound again.", "sounds_intro": "Let's go sound by sound. Say each sound when it lights up.", "blend_now": "Now blend them! Tap and say the word.", "listen": "Listen to me.", "your_turn_word": "Your turn! Say the word.", "your_turn_sentence": "Your turn! Read it to me.", "your_turn_sound": "Now you say it!", "didnt_hear": "I didn't hear you. Tap and try again!", "didnt_hear2": "Say it nice and loud, close to the phone!", "good_try": "Good try! We'll come back to it.", "great_job": "Great job!", "pr1": "Brilliant!", "pr2": "Super reader!", "pr3": "Zoom zoom! Yes!", "pr4": "Fantastic!", "pr5": "You did it!", "pr6": "Amazing!", "pr7": "Turbo reading!", "pr8": "Wow, great blending!", "spr1": "Yes! That's the sound!", "spr2": "Great sound!", "spr3": "Perfect!", "turbo": "Turbo boost! Three in a row!", "race_done": "Race complete! You beat the truck!", "race_lost": "Race complete! Great driving!", "goal_done": "Amazing! You finished all your races today! Your streak is growing!", "new_car": "Wow! You unlocked a new car!", "start_home": "Tap a race to start!", "leave_q": "Do you want to stop racing?", "no_mic": "I can't use the microphone. Ask a grown-up for help.", "tap_mic": "Tap the microphone, then read!", "garage": "Pick your car!", "all_done": "All races done! Try a bonus lap for extra points!", "lets_race": "Ready, steady, go!", "finish_line": "Last one! Read it to cross the finish line!", "welcome": "Hello racer! Tap a race to start!", "hello": "Hello", "well_done": "Well done", "setup_hi": "Hello racer!", "red_word": "This is a red word. We can't Fred Talk it. Listen!", "cups_look": "Look who finished their reading today!", "cup_done": "Well done! You finished today's reading. Here's your cup!", "cup_todo": "Finish all your races today to get your cup!", "cup_none": "Nobody has finished yet. Be the first to get a cup!"};
+const PHRASES = {"read_word": "Read the word!", "read_sentence": "Read the sentence!", "what_sound": "What sound is this?", "pit": "Pit stop! This one came back. Can you read it?", "pit_sound": "Pit stop! What sound is this?", "fred_word": "Not quite. Fred Talk it! Say the sounds, then blend them.", "fred_sentence": "Not quite. Fred Talk the orange words, then read it again.", "again": "Nearly! Have another go.", "fred_again": "Fred Talk it again, then blend!", "sound_again": "Nearly! Say the sound again.", "sounds_intro": "Let's go sound by sound. Say each sound when it lights up.", "blend_now": "Now blend them! Tap and say the word.", "listen": "Listen to me.", "your_turn_word": "Your turn! Say the word.", "your_turn_sentence": "Your turn! Read it to me.", "your_turn_sound": "Now you say it!", "didnt_hear": "I didn't hear you. Tap and try again!", "didnt_hear2": "Say it nice and loud, close to the phone!", "good_try": "Good try! We'll come back to it.", "great_job": "Great job!", "pr1": "Brilliant!", "pr2": "Super reader!", "pr3": "Zoom zoom! Yes!", "pr4": "Fantastic!", "pr5": "You did it!", "pr6": "Amazing!", "pr7": "Turbo reading!", "pr8": "Wow, great blending!", "spr1": "Yes! That's the sound!", "spr2": "Great sound!", "spr3": "Perfect!", "turbo": "Turbo boost! Three in a row!", "race_done": "Race complete! You beat the truck!", "race_lost": "Race complete! Great driving!", "goal_done": "Amazing! You finished all your races today! Your streak is growing!", "new_car": "Wow! You unlocked a new car!", "start_home": "Tap a race to start!", "leave_q": "Do you want to stop racing?", "no_mic": "I can't use the microphone. Ask a grown-up for help.", "tap_mic": "Tap the microphone, then read!", "garage": "Pick your car!", "all_done": "All races done! Try a bonus lap for extra points!", "lets_race": "Ready, steady, go!", "finish_line": "Last one! Read it to cross the finish line!", "welcome": "Hello racer! Tap a race to start!", "hello": "Hello", "well_done": "Well done", "setup_hi": "Hello racer!", "red_word": "This is a red word. We can't Fred Talk it. Listen!", "cups_look": "Look who finished their reading today!", "cup_done": "Well done! You finished today's reading. Here's your cup!", "cup_todo": "Finish all your races today to get your cup!", "cup_none": "Nobody has finished yet. Be the first to get a cup!", "race0": "Rocket Race!", "race1": "Lightning Lap!", "race2": "Superhero Sprint!", "race3": "Police Chase!", "race4": "Dino Dash!", "race5": "Space Speedway!", "race6": "Fire Truck Rescue!", "race7": "Grand Prix!", "race8": "Moto Madness!", "race9": "Sky Rally!", "bonus_lap": "Bonus lap! Extra coins!"};
 </script>
 <script>
 "use strict";
@@ -575,25 +596,55 @@ document.addEventListener('pointerdown', () => {
 
 /* ============ HOME ============ */
 const MEDAL = { 3: '🥇', 2: '🥈', 1: '🥉' };
-const RACE_ICONS = ['🏎️', '🚀', '⚡', '🦸', '🚓', '🛸', '🚒', '🦖', '🏍️', '🚁'];
-const RACE_BG = ['#ffe3e1', '#e1efff', '#fff4cc', '#efe2ff', '#e1f7ff', '#e6ffe9', '#ffe9d6', '#e9fbd9', '#fde2f3', '#e3e8ff'];
+const RACES = [
+  { icon: '🚀', name: 'Rocket Race', bg: 'linear-gradient(135deg,#7b4dff,#2d6bff)' },
+  { icon: '⚡', name: 'Lightning Lap', bg: 'linear-gradient(135deg,#ffb300,#ff6a00)' },
+  { icon: '🦸', name: 'Superhero Sprint', bg: 'linear-gradient(135deg,#ff3d6e,#c8174f)' },
+  { icon: '🚓', name: 'Police Chase', bg: 'linear-gradient(135deg,#2d8cff,#1a3d9e)' },
+  { icon: '🦖', name: 'Dino Dash', bg: 'linear-gradient(135deg,#3ccf6e,#138a52)' },
+  { icon: '🛸', name: 'Space Speedway', bg: 'linear-gradient(135deg,#5b3bd6,#1b1464)' },
+  { icon: '🚒', name: 'Fire Truck Rescue', bg: 'linear-gradient(135deg,#ff5a36,#c21f1f)' },
+  { icon: '🏎️', name: 'Grand Prix', bg: 'linear-gradient(135deg,#14c1b5,#0b7f8a)' },
+  { icon: '🏍️', name: 'Moto Madness', bg: 'linear-gradient(135deg,#ff7ab6,#8e44ad)' },
+  { icon: '🚁', name: 'Sky Rally', bg: 'linear-gradient(135deg,#39b8ff,#1f6fd1)' },
+];
+function coin(size = 24) {
+  return `<svg class="coin" width="${size}" height="${size}" viewBox="0 0 40 40" aria-label="coins"><defs><radialGradient id="cg" cx="35%" cy="30%" r="75%"><stop offset="0" stop-color="#fff3a0"/><stop offset=".45" stop-color="#ffd23f"/><stop offset="1" stop-color="#e69a00"/></radialGradient></defs>
+    <circle cx="20" cy="20" r="18.5" fill="url(#cg)" stroke="#b36b00" stroke-width="2.5"/><circle cx="20" cy="20" r="13" fill="none" stroke="#c98200" stroke-width="2" opacity=".7"/>
+    <path d="M20 10.5 L22.6 16.6 L29.2 17 L24.1 21.2 L25.8 27.6 L20 24 L14.2 27.6 L15.9 21.2 L10.8 17 L17.4 16.6 Z" fill="#fff6c2" stroke="#c98200" stroke-width="1.2" stroke-linejoin="round"/></svg>`;
+}
 function renderHome() {
   const st = currentStreak();
   $('#streakChip').textContent = '🔥 ' + st;
-  $('#coinChip').textContent = '🪙 ' + S.coins;
+  $('#coinChip').innerHTML = coin(26) + ' ' + S.coins;
   const nc = $('#nameChip'); nc.style.display = S.name ? '' : 'none'; nc.textContent = S.name;
   if (!S.setupDone) setTimeout(setupWizard, 50);
   $('#heroCar').innerHTML = carSVG(S.car, 200);
   const wk = [];
-  for (let i = 6; i >= 0; i--) { const k = addDays(today(), -i); const ok = S.days[k] && S.days[k].goal; wk.push(`<b class="${ok ? 'ok' : ''} ${i === 0 ? 'today' : ''}">${ok ? '🔥' : ''}</b>`); }
+  const L = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+  for (let i = 6; i >= 0; i--) {
+    const k = addDays(today(), -i), ok = S.days[k] && S.days[k].goal, [y, m, dd] = k.split('-').map(Number);
+    wk.push(`<div class="wd"><b class="${ok ? 'ok' : ''} ${i === 0 ? 'today' : ''}">${ok ? '🔥' : ''}</b>${i === 0 ? 'Today' : L[new Date(y, m - 1, dd).getDay()]}</div>`);
+  }
   $('#week').innerHTML = wk.join('');
   const plan = todayPlan(), d = dayRec();
   const nextIdx = plan.findIndex((_, i) => !d.done[i]);
-  $('#tiles').innerHTML = plan.map((r, i) => {
-    const m = d.done[i];
-    return `<button class="tile ${m ? 'done' : ''} ${i === nextIdx ? 'next' : ''}" data-r="${i}" style="${m ? '' : `background:${RACE_BG[i % RACE_BG.length]}`}"><span class="num">${i + 1}</span>${m ? MEDAL[m] : RACE_ICONS[i % RACE_ICONS.length]}</button>`;
-  }).join('') + (plan.length ? '' : `<div class="tile" style="font-size:16px;padding:8px;text-align:center;grid-column:span 3;aspect-ratio:auto;min-height:90px">Grown-ups: tap ⚙️ and add the homework words.</div>`) + `<button class="tile bonus" id="bonusTile" aria-label="Bonus">⭐</button><button class="tile garage" id="garageTile" aria-label="Garage">🚗</button>${lbActive() ? '<button class="tile" id="boardTile" aria-label="Leaderboard" style="background:#fff1c2">🏆</button>' : ''}`;
-  document.querySelectorAll('[data-r]').forEach(b => b.onclick = () => { const i = +b.dataset.r; startRace(todayPlan()[i], { race: i }); });
+  const cards = plan.map((r, i) => {
+    const m = d.done[i], th = RACES[i % RACES.length];
+    const nw = r.filter(x => x.type === 'word').length, ns = r.filter(x => x.type === 'sentence').length;
+    const sub = `${nw} word${nw === 1 ? '' : 's'}${ns ? ` + ${ns} sentence${ns === 1 ? '' : 's'}` : ''}`;
+    return `<button class="rcard ${m ? 'done' : ''} ${i === nextIdx ? 'next' : ''}" data-r="${i}" style="background:${th.bg}">
+      <div class="badge"><span class="n">${i + 1}</span>${th.icon}</div>
+      <div class="info"><div class="nm">${th.name}</div><div class="sub">${sub}</div></div>
+      <div class="go">${m ? MEDAL[m] : i === nextIdx ? '▶️' : ''}</div></button>`;
+  }).join('');
+  $('#tiles').innerHTML = `<div class="races">${cards || `<div class="mtile" style="font-size:16px;padding:14px">Grown-ups: tap ⚙️ and add the homework words.</div>`}</div>
+    <div class="mini">
+      <button class="mtile" id="bonusTile" style="background:#efe2ff">⭐<b>Bonus</b></button>
+      <button class="mtile" id="garageTile" style="background:#e1efff">🚗<b>Garage</b></button>
+      ${lbActive() ? '<button class="mtile" id="boardTile" style="background:#fff1c2">🏆<b>Done today</b></button>' : ''}
+    </div>`;
+  document.querySelectorAll('[data-r]').forEach(b => b.onclick = () => { const i = +b.dataset.r; startRace(todayPlan()[i], { race: i, intro: 'race' + (i % RACES.length) }); });
   $('#bonusTile').onclick = bonusLap; $('#garageTile').onclick = garage;
   const bt = $('#boardTile'); if (bt) bt.onclick = openBoard;
 }
@@ -612,12 +663,12 @@ function bonusLap() {
     for (let i = 0; i < pool.length; i++) { if (used.has(i)) continue; r -= weight(pool[i]); if (r <= 0) { used.add(i); chosen.push(pool[i]); break; } }
   }
   chosen.sort((a, b) => (a.type === 'sentence') - (b.type === 'sentence'));
-  startRace(chosen, { bonus: true });
+  startRace(chosen, { bonus: true, intro: 'bonus_lap' });
 }
 function garage() {
-  modal(`<div style="display:flex;justify-content:space-between;align-items:center"><h2>🚗 🪙 ${S.coins}</h2><button class="iconbtn" style="background:#eee;color:#333" onclick="closeModal()">✕</button></div><div class="garage">${CARS.map((c, i) => {
+  modal(`<div style="display:flex;justify-content:space-between;align-items:center"><h2>🚗 ${coin(28)} ${S.coins}</h2><button class="iconbtn" style="background:#eee;color:#333" onclick="closeModal()">✕</button></div><div class="garage">${CARS.map((c, i) => {
     const locked = S.coins < c.at;
-    return `<button class="gcar ${i === S.car ? 'sel' : ''} ${locked ? 'locked' : ''}" data-i="${i}" ${locked ? 'disabled' : ''}>${carSVG(i, 130)}<div>${locked ? '🔒 🪙 ' + c.at : i === S.car ? '✅' : '▶️'}</div></button>`;
+    return `<button class="gcar ${i === S.car ? 'sel' : ''} ${locked ? 'locked' : ''}" data-i="${i}" ${locked ? 'disabled' : ''}>${carSVG(i, 130)}<div>${locked ? '🔒 ' + coin(20) + ' ' + c.at : i === S.car ? '✅' : '▶️'}</div></button>`;
   }).join('')}</div>`);
   say('garage');
   document.querySelectorAll('.gcar:not(.locked)').forEach(b => b.onclick = () => { S.car = +b.dataset.i; save(); sfxVroom(); closeModal(); renderHome(); });
@@ -632,9 +683,13 @@ function startRace(items, meta) {
   ac(); stopAudio(); sfxVroom();
   R = { meta, queue: items.map(it => ({ ...it, comeback: 0 })), idx: 0, coins: 0, firstTry: 0, scored: 0, missed: [], unlocked: null, rival: 0, combo: 0 };
   $('#mascot').innerHTML = carSVG(S.car, 90); $('#runner').innerHTML = carSVG(S.car, 64); $('#rival').innerHTML = truckSVG(64);
-  $('#raceCoins').textContent = '🪙 0';
+  $('#raceCoins').innerHTML = coin(22) + ' 0';
   show('race'); moveCars();
-  (async () => { setBusy(true); await say('lets_race'); setBusy(false); nextItem(); })();
+  const th = meta.race != null ? RACES[meta.race % RACES.length] : { icon: '⭐', name: 'Bonus lap', bg: 'linear-gradient(135deg,#a86bff,#6a2bd9)' };
+  $('#card').classList.remove('redcard');
+  $('#card').innerHTML = `<div style="width:130px;height:130px;border-radius:50%;background:${th.bg};display:grid;place-items:center;font-size:72px;box-shadow:0 6px 0 #0003" class="bounce">${th.icon}</div><div style="font-size:34px;font-weight:800;margin-top:12px">${th.name}</div>`;
+  $('#controls').innerHTML = '';
+  (async () => { setBusy(true); if (meta.intro) await say(meta.intro); await say('lets_race'); setBusy(false); nextItem(); })();
 }
 function moveCars() {
   const n = R.queue.length || 1;
@@ -791,7 +846,7 @@ function award(n) {
   if (!n) return; const before = S.coins;
   S.coins += n; R.coins += n; dayRec().coins += n;
   const unl = CARS.findIndex(c => before < c.at && S.coins >= c.at); if (unl >= 0) R.unlocked = unl;
-  const el = $('#raceCoins'); el.textContent = '🪙 ' + R.coins; el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop'); sfxCoin(); save();
+  const el = $('#raceCoins'); el.innerHTML = coin(22) + ' ' + R.coins; el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop'); sfxCoin(); save();
 }
 function stat(it, firstTry, missed) { const k = norm(plain(it.text)); const s = S.stats[k] || (S.stats[k] = { seen: 0, first: 0, miss: 0 }); s.seen++; if (firstTry) s.first++; if (missed) s.miss++; }
 function addMissed(it) { const d = plain(it.text); if (!R.missed.includes(d)) R.missed.push(d); }
@@ -835,7 +890,7 @@ async function finishRace() {
   $('#resBody').innerHTML = `<div class="res">
       <div class="medal">${goalNow ? '🏆' : MEDAL[medal]}</div>
       <div style="display:flex;justify-content:center;align-items:flex-end;gap:6px">${carSVG(S.car, won ? 170 : 130)}${truckSVG(won ? 90 : 120)}</div>
-      ${S.name ? `<div style="font-size:30px;font-weight:800">${esc(S.name)}</div>` : ''}<div class="plus">+${R.coins} 🪙</div>
+      ${S.name ? `<div style="font-size:30px;font-weight:800">${esc(S.name)}</div>` : ''}<div class="plus">+${R.coins} ${coin(34)}</div>
       ${goalNow ? `<div style="font-size:40px;font-weight:800">🔥 ${S.streak}</div>` : ''}
       ${R.missed.length ? `<div class="practice">${R.missed.map(w => `<span data-say="${esc(w)}">${esc(w)} 🔊</span>`).join('')}</div>` : ''}
     </div>
@@ -847,7 +902,7 @@ async function finishRace() {
   show('results');
   document.querySelectorAll('[data-say]').forEach(s => s.onclick = () => { const t = s.dataset.say; t.includes(' ') ? saySentence(t) : sayWord(t); });
   $('#resHome').onclick = () => { stopAudio(); renderHome(); show('home'); };
-  const nb = $('#resNext'); if (nb) nb.onclick = () => startRace(todayPlan()[next], { race: next });
+  const nb = $('#resNext'); if (nb) nb.onclick = () => startRace(todayPlan()[next], { race: next, intro: 'race' + (next % RACES.length) });
   const bb = $('#resBonus'); if (bb) bb.onclick = bonusLap;
   const dn = $('#driveNew'); if (dn) dn.onclick = () => { S.car = R.unlocked; save(); sfxVroom(); dn.style.opacity = .6; };
   await sayName(); await say(goalNow ? 'goal_done' : won ? 'race_done' : 'race_lost');
