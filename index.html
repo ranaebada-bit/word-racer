@@ -410,15 +410,14 @@ async function sayName() {
 /* ============ speech recognition ============ */
 const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
 let micBlocked = false;
-const micOn = () => !!SR && !micBlocked && S.settings.useMic;
+const micOn = () => !!SR && !micBlocked;
 let currentRec = null;
 // One listening session at a time. iPhone needs the previous session fully closed before a new one starts.
 let recEnded = Promise.resolve();
-async function listen(maxMs, isDone, onReady) {
-  await Promise.race([recEnded, sleep(1500)]);
-  try { if (actx && actx.state === 'running') await actx.suspend(); } catch (e) {} // game sounds off while the mic is on
-  await sleep(200);
-  let rec; try { rec = new SR(); } catch (e) { return { error: 'unsupported', texts: [] }; }
+// IMPORTANT: must run straight from the tap, with no waiting before rec.start(), or iPhone Safari refuses the mic.
+function listen(maxMs, isDone, onReady) {
+  try { if (actx && actx.state === 'running') actx.suspend(); } catch (e) {} // game sounds off while the mic is on
+  let rec; try { rec = new SR(); } catch (e) { return Promise.resolve({ error: 'unsupported', texts: [] }); }
   currentRec = rec; rec.lang = 'en-GB'; rec.interimResults = true; rec.continuous = false; rec.maxAlternatives = 5;
   let endDone; recEnded = new Promise(r => endDone = r);
   return new Promise(resolve => {
@@ -607,7 +606,11 @@ function renderControls() {
   const hear = st === 'model' ? `<button class="round" data-a="hear" aria-label="Hear again">🔊</button>` : '';
   const light = st === 'sounds' ? `<button class="round" data-a="light" aria-label="Light sounds">💡</button>` : '';
   if (micOn()) box.innerHTML = `${light}${hear}<button class="mic" id="micBtn" data-a="mic" aria-label="Read">🎤</button>`;
-  else box.innerHTML = `<div style="display:flex;flex-direction:column;align-items:center;gap:8px"><div class="nomic">🎤🚫</div><div style="display:flex;gap:14px">${hear}<button class="round r" data-a="no" aria-label="wrong">✗</button><button class="round g" data-a="yes" aria-label="right">✓</button></div></div>`;
+  else box.innerHTML = `<div style="display:flex;flex-direction:column;align-items:center;gap:10px;color:#fff;text-align:center">
+    <div style="display:flex;gap:14px;align-items:center">${hear}<button class="mic" data-a="retry" aria-label="Try the microphone again">🔄</button></div>
+    <div style="background:#ffffff1f;border-radius:14px;padding:8px 12px;font-size:14px;line-height:1.35;max-width:340px">${SR
+      ? '<b>Grown-ups:</b> the microphone is off for this page. On iPhone: Settings → Apps → Safari → Microphone → Allow, and Settings → General → Keyboard → Enable Dictation. Then tap 🔄.'
+      : '<b>Grown-ups:</b> this browser can’t listen. On iPhone, open the game in <b>Safari</b>.'}</div></div>`;
 }
 $('#race').addEventListener('click', e => {
   const b = e.target.closest('[data-a]'); if (!b) return; const a = b.dataset.a;
@@ -617,6 +620,7 @@ $('#race').addEventListener('click', e => {
   if (a === 'yes') return handleResult(true, {});
   if (a === 'no') return handleResult(false, {});
   if (a === 'light') return lightSounds(false);
+  if (a === 'retry') { micBlocked = false; renderControls(); return onMic(); }
 });
 function setBusy(v) { busy = v; document.querySelectorAll('#controls button').forEach(b => { if (b.dataset.a !== 'hear') b.disabled = v; }); const m = $('#micBtn'); if (m) m.classList.toggle('ready', !v); }
 
@@ -636,20 +640,24 @@ async function nextItem() {
 }
 let micFails = 0;
 function logHeard(target, heard, ok) { (S.heard = S.heard || []).unshift({ t: target, h: heard, ok, at: new Date().toTimeString().slice(0, 5) }); S.heard = S.heard.slice(0, 40); save(); }
-async function onMic() {
+function onMic() {   // stays synchronous until the mic has started (iPhone rule)
+  if (busy) return;
   setBusy(true); stopAudio();
   const it = R.cur.it, btn = $('#micBtn');
   if (btn) { btn.textContent = '⏳'; btn.disabled = false; btn.classList.remove('ready'); }
-  const r = await listen(it.type === 'sentence' ? 9000 : 6000, texts => check(it, texts).ok,
+  const p = listen(it.type === 'sentence' ? 9000 : 6000, texts => check(it, texts).ok,
     () => { if (btn) { btn.classList.add('listening'); btn.textContent = '👂'; } });   // turns green only when the mic is really on
+  p.then(r => afterListen(it, btn, r));
+}
+async function afterListen(it, btn, r) {
   if (btn) { btn.classList.remove('listening'); btn.textContent = '🎤'; }
+  await Promise.race([recEnded, sleep(1500)]);   // let the iPhone close this listening session before the next tap
   if (r.error && !(r.texts && r.texts.length)) {
     logHeard(it.text, '(' + r.error + ')', false);
     if (['not-allowed', 'service-not-allowed'].includes(r.error)) { micBlocked = true; renderControls(); await say('no_mic'); setBusy(false); return; }
-    if (['start-failed', 'no-audio', 'audio-capture', 'aborted', 'network'].includes(r.error)) { micFails++; await sleep(600); } // a hiccup: just try again
     await say(noHear++ >= 1 ? 'didnt_hear2' : 'didnt_hear'); setBusy(false); return;  // never counts as a wrong answer
   }
-  noHear = 0; micFails = 0;
+  noHear = 0;
   const res = check(it, r.texts);
   logHeard(it.text, r.texts[0] || '', res.ok);
   setBusy(false);
@@ -857,7 +865,6 @@ function pSettings() {
     <div class="set"><label>Times a missed item comes back</label><select id="sCome">${[0, 1, 2, 3].map(v => opt(v, S.settings.comebacks)).join('')}</select></div>
     <div class="set"><label>Daily goal (for the streak)</label><select id="sGoal">${opt('all', S.settings.goal, 'All races')}${Array.from({ length: Math.max(0, n - 1) }, (_, i) => opt(i + 1, S.settings.goal, `${i + 1} race${i ? 's' : ''}`)).join('')}</select></div>
     <div class="set"><label>Sound dots under words</label><select id="sDots">${opt('1', S.settings.dots ? 1 : 0, 'Always')}${opt('0', S.settings.dots ? 1 : 0, 'Only when helping')}</select></div>
-    <div class="set"><label>Microphone</label><select id="sMic">${opt('1', S.settings.useMic ? 1 : 0, 'On')}${opt('0', S.settings.useMic ? 1 : 0, 'Off (grown-up taps ✓ ✗)')}</select></div>
     <div class="note">${SR ? 'This browser can listen to your child.' : '<b>This browser can’t listen.</b> On iPhone, open the game in Safari.'}${micBlocked ? ' The microphone was blocked on this page.' : ''}</div>
     <button class="btn r" id="resetAll" style="margin-top:6px">Reset coins, streak and stats</button>
   </div>`;
@@ -865,7 +872,7 @@ function pSettings() {
   bind('#tRead', v => t.read = +v); bind('#tFred', v => t.fred = +v); bind('#tSounds', v => t.sounds = +v);
   bind('#sCome', v => S.settings.comebacks = +v); bind('#sGoal', v => S.settings.goal = v === 'all' ? 'all' : +v);
   bindName(pSettings); bindClass();
-  bind('#sDots', v => S.settings.dots = v === '1'); bind('#sMic', v => { S.settings.useMic = v === '1'; if (S.settings.useMic) micBlocked = false; });
+  bind('#sDots', v => S.settings.dots = v === '1');
   $('#resetAll').onclick = () => {
     modal(`<h2>Reset coins, streak, cars and stats?</h2><p class="hint">The homework stays.</p><div style="display:flex;gap:10px"><button class="btn w" style="flex:1" onclick="closeModal()">Cancel</button><button class="btn r" style="flex:1" id="rsYes">Reset</button></div>`);
     $('#rsYes').onclick = () => { const keep = { homework: S.homework, review: S.review, settings: S.settings }; S = { ...fresh(), ...keep }; save(); closeModal(); toast('Reset'); pSettings(); };
