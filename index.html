@@ -367,10 +367,45 @@ async function getBuf(key) {
   return bufCache[key] = new Promise(res => { try { c.decodeAudioData(u.buffer, b => res(b), () => res(null)); } catch (e) { res(null); } });
 }
 let curSrc = null;
-function stopAudio() { try { curSrc && curSrc.stop(); } catch (e) {} curSrc = null; try { speechSynthesis.cancel(); } catch (e) {} }
+function stopAudio() { try { curSrc && curSrc.stop(); } catch (e) {} curSrc = null; try { player.pause(); } catch (e) {} if (curDone) curDone(); try { speechSynthesis.cancel(); } catch (e) {} }
+// Voice clips play through one normal <audio> player: on iPhone it ignores the silent switch
+// and keeps working after the microphone has been used. Web Audio is only a backup.
+function setSession(type) { try { if (navigator.audioSession) navigator.audioSession.type = type; } catch (e) {} }
+setSession('playback');
+const player = new Audio(); player.preload = 'auto'; player.setAttribute('playsinline', '');
+const urlCache = {};
+function clipUrl(key) {
+  if (urlCache[key] && urlCache[key].src === AUDIO[key]) return urlCache[key].url;
+  const b64 = AUDIO[key]; if (!b64) return null;
+  const bin = atob(b64), u = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i);
+  const type = key === '__name' && S.nameRec ? (S.nameRec.type || 'audio/mp4').split(';')[0] : 'audio/mpeg';
+  const url = URL.createObjectURL(new Blob([u], { type }));
+  urlCache[key] = { src: b64, url }; return url;
+}
+let curDone = null;   // finishes the clip that is playing now (used when something new starts or stopAudio)
 async function playKey(key) {
+  if (!AUDIO[key]) await allAudio;
+  const url = clipUrl(key); if (!url) return false;
+  setSession('playback');
+  if (curDone) curDone();
+  try { curSrc && curSrc.stop(); } catch (e) {}
+  try {
+    player.pause(); player.src = url; player.currentTime = 0; player.muted = false;
+    await player.play();
+  } catch (e) { return playKeyWA(key); }
+  await new Promise(r => {
+    let t;
+    const done = () => { clearTimeout(t); player.removeEventListener('ended', done); player.removeEventListener('error', done); if (curDone === done) curDone = null; r(); };
+    curDone = done;
+    player.addEventListener('ended', done); player.addEventListener('error', done);
+    const d = isFinite(player.duration) && player.duration > 0 ? player.duration : 8;
+    t = setTimeout(done, d * 1000 + 600);
+  });
+  return true;
+}
+async function playKeyWA(key) {
   const buf = await getBuf(key); if (!buf) return false;
-  const c = ac(); if (c.state !== 'running') { try { await c.resume(); } catch (e) {} }
+  const c = ac(); if (c.state !== 'running') { try { await Promise.race([c.resume(), sleep(800)]); } catch (e) {} }
   try { curSrc && curSrc.stop(); } catch (e) {}
   const src = c.createBufferSource(); src.buffer = buf; src.connect(c.destination); curSrc = src;
   await new Promise(r => { src.onended = r; src.start(); setTimeout(r, buf.duration * 1000 + 300); });
@@ -416,7 +451,7 @@ let currentRec = null;
 let recEnded = Promise.resolve();
 // IMPORTANT: must run straight from the tap, with no waiting before rec.start(), or iPhone Safari refuses the mic.
 function listen(maxMs, isDone, onReady) {
-  try { if (actx && actx.state === 'running') actx.suspend(); } catch (e) {} // game sounds off while the mic is on
+  setSession('play-and-record');   // let the mic in; switched back to loudspeaker 'playback' before the next clip
   let rec; try { rec = new SR(); } catch (e) { return Promise.resolve({ error: 'unsupported', texts: [] }); }
   currentRec = rec; rec.lang = 'en-GB'; rec.interimResults = true; rec.continuous = false; rec.maxAlternatives = 5;
   let endDone; recEnded = new Promise(r => endDone = r);
@@ -512,7 +547,15 @@ function modal(html) { $('#modal').innerHTML = html; $('#modalBg').classList.add
 function closeModal() { $('#modalBg').classList.remove('on'); }
 $('#modalBg').addEventListener('click', e => { if (e.target.id === 'modalBg') closeModal(); });
 let unlocked = false, welcomed = false;
-document.addEventListener('pointerdown', () => { ac(); if (!unlocked) { unlocked = true; try { const u = new SpeechSynthesisUtterance(' '); u.volume = 0; speechSynthesis.speak(u); } catch (e) {} } }, true);
+const SILENT = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAIA+AAACABAAZGF0YQAAAAA=';
+document.addEventListener('pointerdown', () => {
+  ac(); setSession('playback');
+  if (!unlocked) {
+    unlocked = true;
+    try { player.muted = true; player.src = SILENT; const p = player.play(); if (p) p.then(() => { player.pause(); player.muted = false; }).catch(() => { player.muted = false; unlocked = false; }); } catch (e) { player.muted = false; }
+    try { const u = new SpeechSynthesisUtterance(' '); u.volume = 0; speechSynthesis.speak(u); } catch (e) {}
+  }
+}, true);
 
 /* ============ HOME ============ */
 const MEDAL = { 3: '🥇', 2: '🥈', 1: '🥉' };
