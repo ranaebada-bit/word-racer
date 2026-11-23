@@ -183,6 +183,8 @@ table{width:100%;border-collapse:collapse;font-size:15px}td,th{padding:6px 4px;b
 @keyframes zoomout{0%{transform:translate(-50%,-50%) scale(.3);opacity:0}30%{transform:translate(-50%,-50%) scale(1.2);opacity:1}100%{transform:translate(-50%,-80%) scale(1);opacity:0}}
 .wheel{transform-box:fill-box;transform-origin:center}
 .driving .wheel{animation:spin .4s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
+.lboff{text-align:center;padding:30px 22px;margin:20px auto;max-width:460px;background:#ffffff1f;border-radius:22px;color:#fff;font-size:19px;line-height:1.45}
+.lboff p{margin:10px 0}
 </style>
 </head>
 <body>
@@ -1112,6 +1114,10 @@ function lbSubmit() {
 }
 async function openBoard() {
   show('board'); stopAudio();
+  if (!S.lb.on) { // opted out: they don't see the list and aren't on it
+    $('#boardBody').innerHTML = `<div class="lboff"><div style="font-size:70px">🔒</div><p><b>${esc(S.name || 'This racer')} is not on the class list.</b></p><p>A grown-up chose "No" for "Show my child on the list". To see who finished today, a grown-up can tap ⚙️, open <b>Settings</b> and choose <b>Yes</b>.</p></div>`;
+    return;
+  }
   $('#boardBody').innerHTML = '<div style="text-align:center;font-size:60px;padding:40px" class="bounce">🏎️</div>';
   const res = (await lbSubmit()) || await lbCall({ action: 'list' });
   if (!res || !res.ok) { $('#boardBody').innerHTML = '<div style="text-align:center;font-size:70px;padding:40px">📶❌</div>'; return; }
@@ -1127,7 +1133,7 @@ $('#boardRefresh').onclick = openBoard;
 function classBlock() {
   return `<div class="set" style="flex-wrap:wrap"><label>Class code (for the "done today" list)</label><input type="text" id="clsIn" value="${esc(S.lb.cls)}" placeholder="optional" autocapitalize="characters" style="width:150px;border:2px solid #dfe3f2;border-radius:10px;padding:8px;font-size:18px"></div>
     <div class="set"><label>Show my child on the list</label><select id="clsOn"><option value="1" ${S.lb.on ? 'selected' : ''}>Yes</option><option value="0" ${S.lb.on ? '' : 'selected'}>No</option></select></div>
-    <div class="hint">When your child finishes all of today's races, their first name and car appear on the class list with a 🏆. No scores and no ranking. Choose "No" to stay off the list (your child can still see who finished).</div>`;
+    <div class="hint">When your child finishes all of today's races, their first name and car appear on the class list with a 🏆. No scores and no ranking. Choose "No" to stay off the list. Children who are off the list don't see it either.</div>`;
 }
 function bindClass() {
   $('#clsIn').onchange = e => { S.lb.cls = e.target.value.trim().toUpperCase(); save(); };
