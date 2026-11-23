@@ -191,7 +191,7 @@ details.sec .sb{padding:0 2px 14px;display:flex;flex-direction:column;gap:8px}
 .blist{display:flex;flex-direction:column;gap:10px;margin-top:10px}
 .brow{display:flex;align-items:center;gap:12px;background:#f3f5ff;border-radius:18px;padding:10px;text-align:left;width:100%;color:var(--ink)}
 .brow .bi{flex:1;min-width:0}.brow .bi b{font-size:19px}.brow small{font-size:13px;color:#666;font-weight:700}
-.blv{display:flex;gap:4px;margin:4px 0}.blv i{width:22px;height:8px;border-radius:4px;border:1.5px solid #1b1b3a33}
+.blv{display:flex;gap:4px;margin:4px 0}.blv i{width:22px;height:8px;border-radius:4px;border:1.5px solid #1b1b3a55}
 .bbar{height:12px;border-radius:999px;background:#dfe3f2;overflow:hidden;margin-bottom:2px}.bbar i{display:block;height:100%;background:linear-gradient(90deg,#7dffb5,#2bb673);border-radius:999px}
 .bsay{flex:none}
 .bwin{position:fixed;inset:0;z-index:70;background:radial-gradient(circle,#2d4bd8ee,#0f1a4fee);display:grid;place-items:center}
@@ -217,6 +217,15 @@ details.sec .sb{padding:0 2px 14px;display:flex;flex-direction:column;gap:8px}
 .res .slots .slot{background:#e4e7f2;border-color:#cfd5ea}.res .slots .slot.on{background:#ffd23f;border-color:#1b1b3a44}
 .bring{position:relative;width:48px;height:48px;display:grid;place-items:center}.bring>svg:first-child{position:absolute;inset:0}.bring .dot{position:absolute;top:0;right:0;width:12px;height:12px;border-radius:50%;background:#ef3e36;border:2px solid #fff}
 .testbadge{position:fixed;top:0;left:50%;transform:translateX(-50%);z-index:90;background:#ef3e36;color:#fff;font-weight:800;font-size:12px;padding:2px 10px;border-radius:0 0 8px 8px;pointer-events:none}
+/* small phones (iPhone SE / mini): keep the top bar, tabs and garage inside the screen */
+.top .chip{flex:none}
+#nameChip{flex:0 1 auto !important;min-width:0;max-width:34vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block}
+.gear{flex:none}
+@media (max-width:389px){.top .chip{font-size:20px;padding:3px 10px;gap:4px}.top{gap:6px}#nameChip{font-size:17px !important}}
+@media (max-width:359px){.top .chip{font-size:17px;padding:2px 8px}.tabs{gap:4px}.tabs button{font-size:12px;padding:9px 1px;min-width:0}.garage{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.gcar svg{max-width:100%;height:auto}}
+.garage{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.gcar{min-width:0}.gcar svg{max-width:100%;height:auto}
+.toast{bottom:calc(100px + env(safe-area-inset-bottom)) !important}
+.set{flex-wrap:wrap}.set label{min-width:0}.set select{max-width:100%}
 .nleft{font-weight:800;font-size:14px;white-space:nowrap}
 .shopcars{display:flex;gap:6px;overflow-x:auto;padding:6px 2px;margin-top:4px}.shopcars button{flex:none;border-radius:12px;background:#f1f3ff;padding:2px;border:3px solid transparent}.shopcars button.on{border-color:var(--blue);background:#e1efff}
 .shopbtn{width:100%;margin:8px 0;display:flex;align-items:center;justify-content:center;gap:8px}
@@ -327,7 +336,7 @@ table{width:100%;border-collapse:collapse;font-size:15px}td,th{padding:6px 4px;b
 <script>
 const AUDIO = {};
 const AUDIO_PACKS = ["core2"];   // game phrases + letter sounds; each word and name is its own small file, fetched only when needed
-const PHRASES = {"read_word": "Read the word!", "read_sentence": "Read the sentence!", "what_sound": "What sound is this?", "pit": "Pit stop! This one came back. Can you read it?", "pit_sound": "Pit stop! What sound is this?", "fred_word": "Almost! Let's Fred Talk it. Say the sounds, then blend them.", "fred_sentence": "Almost! Let's Fred Talk the orange words, then read it again.", "again": "Nearly! Have another go.", "fred_again": "Fred Talk it again, then blend!", "sound_again": "Nearly! Say the sound again.", "sounds_intro": "Let's go sound by sound. Say each sound when it lights up.", "blend_now": "Now blend them! Tap and say the word.", "listen": "Listen to me.", "your_turn_word": "Your turn! Say the word.", "your_turn_sentence": "Your turn! Read it to me.", "your_turn_sound": "Now you say it!", "didnt_hear": "I didn't hear you. Tap and try again!", "didnt_hear2": "Say it nice and loud, close to the phone!", "good_try": "Good try! We'll come back to it.", "great_job": "Great job!", "pr1": "Brilliant!", "pr2": "Super reader!", "pr3": "Zoom zoom! Yes!", "pr4": "Fantastic!", "pr5": "You did it!", "pr6": "Amazing!", "pr7": "Turbo reading!", "pr8": "Wow, great blending!", "spr1": "Yes! That's the sound!", "spr2": "Great sound!", "spr3": "Perfect!", "turbo": "Turbo boost! Three in a row!", "race_done": "Race complete! You beat the truck!", "race_lost": "Race complete! Great driving!", "goal_done": "Amazing! You finished all your races today! Your streak is growing!", "new_car": "Wow! You unlocked a new car!", "start_home": "Tap a race to start!", "leave_q": "Do you want to stop racing?", "no_mic": "I can't use the microphone. Ask a grown-up for help.", "tap_mic": "Tap the microphone, then read!", "garage": "Pick your car!", "all_done": "All races done! Try a bonus lap for extra points!", "lets_race": "Ready, steady, go!", "finish_line": "Last one! Read it to cross the finish line!", "welcome": "Hello racer! Tap a race to start!", "hello": "Hello", "well_done": "Well done", "setup_hi": "Hello racer!", "red_word": "This is a red word. We can't Fred Talk it. Listen!", "cups_look": "Look who finished their reading today!", "cup_done": "Well done! You finished today's reading. Here's your cup!", "cup_todo": "Finish all your races today to get your cup!", "cup_none": "Nobody has finished yet. Be the first to get a cup!", "race0": "Rocket Race!", "race1": "Lightning Lap!", "race2": "Superhero Sprint!", "race3": "Police Chase!", "race4": "Dino Dash!", "race5": "Space Speedway!", "race6": "Fire Truck Rescue!", "race7": "Grand Prix!", "race8": "Moto Madness!", "race9": "Sky Rally!", "bonus_lap": "Bonus lap! Extra coins!", "fred_word_s": "Fred Talk it!", "fred_sentence_s": "Fred Talk the orange words!", "sounds_intro_s": "Sound by sound!", "blend_now_s": "Now blend!", "your_turn_s": "Your turn!", "didnt_hear_s": "Try again!", "good_try_s": "Good try!", "again_s": "Have another go!", "red_word_s": "Red word! Listen!", "pit_s": "Pit stop!", "fred_again_s": "Again! Fred Talk it!", "listen_s": "Listen!", "pr9": "Super speedy!", "pr10": "You're a reading star!", "pr11": "Vroom vroom! Brilliant!", "pr12": "Wow, you read it!", "pr13": "High five!", "pr14": "Awesome reading!", "pr15": "Yes! You nailed it!", "pr16": "Champion reader!", "badge_new": "Wow! You earned a new badge!", "badges": "These are your badges! Tap one to hear how to win it.", "help_home": "Tap the race with the arrow to start. The star is a bonus lap, and the car is your garage.", "help_results": "Tap the green arrow for the next race, or the house to go home.", "help_garage": "Pick your car! The locked cars need more coins.", "wash": "Your car is muddy! Rub it to wash it!", "wash_done": "Sparkly clean! Great job!", "b_book": "Bookworm badge! Read words in your races to fill it up.", "b_streak": "Super Streak badge! Finish all your races every day to fill it up.", "b_gold": "Gold Star badge! Win gold medals in your races to fill it up.", "b_almost": "Almost there!", "b_full": "You have the rainbow one! Amazing!", "won_book": "You won a Bookworm badge!", "won_streak": "You won a Super Streak badge!", "won_gold": "You won a Gold Star badge!", "tier1": "Bronze!", "tier2": "Silver!", "tier3": "Gold!", "tier4": "Rainbow!", "shop_hi": "Welcome to the paint shop! Pick something for your car.", "shop_buy": "Do you like it? Tap the green button to buy it.", "shop_more": "You need more coins for that one. Keep reading!", "shop_yay": "Wow! Your car looks amazing!", "more_1": "One more race to your next car!", "more_2": "Two more races to your next car!", "more_3": "Three more races to your next car!", "more_4": "Four more races to your next car!", "more_5": "Five more races to your next car!", "more_6": "Six more races to your next car!", "more_7": "Seven more races to your next car!", "more_8": "Eight more races to your next car!", "more_9": "Nine more races to your next car!", "more_10": "Ten more races to your next car!", "race_count": "Look how many races you have finished!"};
+const PHRASES = {"read_word": "Read the word!", "read_sentence": "Read the sentence!", "what_sound": "What sound is this?", "pit": "Pit stop! This one came back. Can you read it?", "pit_sound": "Pit stop! What sound is this?", "fred_word": "Almost! Let's Fred Talk it. Say the sounds, then blend them.", "fred_sentence": "Almost! Let's Fred Talk the orange words, then read it again.", "again": "Nearly! Have another go.", "fred_again": "Fred Talk it again, then blend!", "sound_again": "Nearly! Say the sound again.", "sounds_intro": "Let's go sound by sound. Say each sound when it lights up.", "blend_now": "Now blend them! Tap and say the word.", "listen": "Listen to me.", "your_turn_word": "Your turn! Say the word.", "your_turn_sentence": "Your turn! Read it to me.", "your_turn_sound": "Now you say it!", "didnt_hear": "I didn't hear you. Tap and try again!", "didnt_hear2": "Say it nice and loud, close to the phone!", "good_try": "Good try! We'll come back to it.", "great_job": "Great job!", "pr1": "Brilliant!", "pr2": "Super reader!", "pr3": "Zoom zoom! Yes!", "pr4": "Fantastic!", "pr5": "You did it!", "pr6": "Amazing!", "pr7": "Turbo reading!", "pr8": "Wow, great blending!", "spr1": "Yes! That's the sound!", "spr2": "Great sound!", "spr3": "Perfect!", "turbo": "Turbo boost! Three in a row!", "race_done": "Race complete! You beat the truck!", "race_lost": "Race complete! Great driving!", "goal_done": "Amazing! You finished all your races today! Your streak is growing!", "new_car": "Wow! You unlocked a new car!", "start_home": "Tap a race to start!", "leave_q": "Do you want to stop racing?", "no_mic": "I can't use the microphone. Ask a grown-up for help.", "tap_mic": "Tap the microphone, then read!", "garage": "Pick your car!", "all_done": "All races done! Try a bonus lap for extra points!", "lets_race": "Ready, steady, go!", "finish_line": "Last one! Read it to cross the finish line!", "welcome": "Hello racer! Tap a race to start!", "hello": "Hello", "well_done": "Well done", "setup_hi": "Hello racer!", "red_word": "This is a red word. We can't Fred Talk it. Listen!", "cups_look": "Look who finished their reading today!", "cup_done": "Well done! You finished today's reading. Here's your cup!", "cup_todo": "Finish all your races today to get your cup!", "cup_none": "Nobody has finished yet. Be the first to get a cup!", "race0": "Rocket Race!", "race1": "Lightning Lap!", "race2": "Superhero Sprint!", "race3": "Police Chase!", "race4": "Dino Dash!", "race5": "Space Speedway!", "race6": "Fire Truck Rescue!", "race7": "Grand Prix!", "race8": "Moto Madness!", "race9": "Sky Rally!", "bonus_lap": "Bonus lap! Extra coins!", "fred_word_s": "Fred Talk it!", "fred_sentence_s": "Fred Talk the orange words!", "sounds_intro_s": "Sound by sound!", "blend_now_s": "Now blend!", "your_turn_s": "Your turn!", "didnt_hear_s": "Try again!", "good_try_s": "Good try!", "again_s": "Have another go!", "red_word_s": "Red word! Listen!", "pit_s": "Pit stop!", "fred_again_s": "Again! Fred Talk it!", "listen_s": "Listen!", "pr9": "Super speedy!", "pr10": "You're a reading star!", "pr11": "Vroom vroom! Brilliant!", "pr12": "Wow, you read it!", "pr13": "High five!", "pr14": "Awesome reading!", "pr15": "Yes! You nailed it!", "pr16": "Champion reader!", "badge_new": "Wow! You earned a new badge!", "badges": "These are your badges! Tap one to hear how to win it.", "help_home": "Tap the race with the arrow to start. The star is a bonus lap, and the car is your garage.", "help_results": "Tap the green arrow for the next race, or the house to go home.", "help_garage": "Pick your car! The locked cars need more coins.", "wash": "Your car is muddy! Rub it to wash it!", "wash_done": "Sparkly clean! Great job!", "b_book": "Bookworm badge! Read words in your races to fill it up.", "b_streak": "Super Streak badge! Finish all your races every day to fill it up.", "b_gold": "Gold Star badge! Win gold medals in your races to fill it up.", "b_almost": "Almost there!", "b_full": "You have the rainbow one! Amazing!", "won_book": "You won a Bookworm badge!", "won_streak": "You won a Super Streak badge!", "won_gold": "You won a Gold Star badge!", "tier1": "Bronze!", "tier2": "Silver!", "tier3": "Gold!", "tier4": "Rainbow!", "shop_hi": "Welcome to the paint shop! Pick something for your car.", "shop_buy": "Do you like it? Tap the green button to buy it.", "shop_more": "You need more coins for that one. Keep reading!", "shop_yay": "Wow! Your car looks amazing!", "more_1": "One more race to your next car!", "more_2": "Two more races to your next car!", "more_3": "Three more races to your next car!", "more_4": "Four more races to your next car!", "more_5": "Five more races to your next car!", "more_6": "Six more races to your next car!", "more_7": "Seven more races to your next car!", "more_8": "Eight more races to your next car!", "more_9": "Nine more races to your next car!", "more_10": "Ten more races to your next car!", "race_count": "Look how many races you have finished!", "bn_book_0": "Bookworm badge!", "bn_book_1": "Bronze Bookworm!", "bn_book_2": "Silver Bookworm!", "bn_book_3": "Gold Bookworm!", "bn_book_4": "Rainbow Bookworm!", "bh_book": "Read words in your races to win the next one.", "bn_streak_0": "Super Streak badge!", "bn_streak_1": "Bronze Super Streak!", "bn_streak_2": "Silver Super Streak!", "bn_streak_3": "Gold Super Streak!", "bn_streak_4": "Rainbow Super Streak!", "bh_streak": "Finish all your races every day to win the next one.", "bn_gold_0": "Gold Star badge!", "bn_gold_1": "Bronze Gold Star!", "bn_gold_2": "Silver Gold Star!", "bn_gold_3": "Gold Gold Star!", "bn_gold_4": "Rainbow Gold Star!", "bh_gold": "Win gold medals in your races to win the next one."};
 </script>
 <script>
 "use strict";
@@ -824,7 +833,7 @@ const skel = w => { const s = sp(w); return s[0] + s.slice(1).replace(/[aeiouy]/
 let hwWords = new Set();   // today's homework words: hearing one of THESE instead is a real mistake
 // "th" is the sound speech recognisers get wrong most (and young children often say it as f/v/d).
 // So for words with "th" we also accept the usual mishearings: thin -> fin/tin/thing, this -> dis/vis/these, with -> wif/wiv.
-const TH_ALIAS = { thin: ['fin', 'finn', 'fen', 'tin', 'thing', 'think', 'thins', 'sin', 'thinn'], this: ['dis', 'diss', 'these', 'vis', 'fis', 'fiss', 'thiss', 'tis', 'thus', 'thes'],
+const TH_ALIAS = { thin: ['fin', 'finn', 'fen', 'tin', 'thing', 'think', 'thins', 'sin', 'thinn'], this: ['yes', 'guess', 'dis', 'diss', 'these', 'vis', 'fis', 'fiss', 'thiss', 'tis', 'thus', 'thes'],
   that: ['dat', 'vat', 'fat', 'thats'], then: ['den', 'ven', 'than', 'them'], them: ['dem', 'vem', 'then'], the: ['da', 'de', 'duh'], with: ['wif', 'wiv', 'wid', 'wit', 'width'],
   thick: ['fick', 'tick', 'sick'], thing: ['fing', 'ting', 'think', 'thin'], think: ['fink', 'tink', 'thing', 'sink'], moth: ['mof', 'moff', 'mouth', 'mott'], bath: ['baf', 'barf', 'bat'],
   path: ['paf', 'pat'], three: ['free', 'tree', 'fee'], thank: ['fank', 'tank'], cloth: ['clof', 'clot'], teeth: ['teef'], tooth: ['toof'], they: ['day', 'dey'], there: ['dare', 'their'] };
@@ -1079,7 +1088,7 @@ const BADGES = [
   { id: 'gold', name: 'Gold Star', icon: 'star', unit: 'gold medals', steps: [5, 15, 40, 100], val: t => t.gold },
 ];
 const TIERS = ['', 'Bronze', 'Silver', 'Gold', 'Rainbow'];
-const TIER_FILL = ['#e4e7f2', '#e0904f', '#d6dbe8', '#ffd23f', 'url(#rbw)'];
+const TIER_FILL = ['#e4e7f2', '#e0904f', '#a9b4cc', '#ffd23f', 'url(#rbw)'];
 function totals() {
   let words = 0, gold = 0, races = 0;
   allDayKeys().forEach(k => { const d = view(k); words += d.words || 0; Object.values(d.done || {}).forEach(m => { races++; if (m === 3) gold++; }); });
@@ -1089,7 +1098,7 @@ function totals() {
 function badgeState(b, t = totals()) {   // level reached (0-4), progress to the next level
   const v = b.val(t), lvl = b.steps.filter(x => v >= x).length;
   const prev = lvl ? b.steps[lvl - 1] : 0, next = b.steps[lvl];
-  return { v, lvl, next, pct: next ? Math.max(0, Math.min(1, (v - prev) / (next - prev))) : 1 };
+  return { v, lvl, next, pct: next ? Math.max(0, Math.min(1, v / next)) : 1 };   // same as the numbers shown: 505 of 1000 = half full
 }
 function medallion(b, lvl, size = 64) {   // round badge: coloured by level, picture in the middle, grey when not won yet
   return `<svg class="ic" width="${size}" height="${size}" viewBox="0 0 64 64" aria-hidden="true" ${lvl ? '' : 'style="opacity:.5"'}><defs><linearGradient id="rbw" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ef3e36"/><stop offset=".33" stop-color="#ffd23f"/><stop offset=".66" stop-color="#2bb673"/><stop offset="1" stop-color="#1d7bf2"/></linearGradient></defs>
@@ -1103,13 +1112,13 @@ function checkBadges() {   // returns [{badge, lvl}] for levels won just now
   if (fresh.length) save(); return fresh;
 }
 function badgeCount() { return Object.values(S.badgeLv || {}).reduce((a, n) => a + n, 0); }
-function sayBadge(b) { stopAudio(); const st = badgeState(b); (async () => { await say('b_' + b.id); if (!st.next) await say('b_full'); else if (st.pct >= .75) await say('b_almost'); })(); }
+function sayBadge(b) { stopAudio(); const st = badgeState(b); (async () => { await say(`bn_${b.id}_${st.lvl}`); if (!st.next) await say('b_full'); else { await say('bh_' + b.id); if (st.pct >= .75) await say('b_almost'); } })(); }   // tap a badge: its name (and level), then how to win the next one
 function badgeRow(b) {
   const st = badgeState(b);
   return `<button class="brow" data-b="${b.id}">${medallion(b, st.lvl, 70)}<div class="bi"><b>${b.name}</b>
     <div class="blv">${[1, 2, 3, 4].map(i => `<i style="background:${i <= st.lvl ? (i === 4 ? 'linear-gradient(90deg,#ef3e36,#ffd23f,#2bb673,#1d7bf2)' : TIER_FILL[i]) : '#e4e7f2'}"></i>`).join('')}</div>
     ${st.next ? `<div class="bbar"><i style="width:${Math.round(st.pct * 100)}%"></i></div><small>${st.v} / ${st.next} ${b.unit}</small>` : '<small>All 4 won!</small>'}</div>
-    <span class="bsay">${ic('speaker', 30)}</span></button>`;
+    </button>`;
 }
 function badgesModal() {
   checkBadges();
@@ -1628,7 +1637,7 @@ function pSettings() {
       <p class="hint">Relaxed: small mishearings like “hell” for <i>hill</i> still count.</p>
       ${micTestBlock()}
       ${SR ? '' : '<div class="note"><b>This browser can’t listen.</b> On iPhone, open the game in Safari.</div>'}${micBlocked ? '<div class="note">The microphone was blocked on this page.</div>' : ''}`)}
-    ${sec('reset', ic('trash', 26), 'Start over', '', `<p class="hint">Clears coins, streak, cars and stats on this phone. The homework and name stay.</p><button class="btn r" id="resetAll">Reset coins, streak and stats</button>`)}
+    ${sec('reset', ic('trash', 26), 'Start over', '', `<p class="hint">Clears coins, streak, cars and stats on this phone. The homework and name stay.</p><button class="btn r" id="resetAll">Reset coins, streak and stats</button>${IS_TEST ? '<button class="btn w" id="testFresh" style="margin-top:8px">Test copy: start fresh (setup again)</button><button class="btn w" id="testLoad" style="margin-top:8px">Test copy: load test data</button>' : ''}`)}
   </div>`;
   trackSecs();
   const bind = (id, fn) => $(id).onchange = e => { fn(e.target.value); save(); toast('Saved ✓'); };
@@ -1636,6 +1645,8 @@ function pSettings() {
   bind('#sCome', v => S.settings.comebacks = +v); bind('#sGoal', v => S.settings.goal = v === 'all' ? 'all' : +v);
   bindName(pSettings); bindClass(); bindLink(); checkDupName();
   bind('#sDots', v => S.settings.dots = v === '1'); bind('#sStrict', v => S.settings.strict = v === '1'); bindMicTest();
+  const tf = $('#testFresh'); if (tf) tf.onclick = () => { S = fresh(); save(); renderHome(); show('home'); };
+  const tl = $('#testLoad'); if (tl) tl.onclick = loadTestData;
   $('#resetAll').onclick = () => {
     modal(`<h2>Reset coins, streak, cars and stats?</h2><p class="hint">The homework stays.</p><div style="display:flex;gap:10px"><button class="btn w" style="flex:1" onclick="closeModal()">Cancel</button><button class="btn r" style="flex:1" id="rsYes">Reset</button></div>`);
     $('#rsYes').onclick = () => { const keep = { homework: S.homework, review: S.review, settings: S.settings, name: S.name, nameRec: S.nameRec, lb: S.lb, setupDone: true }; S = { ...fresh(), ...keep }; save(); closeModal(); toast('Reset'); pSettings(); };
@@ -1721,7 +1732,7 @@ function bindFeedback() {
     const msg = $('#fbTx').value.trim(); if (!msg) return toast('Write something first');
     go.disabled = true; $('#fbRes').textContent = 'Sending…';
     const info = { name: S.name || '', cls: S.lb.cls || '', version: APP_VERSION + (IS_TEST ? ' (test)' : ''), phone: navigator.userAgent.slice(0, 180),
-      mic: SR ? (micBlocked ? 'blocked' : 'ok') : 'none', heard: (S.heard || []).slice(0, 5).map(x => `${x.t}>${x.h}`).join(' | ') };
+      mic: SR ? (micBlocked ? 'blocked' : 'ok') : 'none', heard: (S.heard || []).slice(0, 5).map(x => `${x.t}: ${x.h}${x.ok ? ' (ok)' : ' (no)'}`).join(' | ') };
     try {
       const r = await (await fetch(LB_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'feedback', message: msg.slice(0, 2000), info }) })).json();
       if (r && r.ok) { $('#fbTx').value = ''; $('#fbRes').innerHTML = ic('check', 16) + ' Thank you! We got it.'; }
@@ -1751,13 +1762,24 @@ function pHelp() {
   </div>`;
   bindMicTest(); bindFeedback();
 }
+/* test copy only: fill the game with sample data so every screen can be checked straight away */
+function loadTestData() {
+  const d = n => addDays(today(), -n), days = {};
+  [1, 3, 4, 5, 6, 8, 9].forEach((n, j) => days[d(n)] = { done: { 0: 3, 1: j % 3 ? 3 : 2, 2: 3, 3: 1 }, goal: true, words: 26, coins: 90, help: j % 2 ? { egg: 1, hill: 1 } : { yell: 1 } });
+  days[d(7)] = { done: { 0: 2 }, goal: false, words: 8, coins: 20 };
+  S = { ...fresh(), name: 'Tester', homework: DEFAULT_HW, setupDone: true, firstMicDone: true, coins: 1400, car: 3, raceCount: 30, turbos: 4, best: 6, days,
+    stats: { egg: { seen: 5, first: 2, miss: 3 }, hill: { seen: 4, first: 2, miss: 2 }, yell: { seen: 3, first: 2, miss: 1 }, red: { seen: 6, first: 6, miss: 0 } },
+    heard: [{ t: 'hill', h: 'till', ok: false, at: '17:02' }, { t: 'egg', h: 'leg', ok: false, at: '17:01' }, { t: 'red', h: 'red', ok: true, at: '17:00' }],
+    lb: { cls: '', on: true, player: 'test' + Math.random().toString(36).slice(2, 8), phone: 'ptest' } };
+  refreshRed(); checkBadges(); save(); closeModal(); renderHome(); show('home'); toast('Test data loaded ✓');
+}
 function setupWizard(step = 0) {
   if (S.setupDone || (step === 0 && $('#modalBg').classList.contains('on'))) return;
   const N = 4, dots = `<div class="steps">${Array.from({ length: N }, (_, i) => `<i class="${i <= step ? 'on' : ''}"></i>`).join('')}</div>`;
   const nav = (next, label = 'Next →') => `<div style="display:flex;gap:10px;margin-top:6px">${step ? '<button class="btn w" style="flex:1" id="suBack">← Back</button>' : ''}<button class="btn g" style="flex:2" id="suNext">${label}</button></div>`;
   const body = [
     () => `<h2 style="display:flex;align-items:center;gap:8px">${carSVG(0, 56)} Welcome to Word Racer</h2><p class="hint">A 1-minute setup for grown-ups. You can change everything later with ${ic('gear', 18)}.</p>
-      <div class="panel" style="padding:0">${nameBlock()}</div>${nav()}`,
+      <div class="panel" style="padding:0">${nameBlock()}</div>${nav()}${IS_TEST ? '<button class="btn w" id="suTest" style="width:100%;margin-top:10px;border-color:#ef3e36;color:#ef3e36">Skip setup: load test data</button>' : ''}`,
     () => `<h2 style="display:flex;align-items:center;gap:8px">${ic('books', 34)} This week's homework</h2><p class="hint">Paste the words with commas between them, and each sentence on its own line. You can add or change it any time.</p>
       <textarea class="hw" id="suHw" style="min-height:150px" spellcheck="false" autocapitalize="off" placeholder="Words: cat, hen, zip, fox
 Sentences:
@@ -1768,7 +1790,7 @@ get a pen">${esc(S.homework)}</textarea>${nav()}`,
     () => `<h2 style="display:flex;align-items:center;gap:8px">${ic('mic', 34)} Last step</h2>${micTestBlock()}<div style="height:8px"></div>${homeTip()}${nav(0, `Let's race! ${ic('flag', 22)}`)}`,
   ];
   modal(dots + body[step]());
-  if (step === 0) bindName();
+  if (step === 0) { bindName(); const st = $('#suTest'); if (st) st.onclick = loadTestData; }
   if (step === 2) bindClass();
   if (step === 3) bindMicTest();
   const keepHw = () => { const t = $('#suHw'); if (t) { S.homework = t.value; refreshRed(); save(); } };
