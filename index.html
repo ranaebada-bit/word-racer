@@ -1179,7 +1179,7 @@ function paintShop(car = S.car, tab = 'body', pick = null) {
   };
 }
 function garageTabs(on) {
-  return `<div class="gtabs"><button data-g="cars" class="${on === 'cars' ? 'on' : ''}">${carSVG(S.car, 44)}<b>My cars</b></button><button data-g="shop" class="${on === 'shop' ? 'on' : ''}">${ic('brush', 28)}<b>Paint shop</b></button></div>`;
+  return `<div class="gtabs"><button data-g="cars" class="${on === 'cars' ? 'on' : ''}">${carSVG(S.car, 44)}<b>Cars</b></button><button data-g="shop" class="${on === 'shop' ? 'on' : ''}">${ic('brush', 28)}<b>Paint shop</b></button></div>`;
 }
 function bindGarageTabs() {
   document.querySelectorAll('.gtabs button').forEach(b => b.onclick = () => { stopAudio(); if (b.dataset.g === 'cars') garage(); else { paintShop(S.car); say('shop_hi'); } });
@@ -1190,11 +1190,12 @@ function garage() {
     const st = has ? (i === S.car ? ic('check', 28) : ic('play', 26)) : c.special ? `${coin(20)} ${c.price}` : `${ic('lock', 22)} ${coin(20)} ${c.at}`;
     return `<button class="gcar ${i === S.car ? 'sel' : ''} ${has ? '' : 'locked'} ${c.special ? 'spc' : ''}" data-i="${i}">${carSVG(i, 130)}<div class="gst">${st}</div></button>`;
   };
-  const normal = CARS.map((c, i) => i).filter(i => !CARS[i].special), special = CARS.map((c, i) => i).filter(i => CARS[i].special);
+  const all = CARS.map((c, i) => i), mine = all.filter(hasCar), toBuy = all.filter(i => CARS[i].special && !hasCar(i)), toRead = all.filter(i => !CARS[i].special && !hasCar(i));
   modal(`<div style="display:flex;justify-content:space-between;align-items:center"><h2 style="display:flex;align-items:center;gap:8px">${coin(28)} ${wallet()}</h2><button class="iconbtn" style="background:#eee;color:#333" onclick="closeModal()" aria-label="Close">${ic('close', 22)}</button></div>
     ${garageTabs('cars')}
-    <p class="ghint">${ic('book', 20)} Read to unlock</p><div class="garage">${normal.map(card).join('')}</div>
-    <p class="ghint">${ic('shine', 20)} Special cars: buy with coins</p><div class="garage">${special.map(card).join('')}</div>`);
+    <p class="ghint">${ic('check', 20)} My cars</p><div class="garage">${mine.map(card).join('')}</div>
+    ${toBuy.length ? `<p class="ghint">${ic('shine', 20)} Buy with coins</p><div class="garage">${toBuy.map(card).join('')}</div>` : ''}
+    ${toRead.length ? `<p class="ghint">${ic('book', 20)} Read to unlock</p><div class="garage">${toRead.map(card).join('')}</div>` : ''}`);
   say('help_garage'); bindGarageTabs();
   document.querySelectorAll('.gcar').forEach(b => b.onclick = () => {
     const i = +b.dataset.i, c = CARS[i];
