@@ -203,6 +203,12 @@ details.sec .sb{padding:0 2px 14px;display:flex;flex-direction:column;gap:8px}
 #paintBtn{position:absolute;top:8px;left:8px;width:48px;height:48px;border-radius:50%;background:#ffffff26;display:grid;place-items:center}
 #paintBtn .dot{position:absolute;top:2px;right:2px;width:14px;height:14px;border-radius:50%;background:#ef3e36;border:2px solid #fff}
 #paintBtn.glow{animation:glow 1.4s infinite;background:#ffd23f55}
+.gtabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0 4px}
+.gtabs button{display:flex;align-items:center;justify-content:center;gap:6px;padding:8px;border-radius:16px;background:#f1f3ff;color:var(--ink);font-size:16px;min-height:52px}
+.gtabs button.on{background:#e1efff;box-shadow:inset 0 0 0 3px var(--blue)}
+.ghint{display:flex;align-items:center;gap:6px;margin:12px 0 4px;font-weight:800;color:#555;font-size:15px}
+.gcar.spc{background:linear-gradient(135deg,#fff6d6,#ffe1f2)}
+.gcar.spc.locked{opacity:1}
 .shopcars{display:flex;gap:6px;overflow-x:auto;padding:6px 2px;margin-top:4px}.shopcars button{flex:none;border-radius:12px;background:#f1f3ff;padding:2px;border:3px solid transparent}.shopcars button.on{border-color:var(--blue);background:#e1efff}
 .shopbtn{width:100%;margin:8px 0;display:flex;align-items:center;justify-content:center;gap:8px}
 .shopcar{display:flex;justify-content:center;background:radial-gradient(circle at 50% 80%,#ffd23f44,transparent 60%),#eef1ff;border-radius:20px;padding:10px 0;margin:8px 0}
@@ -417,7 +423,12 @@ const CARS = [
   { name: 'Monster Blaze', shape: 'monster', body: '#ff5a1f', accent: '#2b2d3a', emblem: 'flame', at: 8200 },
   { name: 'Turbo Formula', shape: 'f1', body: '#1d7bf2', accent: '#ffd23f', emblem: 'star', at: 9500 },
   { name: 'Diamond Rocket', shape: 'rocket', body: '#5ef2d6', accent: '#8e44ad', emblem: 'crown', at: 11000 },
+  // special cars: bought in the garage with coins
+  { name: 'Golden Racer', body: '#ffd23f', accent: '#ff8c1a', emblem: 'crown', at: Infinity, price: 1500, special: true },
+  { name: 'Dragon Rocket', shape: 'rocket', body: '#2bb673', accent: '#ef3e36', emblem: 'flame', at: Infinity, price: 2500, special: true },
+  { name: 'Rainbow Monster', shape: 'monster', body: '#ff7ab6', accent: '#5ef2d6', emblem: 'star', at: Infinity, price: 3500, special: true },
 ];
+const hasCar = i => CARS[i] && (CARS[i].special ? !!(S.owned || {})['car|' + i] : allCoins() >= CARS[i].at);
 function fresh() {
   return { homework: '', name: '', nameRec: null, setupDone: false, review: [], lb: { cls: '', on: true, player: Math.random().toString(36).slice(2, 12) },
     settings: { tries: { read: 1, fred: 1, sounds: 1, sound: 2 }, comebacks: 2, goal: 'all', useMic: true, dots: true },
@@ -965,7 +976,7 @@ function renderHome() {
   if (!S.setupDone) setTimeout(setupWizard, 50);
   $('#heroCar').innerHTML = carSVG(S.car, 170);
   const pb = $('#paintBtn'); pb.innerHTML = ic('brush', 30) + (canBuySomething() ? '<i class="dot"></i>' : ''); pb.classList.toggle('glow', canBuySomething()); pb.onclick = () => { stopAudio(); paintShop(S.car); say('shop_hi'); };
-  const coinsNow = allCoins(), ni = CARS.findIndex(c => c.at > coinsNow);
+  const coinsNow = allCoins(), ni = CARS.findIndex(c => !c.special && c.at > coinsNow);
   if (ni >= 0) {
     const prev = ni > 0 ? CARS[ni - 1].at : 0, pct = Math.max(4, Math.min(100, (coinsNow - prev) / (CARS[ni].at - prev) * 100));
     $('#nextCar').innerHTML = `${coin(22)}<div class="bar"><i style="width:${pct}%"></i></div><span class="nc">${carSVG(ni, 64)}</span>${ic('lock', 22)}`;
@@ -1133,7 +1144,7 @@ function owns(car, part, val) {
   if (S.owned && !S.ownedV2) { const o = {}; Object.keys(S.owned).forEach(k => { const x = k.split('|'); o[x.length === 3 ? x[1] + '|' + x[2] : k] = 1; }); S.owned = o; S.ownedV2 = 1; save(); }
   return (CARS[car] || {})[part] === val || !!(S.owned || {})[ownedKey(part, val)];
 }
-const unlockedCars = () => CARS.map((c, i) => i).filter(i => allCoins() >= CARS[i].at);
+const unlockedCars = () => CARS.map((c, i) => i).filter(hasCar);
 function canBuySomething() { return SHOP.some(t => wallet() >= t.price && t.opts.some(v => !owns(S.car, t.id, v))); }
 function paintShop(car = S.car, tab = 'body', pick = null) {
   const t = SHOP.find(x => x.id === tab), cur = { ...CARS[car], ...((S.mods || {})[car] || {}) };
@@ -1142,6 +1153,7 @@ function paintShop(car = S.car, tab = 'body', pick = null) {
     ? `<button class="sw" data-v="${v}" style="background:#fff" aria-label="${v}"><svg width="34" height="34" viewBox="-12 -12 24 24">${EMBLEMS[v]}</svg><i>${ic(owns(car, tab, v) ? 'check' : 'lock', 16)}</i></button>`
     : `<button class="sw ${tab === 'wheel' ? 'wh' : ''}" data-v="${v}" style="background:${v}" aria-label="colour"><i>${ic(owns(car, tab, v) ? 'check' : 'lock', 16)}</i></button>`;
   modal(`<div style="display:flex;justify-content:space-between;align-items:center"><h2 style="display:flex;align-items:center;gap:8px">${coin(28)} ${wallet()}</h2><button class="iconbtn" style="background:#eee;color:#333" id="shopX" aria-label="Close">${ic('close', 22)}</button></div>
+    ${garageTabs('shop')}
     <div class="shopcars">${unlockedCars().map(i => `<button class="${i === car ? 'on' : ''}" data-c="${i}" aria-label="${esc(CARS[i].name)}">${carSVG(i, 64)}</button>`).join('')}</div>
     <div class="shopcar">${carSVG(car, 260, true, { [tab]: val })}</div>
     <div class="shoptabs">${SHOP.map(x => `<button data-t="${x.id}" class="${x.id === tab ? 'on' : ''}">${ic(x.icon, 26)}<b>${x.label}</b></button>`).join('')}</div>
@@ -1150,7 +1162,7 @@ function paintShop(car = S.car, tab = 'body', pick = null) {
       : has ? `<button class="btn g" id="shopUse">${ic('check', 26)} Use it</button>`
       : can ? `<button class="btn g" id="shopBuy">${ic('check', 26)} Buy ${coin(26)} ${t.price}</button>`
       : `<button class="btn w" disabled style="opacity:.7">${ic('lock', 24)} ${coin(24)} ${t.price}</button>`}</div>`);
-  $('#shopX').onclick = () => { closeModal(); garage(); };
+  $('#shopX').onclick = closeModal; bindGarageTabs();
   document.querySelectorAll('.shoptabs button').forEach(b => b.onclick = () => paintShop(car, b.dataset.t));
   document.querySelectorAll('.shopcars button').forEach(b => b.onclick = () => { stopAudio(); paintShop(+b.dataset.c, tab); });
   const onCar = document.querySelector('.shopcars button.on'); if (onCar) onCar.scrollIntoView({ inline: 'center', block: 'nearest' });
@@ -1166,14 +1178,35 @@ function paintShop(car = S.car, tab = 'body', pick = null) {
     S.spent = (S.spent || 0) + t.price; S.owned = S.owned || {}; S.ownedV2 = 1; S.owned[ownedKey(tab, val)] = 1; sfxCoin(); apply(); sync();
   };
 }
+function garageTabs(on) {
+  return `<div class="gtabs"><button data-g="cars" class="${on === 'cars' ? 'on' : ''}">${carSVG(S.car, 44)}<b>My cars</b></button><button data-g="shop" class="${on === 'shop' ? 'on' : ''}">${ic('brush', 28)}<b>Paint shop</b></button></div>`;
+}
+function bindGarageTabs() {
+  document.querySelectorAll('.gtabs button').forEach(b => b.onclick = () => { stopAudio(); if (b.dataset.g === 'cars') garage(); else { paintShop(S.car); say('shop_hi'); } });
+}
 function garage() {
-  modal(`<div style="display:flex;justify-content:space-between;align-items:center"><h2 style="display:flex;align-items:center;gap:8px">${coin(28)} ${allCoins()}</h2><button class="iconbtn" style="background:#eee;color:#333" onclick="closeModal()" aria-label="Close">${ic('close', 22)}</button></div><button class="btn g shopbtn" id="toShop">${ic('brush', 28)} Paint shop</button><div class="garage">${CARS.map((c, i) => {
-    const locked = allCoins() < c.at;
-    return `<button class="gcar ${i === S.car ? 'sel' : ''} ${locked ? 'locked' : ''}" data-i="${i}" ${locked ? 'disabled' : ''}>${carSVG(i, 130)}<div class="gst">${locked ? ic('lock', 22) + ' ' + coin(20) + ' ' + c.at : i === S.car ? ic('check', 28) : ic('play', 26)}</div></button>`;
-  }).join('')}</div>`);
-  say('help_garage');
-  $('#toShop').onclick = () => { stopAudio(); paintShop(S.car); say('shop_hi'); };
-  document.querySelectorAll('.gcar:not(.locked)').forEach(b => b.onclick = () => { S.car = +b.dataset.i; save(); sfxVroom(); closeModal(); renderHome(); });
+  const card = i => {
+    const c = CARS[i], has = hasCar(i);
+    const st = has ? (i === S.car ? ic('check', 28) : ic('play', 26)) : c.special ? `${coin(20)} ${c.price}` : `${ic('lock', 22)} ${coin(20)} ${c.at}`;
+    return `<button class="gcar ${i === S.car ? 'sel' : ''} ${has ? '' : 'locked'} ${c.special ? 'spc' : ''}" data-i="${i}">${carSVG(i, 130)}<div class="gst">${st}</div></button>`;
+  };
+  const normal = CARS.map((c, i) => i).filter(i => !CARS[i].special), special = CARS.map((c, i) => i).filter(i => CARS[i].special);
+  modal(`<div style="display:flex;justify-content:space-between;align-items:center"><h2 style="display:flex;align-items:center;gap:8px">${coin(28)} ${wallet()}</h2><button class="iconbtn" style="background:#eee;color:#333" onclick="closeModal()" aria-label="Close">${ic('close', 22)}</button></div>
+    ${garageTabs('cars')}
+    <p class="ghint">${ic('book', 20)} Read to unlock</p><div class="garage">${normal.map(card).join('')}</div>
+    <p class="ghint">${ic('shine', 20)} Special cars: buy with coins</p><div class="garage">${special.map(card).join('')}</div>`);
+  say('help_garage'); bindGarageTabs();
+  document.querySelectorAll('.gcar').forEach(b => b.onclick = () => {
+    const i = +b.dataset.i, c = CARS[i];
+    if (hasCar(i)) { S.car = i; save(); sfxVroom(); closeModal(); renderHome(); return; }
+    if (!c.special) { stopAudio(); say('help_garage'); return; }
+    if (wallet() < c.price) { stopAudio(); say('shop_more'); return; }
+    modal(`<div style="text-align:center">${carSVG(i, 240)}<h2 style="margin:6px 0">${esc(c.name)}</h2>
+      <div style="display:flex;gap:10px;margin-top:10px"><button class="btn w" style="flex:1" id="bcNo">${ic('close', 22)}</button><button class="btn g" style="flex:2;display:flex;align-items:center;justify-content:center;gap:6px" id="bcYes">${ic('check', 24)} Buy ${coin(24)} ${c.price}</button></div></div>`);
+    stopAudio(); say('shop_buy');
+    $('#bcNo').onclick = garage;
+    $('#bcYes').onclick = () => { if (wallet() < c.price) return; S.spent = (S.spent || 0) + c.price; S.owned = S.owned || {}; S.owned['car|' + i] = 1; S.car = i; save(); sfxCoin(); sfxWin(); confetti(60); say('new_car'); renderHome(); garage(); sync(); };
+  });
 }
 
 /* ============ RACE ============ */
@@ -1515,9 +1548,6 @@ function pProgress() {
   const heard = S.heard || [], missed = heard.filter(x => !x.ok).length;
   $('#pbody').innerHTML = `<div class="panel settings">
     ${secBlock('week', ic('flame', 26), 'This week', `Streak ${currentStreak()} · best ${bestStreak()}`, weekSummary().replace('<h3 style="margin:0">This week (last 7 days)</h3>', '') + `<p class="hint" style="margin:0">${coin(16)} ${allCoins()} coins in total</p>`)}
-    ${secBlock('report', ic('share', 26), 'Weekly report', 'Send on WhatsApp',
-      `<pre class="report">${esc(weeklyReport())}</pre>
-       <a class="btn g" style="text-align:center;text-decoration:none" target="_blank" href="https://wa.me/?text=${encodeURIComponent(weeklyReport())}">Send on WhatsApp</a>`)}
     ${secBlock('tricky', ic('bulb', 26), 'Tricky words', tricky.length ? tricky.slice(0, 3).map(t => esc(t.w)).join(', ') : 'None yet',
       tricky.length ? `<table><tr><th>Word</th><th>Read alone</th><th>Needed help</th></tr>${tricky.map(t => `<tr><td style="font-family:var(--read);font-size:18px">${esc(t.w)}</td><td>${t.first}/${t.seen}</td><td>${t.miss}</td></tr>`).join('')}</table>` : '<p class="hint">Nothing tricky yet.</p>')}
     ${secBlock('heard', ic('mic', 26), 'What the mic heard', heard.length ? `${missed} not accepted` : 'Nothing yet',
