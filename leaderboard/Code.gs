@@ -5,7 +5,7 @@
 //
 // Tabs it uses (created automatically):
 //   Finished  - one row per child per day when they finish all races: first name and car only. Kept 30 days.
-//   Progress  - one row per phone: that phone's coins, medals and tricky words. Kept 180 days after last use.
+//   Progress  - one row per phone: that phone's coins, medals and tricky words. Kept until the child hasn't played for 180 days.
 //   Classes   - class codes allowed to use the "done today" list. To add a class, type its code in column A.
 
 const FINISHED = 'Finished', PROGRESS = 'Progress', CLASSES = 'Classes';
@@ -152,5 +152,8 @@ function cleanup_() {
     if (kept.length) sh.getRange(2, 1, kept.length, rows[0].length).setValues(kept);
   };
   keep(finished_(), r => now - new Date(String(r[0]).slice(1)).getTime() < KEEP_FINISHED_DAYS * day);
-  keep(progress_(), r => now - new Date(r[3]).getTime() < KEEP_PROGRESS_DAYS * day);
+  // a phone's progress is kept while ANY phone of the same child is still used (an old phone's coins stay counted)
+  const prog = progress_(), rows = prog.getDataRange().getValues().slice(1), active = {};
+  rows.forEach(r => { if (now - new Date(r[3]).getTime() < KEEP_PROGRESS_DAYS * day) active[String(r[1])] = true; });
+  keep(prog, r => active[String(r[1])]);
 }
