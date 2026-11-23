@@ -217,6 +217,9 @@ details.sec .sb{padding:0 2px 14px;display:flex;flex-direction:column;gap:8px}
 .slot.pop{animation:pop .8s 2}
 .res .slots .slot{background:#e4e7f2;border-color:#cfd5ea}.res .slots .slot.on{background:#ffd23f;border-color:#1b1b3a44}
 .bring{position:relative;width:48px;height:48px;display:grid;place-items:center}.bring>svg:first-child{position:absolute;inset:0}.bring .dot{position:absolute;top:0;right:0;width:12px;height:12px;border-radius:50%;background:#ef3e36;border:2px solid #fff}
+.tskip{display:flex;flex-direction:column;gap:6px;margin-left:10px}
+.tskip button{background:#ef3e36;color:#fff;font-weight:800;font-size:13px;border:0;border-radius:999px;padding:6px 10px}
+.tskip button:disabled{opacity:.4}
 .testbadge{position:fixed;top:0;left:50%;transform:translateX(-50%);z-index:90;background:#ef3e36;color:#fff;font-weight:800;font-size:12px;padding:2px 10px;border-radius:0 0 8px 8px;pointer-events:none}
 /* small phones (iPhone SE / mini): keep the top bar, tabs and garage inside the screen */
 .top .chip{flex:none;font-size:21px;padding:4px 12px}
@@ -1315,10 +1318,11 @@ function renderCard() {
 function renderControls() {
   const st = stageName(), box = $('#controls');
   const hear = st === 'model' ? `<button class="round" data-a="hear" aria-label="Hear again">${ic('speaker', 40)}</button>` : '';
+  const tskip = IS_TEST ? '<span class="tskip"><button data-a="tskip">Skip word</button><button data-a="tlast">To last</button></span>' : '';   // test copy only
   const light = st === 'sounds' ? `<button class="round" data-a="light" aria-label="Light the sounds again">${ic('refresh', 38)}</button>` : '';
-  if (micOn()) box.innerHTML = `${light}${hear}<button class="mic" id="micBtn" data-a="mic" aria-label="Read">${ic('mic', 70)}</button>`;
+  if (micOn()) box.innerHTML = `${light}${hear}<button class="mic" id="micBtn" data-a="mic" aria-label="Read">${ic('mic', 70)}</button>${tskip}`;
   else box.innerHTML = `<div style="display:flex;flex-direction:column;align-items:center;gap:10px;color:#fff;text-align:center">
-    <div style="display:flex;gap:14px;align-items:center">${hear}<button class="mic" data-a="retry" aria-label="Try the microphone again">${ic('refresh', 60)}</button></div>
+    <div style="display:flex;gap:14px;align-items:center">${hear}<button class="mic" data-a="retry" aria-label="Try the microphone again">${ic('refresh', 60)}</button>${tskip}</div>
     <div style="background:#ffffff1f;border-radius:14px;padding:8px 12px;font-size:14px;line-height:1.35;max-width:340px">${SR
       ? '<b>Grown-ups:</b> the microphone is off for this page. On iPhone: Settings → Apps → Safari → Microphone → Allow, and Settings → General → Keyboard → Enable Dictation. Then tap ' + ic('refresh', 16) + '.'
       : '<b>Grown-ups:</b> this browser can’t listen. On iPhone, open the game in <b>Safari</b>.'}</div></div>`;
@@ -1331,6 +1335,11 @@ $('#race').addEventListener('click', e => {
   if (a === 'yes') return handleResult(true, {});
   if (a === 'no') return handleResult(false, {});
   if (a === 'light') return lightSounds(false);
+  if (IS_TEST && (a === 'tskip' || a === 'tlast') && R && !R.dead) {   // test copy: skip this word, or jump to the last one
+    stopAudio();
+    if (a === 'tlast' && R.idx < R.queue.length - 1) { R.idx = R.queue.length - 1; R.rival = Math.max(R.rival, R.idx * .6); moveCars(); return nextItem(); }
+    return advance();
+  }
   if (a === 'retry') { micBlocked = false; renderControls(); return onMic(); }
 });
 function setBusy(v) {
