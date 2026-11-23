@@ -119,7 +119,8 @@ input,select,textarea{font-family:var(--ui);font-size:16px;-webkit-user-select:t
 .mic:active{transform:translateY(4px)}
 .mic.listening{animation:pulse 1s infinite;background:radial-gradient(circle at 35% 30%,#7dffb5,var(--green));box-shadow:0 8px 0 #157a48,0 0 0 8px #ffffff55}
 .mic:disabled{animation:none}
-.mic.talking{background:radial-gradient(circle at 35% 30%,#b9c6ff,#6f82e8);box-shadow:0 8px 0 #3d4fa8,0 0 0 8px #ffffff22;position:relative;overflow:visible}
+.mic.talking{background:radial-gradient(circle at 35% 30%,#c9d2f5,#8f9bd0);box-shadow:0 4px 0 #5d6aa8,0 0 0 8px #ffffff14;position:relative;overflow:visible;opacity:.85;transform:scale(.94)}
+.mic.talking .ic path{stroke:#fff}
 .mic.talking .ear{font-size:58px}
 .mic.talking i{position:absolute;inset:-6px;border-radius:50%;border:4px solid #ffffff99;animation:wave 1.4s ease-out infinite}
 .mic.talking i.w2{animation-delay:.7s}
@@ -218,7 +219,8 @@ details.sec .sb{padding:0 2px 14px;display:flex;flex-direction:column;gap:8px}
 .bring{position:relative;width:48px;height:48px;display:grid;place-items:center}.bring>svg:first-child{position:absolute;inset:0}.bring .dot{position:absolute;top:0;right:0;width:12px;height:12px;border-radius:50%;background:#ef3e36;border:2px solid #fff}
 .testbadge{position:fixed;top:0;left:50%;transform:translateX(-50%);z-index:90;background:#ef3e36;color:#fff;font-weight:800;font-size:12px;padding:2px 10px;border-radius:0 0 8px 8px;pointer-events:none}
 /* small phones (iPhone SE / mini): keep the top bar, tabs and garage inside the screen */
-.top .chip{flex:none}
+.top .chip{flex:none;font-size:21px;padding:4px 12px}
+#home #nameChip{font-size:18px !important}
 #nameChip{flex:0 1 auto !important;min-width:0;max-width:34vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block}
 .gear{flex:none}
 @media (max-width:389px){.top .chip{font-size:20px;padding:3px 10px;gap:4px}.top{gap:6px}#nameChip{font-size:17px !important}}
@@ -226,6 +228,9 @@ details.sec .sb{padding:0 2px 14px;display:flex;flex-direction:column;gap:8px}
 .garage{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.gcar{min-width:0}.gcar svg{max-width:100%;height:auto}
 .toast{bottom:calc(100px + env(safe-area-inset-bottom)) !important}
 .set{flex-wrap:wrap}.set label{min-width:0}.set select{max-width:100%}
+.phead{display:flex;align-items:center;gap:8px;margin-bottom:4px}.phead h2{flex:1;margin:0;font-size:24px}
+.phead .pclose{background:#eee;color:#333;flex:none}
+.cpill{display:flex;align-items:center;gap:4px;background:#fff4cc;border-radius:999px;padding:4px 10px;font-weight:800;font-size:17px;color:var(--ink)}
 .nleft{font-weight:800;font-size:14px;white-space:nowrap}
 .shopcars{display:flex;gap:6px;overflow-x:auto;padding:6px 2px;margin-top:4px}.shopcars button{flex:none;border-radius:12px;background:#f1f3ff;padding:2px;border:3px solid transparent}.shopcars button.on{border-color:var(--blue);background:#e1efff}
 .shopbtn{width:100%;margin:8px 0;display:flex;align-items:center;justify-content:center;gap:8px}
@@ -994,15 +999,15 @@ const MEDAL = { 3: ic('medal3', 40), 2: ic('medal2', 40), 1: ic('medal1', 40) };
 const bigMedal = m => ic('medal' + m, 110);
 const RACES = [
   { icon: 'rocket', name: 'Rocket Race', bg: 'linear-gradient(135deg,#7b4dff,#2d6bff)' },
-  { icon: 'bolt', name: 'Lightning Lap', bg: 'linear-gradient(135deg,#ffb300,#ff6a00)' },
-  { icon: 'hero', name: 'Superhero Sprint', bg: 'linear-gradient(135deg,#ff3d6e,#c8174f)' },
-  { icon: 'siren', name: 'Police Chase', bg: 'linear-gradient(135deg,#2d8cff,#1a3d9e)' },
-  { icon: 'dino', name: 'Dino Dash', bg: 'linear-gradient(135deg,#3ccf6e,#138a52)' },
+  { icon: 'bolt', name: 'Lightning Lap', bg: 'linear-gradient(135deg,#c25500,#a83700)' },
+  { icon: 'hero', name: 'Superhero Sprint', bg: 'linear-gradient(135deg,#e0245a,#b0123f)' },
+  { icon: 'siren', name: 'Police Chase', bg: 'linear-gradient(135deg,#1f6fe0,#1a3d9e)' },
+  { icon: 'dino', name: 'Dino Dash', bg: 'linear-gradient(135deg,#178a49,#0f6e3f)' },
   { icon: 'ufo', name: 'Space Speedway', bg: 'linear-gradient(135deg,#5b3bd6,#1b1464)' },
-  { icon: 'firetruck', name: 'Fire Truck Rescue', bg: 'linear-gradient(135deg,#ff5a36,#c21f1f)' },
-  { icon: 'flag', name: 'Grand Prix', bg: 'linear-gradient(135deg,#14c1b5,#0b7f8a)' },
-  { icon: 'moto', name: 'Moto Madness', bg: 'linear-gradient(135deg,#ff7ab6,#8e44ad)' },
-  { icon: 'heli', name: 'Sky Rally', bg: 'linear-gradient(135deg,#39b8ff,#1f6fd1)' },
+  { icon: 'firetruck', name: 'Fire Truck Rescue', bg: 'linear-gradient(135deg,#e0391f,#a81818)' },
+  { icon: 'flag', name: 'Grand Prix', bg: 'linear-gradient(135deg,#0b8279,#086068)' },
+  { icon: 'moto', name: 'Moto Madness', bg: 'linear-gradient(135deg,#c4459a,#8e44ad)' },
+  { icon: 'heli', name: 'Sky Rally', bg: 'linear-gradient(135deg,#1b7bc8,#1858b0)' },
 ];
 function coin(size = 24) {
   return `<svg class="coin" width="${size}" height="${size}" viewBox="0 0 40 40" aria-label="coins"><defs><radialGradient id="cg" cx="35%" cy="30%" r="75%"><stop offset="0" stop-color="#fff3a0"/><stop offset=".45" stop-color="#ffd23f"/><stop offset="1" stop-color="#e69a00"/></radialGradient></defs>
@@ -1122,7 +1127,7 @@ function badgeRow(b) {
 }
 function badgesModal() {
   checkBadges();
-  modal(`<div style="display:flex;justify-content:space-between;align-items:center"><h2 style="display:flex;align-items:center;gap:8px">${ic('ribbon', 34)} Badges</h2><button class="iconbtn" style="background:#eee;color:#333" onclick="closeModal()" aria-label="Close">${ic('close', 22)}</button></div>
+  modal(`${popHead(ic('ribbon', 34), 'Badges')}
     <div class="blist">${BADGES.map(badgeRow).join('')}</div>`);
   document.querySelectorAll('.brow').forEach(r => r.onclick = () => sayBadge(BADGES.find(b => b.id === r.dataset.b)));
   say('badges');
@@ -1199,7 +1204,7 @@ function paintShop(car = S.car, tab = 'body', pick = null) {
   const sw = v => tab === 'emblem'
     ? `<button class="sw" data-v="${v}" style="background:#fff" aria-label="${v}"><svg width="34" height="34" viewBox="-12 -12 24 24">${EMBLEMS[v]}</svg><i>${ic(owns(car, tab, v) ? 'check' : 'lock', 16)}</i></button>`
     : `<button class="sw ${tab === 'wheel' ? 'wh' : ''}" data-v="${v}" style="background:${v}" aria-label="colour"><i>${ic(owns(car, tab, v) ? 'check' : 'lock', 16)}</i></button>`;
-  modal(`<div style="display:flex;justify-content:space-between;align-items:center"><h2 style="display:flex;align-items:center;gap:8px">${coin(28)} ${wallet()}</h2><button class="iconbtn" style="background:#eee;color:#333" id="shopX" aria-label="Close">${ic('close', 22)}</button></div>
+  modal(`${popHead(ic('brush', 32), 'Garage', coinPill(), 'shopX')}
     ${garageTabs('shop')}
     <div class="shopcars">${unlockedCars().map(i => `<button class="${i === car ? 'on' : ''}" data-c="${i}" aria-label="${esc(CARS[i].name)}">${carSVG(i, 64)}</button>`).join('')}</div>
     <div class="shopcar">${carSVG(car, 260, true, { [tab]: val })}</div>
@@ -1225,6 +1230,10 @@ function paintShop(car = S.car, tab = 'body', pick = null) {
     S.spent = (S.spent || 0) + t.price; S.owned = S.owned || {}; S.ownedV2 = 1; S.owned[ownedKey(tab, val)] = 1; sfxCoin(); apply(); sync();
   };
 }
+function popHead(icon, title, extra = '', closeId = '') {   // same top row on every popup
+  return `<div class="phead">${icon}<h2>${title}</h2>${extra}<button class="iconbtn pclose" ${closeId ? `id="${closeId}"` : 'onclick="closeModal()"'} aria-label="Close">${ic('close', 22)}</button></div>`;
+}
+const coinPill = () => `<span class="cpill">${coin(22)} ${wallet()}</span>`;
 function garageTabs(on) {
   if (!FEATURES.shop) return '';
   return `<div class="gtabs"><button data-g="cars" class="${on === 'cars' ? 'on' : ''}">${carSVG(S.car, 44)}<b>Cars</b></button><button data-g="shop" class="${on === 'shop' ? 'on' : ''}">${ic('brush', 28)}<b>Paint shop</b></button></div>`;
@@ -1239,7 +1248,7 @@ function garage() {
     return `<button class="gcar ${i === S.car ? 'sel' : ''} ${has ? '' : 'locked'} ${c.special ? 'spc' : ''}" data-i="${i}">${carSVG(i, 130)}<div class="gst">${st}</div></button>`;
   };
   const all = CARS.map((c, i) => i), mine = all.filter(hasCar), toBuy = FEATURES.shop ? all.filter(i => CARS[i].special && !hasCar(i)) : [], toRead = all.filter(i => !CARS[i].special && !hasCar(i));
-  modal(`<div style="display:flex;justify-content:space-between;align-items:center"><h2 style="display:flex;align-items:center;gap:8px">${coin(28)} ${wallet()}</h2><button class="iconbtn" style="background:#eee;color:#333" onclick="closeModal()" aria-label="Close">${ic('close', 22)}</button></div>
+  modal(`${popHead(carSVG(S.car, 52), 'Garage', coinPill())}
     ${garageTabs('cars')}
     <p class="ghint">${ic('check', 20)} My cars</p><div class="garage">${mine.map(card).join('')}</div>
     ${toBuy.length ? `<p class="ghint">${ic('shine', 20)} Buy with coins</p><div class="garage">${toBuy.map(card).join('')}</div>` : ''}
@@ -1269,7 +1278,7 @@ function startRace(items, meta) {
   $('#mascot').innerHTML = carSVG(S.car, 90); $('#runner').innerHTML = carSVG(S.car, 64); $('#rival').innerHTML = truckSVG(64);
   $('#raceCoins').innerHTML = coin(22) + ' 0';
   show('race'); moveCars();
-  const th = meta.race != null ? RACES[meta.race % RACES.length] : { icon: 'star', name: 'Bonus lap', bg: 'linear-gradient(135deg,#a86bff,#6a2bd9)' };
+  const th = meta.race != null ? RACES[meta.race % RACES.length] : { icon: 'star', name: 'Bonus lap', bg: 'linear-gradient(135deg,#8a4fe8,#6a2bd9)' };
   $('#card').classList.remove('redcard');
   $('#card').innerHTML = `<div style="width:130px;height:130px;border-radius:50%;background:${th.bg};display:grid;place-items:center;font-size:72px;box-shadow:0 6px 0 #0003" class="bounce">${ic(th.icon, 80)}</div><div style="font-size:34px;font-weight:800;margin-top:12px">${th.name}</div>`;
   $('#controls').innerHTML = '';
@@ -1328,7 +1337,7 @@ function setBusy(v) {
   busy = v;
   document.querySelectorAll('#controls button').forEach(b => { if (b.dataset.a !== 'hear') b.disabled = v; });
   const m = $('#micBtn');
-  if (m) { m.classList.toggle('ready', !v); m.classList.toggle('talking', v); if (!m.classList.contains('listening')) m.innerHTML = v ? `<span class="ear">${ic('ear', 64)}</span><i class="w1"></i><i class="w2"></i>` : ic('mic', 70); }
+  if (m) { m.classList.toggle('ready', !v); m.classList.toggle('talking', v); if (!m.classList.contains('listening')) m.innerHTML = v ? `<span class="ear">${ic('speaker', 64)}</span><i class="w1"></i><i class="w2"></i>` : ic('mic', 70); }
 }
 
 async function nextItem() {
