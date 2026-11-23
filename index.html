@@ -174,6 +174,7 @@ input,select,textarea{font-family:var(--ui);font-size:16px;-webkit-user-select:t
 .gcarmini{height:36px;display:flex;align-items:center}
 .gear{opacity:.8}
 .mic .ic{color:#fff}
+.nmbtns .btn{white-space:nowrap;font-size:16px}
 .panel{background:#fff;border-radius:22px;padding:14px;display:flex;flex-direction:column;gap:10px}
 .tabs{display:flex;gap:6px}
 .tabs button{flex:1;padding:10px 6px;border-radius:14px;background:#ffffff22;color:#fff;font-weight:800;font-size:16px}
@@ -224,14 +225,14 @@ table{width:100%;border-collapse:collapse;font-size:15px}td,th{padding:6px 4px;b
 
 <section id="home" class="screen">
   <div class="top">
-    <div class="chip fire" id="streakChip">🔥 0</div>
+    <div class="chip fire" id="streakChip"></div>
     <div class="chip" id="coinChip"></div>
     <div class="chip" id="nameChip" style="font-size:20px;display:none"></div>
     <div class="spacer"></div>
-    <button class="gear" id="parentBtn" aria-label="Grown-ups">⚙️</button>
+    <button class="gear" id="parentBtn" aria-label="Grown-ups"></button>
   </div>
   <div class="hero" style="position:relative">
-    <button id="helpBtn" aria-label="What do I do?" style="position:absolute;top:8px;right:8px;width:44px;height:44px;border-radius:50%;background:#ffffff26;font-size:22px">🔊</button>
+    <button id="helpBtn" aria-label="What do I do?" style="position:absolute;top:8px;right:8px;width:44px;height:44px;border-radius:50%;background:#ffffff26;font-size:22px"></button>
     <div class="bounce" id="heroCar" style="display:flex;justify-content:center"></div>
     <div class="nextcar" id="nextCar"></div>
     <div class="week" id="week"></div>
@@ -241,7 +242,7 @@ table{width:100%;border-collapse:collapse;font-size:15px}td,th{padding:6px 4px;b
 
 <section id="race" class="screen">
   <div class="racebar">
-    <button class="iconbtn" id="exitRace" aria-label="Stop">✕</button>
+    <button class="iconbtn" id="exitRace" aria-label="Stop"></button>
     <div style="flex:1;display:flex;flex-direction:column;gap:6px"><div class="track"><div class="lane"></div><div class="finish"></div><div class="runner" id="runner"></div><div class="runner" id="rival"></div></div><div class="pdots" id="pdots"></div></div>
     <div class="coins" id="raceCoins"></div>
   </div>
@@ -253,12 +254,12 @@ table{width:100%;border-collapse:collapse;font-size:15px}td,th{padding:6px 4px;b
 <section id="results" class="screen"><div id="resBody"></div></section>
 
 <section id="board" class="screen">
-  <div class="top"><button class="iconbtn" id="boardBack" aria-label="Home">🏠</button><div style="font-size:28px;font-weight:800;flex:1">🏆 Done today</div><button class="iconbtn" id="boardRefresh" aria-label="Refresh">🔄</button></div>
+  <div class="top"><button class="iconbtn" id="boardBack" aria-label="Home"></button><div style="font-size:28px;font-weight:800;flex:1">Done today</div><button class="iconbtn" id="boardRefresh" aria-label="Refresh"></button></div>
   <div id="boardBody"></div>
 </section>
 
 <section id="parent" class="screen">
-  <div class="top"><button class="iconbtn" id="parentBack">←</button><div style="font-size:26px;font-weight:800">Grown-ups</div></div>
+  <div class="top"><button class="iconbtn" id="parentBack" aria-label="Back"></button><div style="font-size:26px;font-weight:800">Grown-ups</div></div>
   <div class="tabs" id="ptabs"><button data-t="homework" class="on">Homework</button><button data-t="progress">Progress</button><button data-t="settings">Settings</button><button data-t="help">Help</button></div>
   <div id="pbody"></div>
 </section>
@@ -317,6 +318,16 @@ const ICON = {
   party: `<path d="M6 42l9-27 18 18z" fill="#ffd23f" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/><path d="M11 30l7 7M13 23l12 12" stroke="#ef3e36" stroke-width="3"/><circle cx="30" cy="9" r="2.5" fill="#1d7bf2"/><circle cx="40" cy="17" r="2.5" fill="#2bb673"/><circle cx="38" cy="7" r="2" fill="#ef3e36"/><path d="M22 6c2 3 0 6 2 9M34 26c3-1 6 1 9-1" fill="none" stroke="#a78bfa" stroke-width="3" stroke-linecap="round"/>`,
   sponge: `<rect x="6" y="14" width="36" height="22" rx="6" fill="#ffd23f" stroke="${INK}" stroke-width="3"/><circle cx="15" cy="22" r="2.5" fill="#e0a800"/><circle cx="27" cy="28" r="3" fill="#e0a800"/><circle cx="35" cy="21" r="2" fill="#e0a800"/><circle cx="40" cy="9" r="4" fill="#bfe9ff" stroke="${INK}" stroke-width="2"/><circle cx="32" cy="6" r="2.5" fill="#bfe9ff" stroke="${INK}" stroke-width="2"/>`,
   offline: `<path d="M6 18a26 26 0 0 1 36 0M12 25a17 17 0 0 1 24 0M18 32a8 8 0 0 1 12 0" fill="none" stroke="#aab4c3" stroke-width="4" stroke-linecap="round"/><circle cx="24" cy="38" r="3" fill="#aab4c3"/><circle cx="36" cy="36" r="9" fill="#ef3e36" stroke="${INK}" stroke-width="3"/><path d="M32 32l8 8M40 32l-8 8" stroke="#fff" stroke-width="3" stroke-linecap="round"/>`,
+  save: `<path d="M8 6h26l6 6v30H8z" fill="#1d7bf2" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/><rect x="14" y="6" width="16" height="11" fill="#dfe4f7" stroke="${INK}" stroke-width="3"/><rect x="14" y="26" width="20" height="16" fill="#fff" stroke="${INK}" stroke-width="3"/>`,
+  trash: `<path d="M8 12h32M18 12V7h12v5" fill="none" stroke="${INK}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M11 12l2 30h22l2-30z" fill="#ef3e36" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/><path d="M20 19v16M28 19v16" stroke="#fff" stroke-width="3" stroke-linecap="round"/>`,
+  back: `<path d="M30 10L16 24l14 14" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>`,
+  warn: `<path d="M24 5l20 36H4z" fill="#ffd23f" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/><path d="M24 18v11" stroke="${INK}" stroke-width="4" stroke-linecap="round"/><circle cx="24" cy="35" r="2.5" fill="${INK}"/>`,
+  cross: `<circle cx="24" cy="24" r="19" fill="#ef3e36" stroke="${INK}" stroke-width="3"/><path d="M17 17l14 14M31 17L17 31" stroke="#fff" stroke-width="5" stroke-linecap="round"/>`,
+  share: `<rect x="9" y="18" width="30" height="26" rx="5" fill="#fff" stroke="${INK}" stroke-width="3"/><path d="M24 4v24M16 12l8-8 8 8" fill="none" stroke="#1d7bf2" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>`,
+  phone: `<rect x="12" y="3" width="24" height="42" rx="5" fill="#2b2d3a" stroke="${INK}" stroke-width="3"/><rect x="15" y="9" width="18" height="28" rx="2" fill="#5ec8ff"/><rect x="18" y="13" width="5" height="5" rx="1.5" fill="#ffd23f"/><rect x="25" y="13" width="5" height="5" rx="1.5" fill="#ef3e36"/><rect x="18" y="21" width="5" height="5" rx="1.5" fill="#2bb673"/><circle cx="24" cy="41" r="1.6" fill="#fff"/>`,
+  link: `<path d="M20 28l8-8" stroke="${INK}" stroke-width="4" stroke-linecap="round"/><path d="M22 14l4-4a8 8 0 0 1 12 12l-4 4M26 34l-4 4a8 8 0 0 1-12-12l4-4" fill="none" stroke="#1d7bf2" stroke-width="5" stroke-linecap="round"/>`,
+  record: `<rect x="17" y="4" width="14" height="24" rx="7" fill="#fff" stroke="${INK}" stroke-width="3"/><path d="M11 22a13 13 0 0 0 26 0M24 35v7M17 43h14" fill="none" stroke="${INK}" stroke-width="3.5" stroke-linecap="round"/><circle cx="38" cy="9" r="5" fill="#ef3e36" stroke="${INK}" stroke-width="2"/>`,
+  info: `<circle cx="24" cy="24" r="19" fill="#1d7bf2" stroke="${INK}" stroke-width="3"/><circle cx="24" cy="15" r="2.8" fill="#fff"/><path d="M24 22v13" stroke="#fff" stroke-width="4.5" stroke-linecap="round"/>`,
   box: `<rect x="8" y="8" width="32" height="32" rx="6" fill="#ffffff55" stroke="#ffffffaa" stroke-width="3"/>`,
 };
 function ic(name, size = 28, extra = '') { return `<svg class="ic" width="${size}" height="${size}" viewBox="0 0 48 48" aria-hidden="true" ${extra}>${ICON[name] || ''}</svg>`; }
@@ -327,7 +338,7 @@ const rand = (a, b) => a + Math.floor(Math.random() * (b - a + 1));
 const pick = a => a[Math.floor(Math.random() * a.length)];
 function dayKey(d = new Date()) { return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
 function addDays(k, n) { const [y, m, d] = k.split('-').map(Number); const dt = new Date(y, m - 1, d); dt.setDate(dt.getDate() + n); return dayKey(dt); }
-function toast(t) { const el = $('#toast'); el.textContent = t; el.classList.add('on'); clearTimeout(toast._t); toast._t = setTimeout(() => el.classList.remove('on'), 2200); }
+function toast(t) { const el = $('#toast'); el.innerHTML = String(t).replace(/✓/g, ic('check', 20)); el.classList.add('on'); clearTimeout(toast._t); toast._t = setTimeout(() => el.classList.remove('on'), 2200); }
 function hashStr(s) { let h = 7; for (const c of s) h = (h * 31 + c.charCodeAt(0)) | 0; return h; }
 function seeded(seed) { let x = seed || 1; return () => { x ^= x << 13; x ^= x >>> 17; x ^= x << 5; return ((x >>> 0) % 100000) / 100000; }; }
 
@@ -1014,7 +1025,7 @@ function renderControls() {
   else box.innerHTML = `<div style="display:flex;flex-direction:column;align-items:center;gap:10px;color:#fff;text-align:center">
     <div style="display:flex;gap:14px;align-items:center">${hear}<button class="mic" data-a="retry" aria-label="Try the microphone again">${ic('refresh', 60)}</button></div>
     <div style="background:#ffffff1f;border-radius:14px;padding:8px 12px;font-size:14px;line-height:1.35;max-width:340px">${SR
-      ? '<b>Grown-ups:</b> the microphone is off for this page. On iPhone: Settings → Apps → Safari → Microphone → Allow, and Settings → General → Keyboard → Enable Dictation. Then tap 🔄.'
+      ? '<b>Grown-ups:</b> the microphone is off for this page. On iPhone: Settings → Apps → Safari → Microphone → Allow, and Settings → General → Keyboard → Enable Dictation. Then tap ' + ic('refresh', 16) + '.'
       : '<b>Grown-ups:</b> this browser can’t listen. On iPhone, open the game in <b>Safari</b>.'}</div></div>`;
 }
 $('#race').addEventListener('click', e => {
@@ -1252,7 +1263,7 @@ function pHomework() {
     <div class="hint">Paste the teacher's new homework here: commas between words, each sentence on its own line. Common red words (the, said, you…) are known already; for others, start a line with <b>Red words:</b>. The game builds the races by itself.</div>
     <textarea class="hw" id="hwTx" spellcheck="false" autocapitalize="off">${esc(S.homework)}</textarea>
     <div id="hwPv">${preview(S.homework)}</div>
-    <button class="btn g" id="hwSave">💾 Save homework</button>
+    <button class="btn g" id="hwSave">${ic('save', 24)} Save homework</button>
   </div>`;
   const refreshPv = () => { const t = $('#hwTx'); if (!t) return; const hw = parseHomework(t.value); ensureWords([...hw.words, ...hw.sents]).then(() => { const t2 = $('#hwTx'); if (t2) $('#hwPv').innerHTML = preview(t2.value); }); };
   $('#hwTx').oninput = e => { $('#hwPv').innerHTML = preview(e.target.value); clearTimeout(refreshPv._t); refreshPv._t = setTimeout(refreshPv, 600); };
@@ -1277,16 +1288,16 @@ function weekSummary() {
     <p class="hint" style="margin:0">${top.length ? `Needed help with: <b style="font-family:var(--read);color:var(--ink)">${top.map(esc).join(', ')}</b>` : 'No words needed help this week.'}</p>`;
 }
 function pProgress() {
-  const rows = []; for (let i = 0; i < 14; i++) { const k = addDays(today(), -i); const d = view(k); if (d && (d.coins || Object.keys(d.done).length)) rows.push(`<tr><td>${k}</td><td>${Object.keys(d.done).length}${d.plan ? '/' + d.plan.length : ''}</td><td>${d.coins}</td><td>${d.goal ? '🔥' : ''}</td></tr>`); }
+  const rows = []; for (let i = 0; i < 14; i++) { const k = addDays(today(), -i); const d = view(k); if (d && (d.coins || Object.keys(d.done).length)) rows.push(`<tr><td>${k}</td><td>${Object.keys(d.done).length}${d.plan ? '/' + d.plan.length : ''}</td><td>${d.coins}</td><td>${d.goal ? ic('flame', 20) : ''}</td></tr>`); }
   const tricky = Object.entries(mergedStats()).filter(([, s]) => s.miss > 0).map(([w, s]) => ({ w, ...s, rate: s.first / s.seen })).sort((a, b) => a.rate - b.rate || b.miss - a.miss).slice(0, 15);
   $('#pbody').innerHTML = `<div class="panel">
     ${weekSummary()}
-    <div style="display:flex;gap:8px;flex-wrap:wrap"><div class="chip" style="color:var(--ink);background:#fff4cc;font-size:17px">🔥 Streak ${currentStreak()}</div><div class="chip" style="color:var(--ink);background:#e1efff;font-size:17px">Best ${bestStreak()}</div><div class="chip" style="color:var(--ink);background:#eafbf1;font-size:17px">🪙 ${allCoins()}</div></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap"><div class="chip" style="color:var(--ink);background:#fff4cc;font-size:17px">${ic('flame', 22)} Streak ${currentStreak()}</div><div class="chip" style="color:var(--ink);background:#e1efff;font-size:17px">Best ${bestStreak()}</div><div class="chip" style="color:var(--ink);background:#eafbf1;font-size:17px">${coin(20)} ${allCoins()}</div></div>
     <h3 style="margin:6px 0 0">Tricky ones</h3>
     ${tricky.length ? `<table><tr><th>Item</th><th>Read alone</th><th>Needed help</th></tr>${tricky.map(t => `<tr><td style="font-family:var(--read);font-size:18px">${esc(t.w)}</td><td>${t.first}/${t.seen}</td><td>${t.miss}</td></tr>`).join('')}</table>` : '<p class="hint">Nothing tricky yet.</p>'}
     <h3 style="margin:6px 0 0">What the microphone heard</h3>
-    <p class="hint">The last 40 tries. If he read a word right but it shows ✗, the phone misheard him. "(no-speech)" means it heard nothing.</p>
-    ${(S.heard || []).length ? `<table><tr><th>Time</th><th>Word</th><th>Heard</th><th></th></tr>${S.heard.map(x => `<tr><td>${x.at}</td><td style="font-family:var(--read)">${esc(x.t)}</td><td>${esc(x.h)}</td><td>${x.ok ? '✓' : '✗'}</td></tr>`).join('')}</table>` : '<p class="hint">Nothing yet.</p>'}
+    <p class="hint">The last 40 tries. If he read a word right but it shows ${ic('cross', 16)}, the phone misheard him. "(no-speech)" means it heard nothing.</p>
+    ${(S.heard || []).length ? `<table><tr><th>Time</th><th>Word</th><th>Heard</th><th></th></tr>${S.heard.map(x => `<tr><td>${x.at}</td><td style="font-family:var(--read)">${esc(x.t)}</td><td>${esc(x.h)}</td><td>${x.ok ? ic('check', 20) : ic('cross', 20)}</td></tr>`).join('')}</table>` : '<p class="hint">Nothing yet.</p>'}
     <h3 style="margin:6px 0 0">Last 14 days</h3>
     ${rows.length ? `<table><tr><th>Day</th><th>Races</th><th>Coins</th><th>Goal</th></tr>${rows.join('')}</table>` : '<p class="hint">No races yet.</p>'}
   </div>`;
@@ -1333,7 +1344,7 @@ function nameVoiceHint() {
   if (!S.name) return 'The game shows the name and says it out loud.';
   const known = VOICE.n.has(nameKey(S.name));
   return `${S.nameRec ? 'The game uses your recording of the name.' : known ? 'The game knows how to say this name.' : '<b>The game’s voice doesn’t know this name</b>, so it will only show it. You can record it (3 seconds).'}
-    <div style="display:flex;gap:8px;margin-top:6px">${hasNameVoice() ? '<button class="btn w" id="nmPlay" style="padding:8px 12px">🔊 Hear it</button>' : ''}<button class="btn w" id="nmRec" style="padding:8px 12px">🎙️ ${S.nameRec ? 'Record again' : 'Record the name'}</button>${S.nameRec ? '<button class="btn w" id="nmDel" style="padding:8px 12px">🗑</button>' : ''}</div>`;
+    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:6px" class="nmbtns">${hasNameVoice() ? `<button class="btn w" id="nmPlay" style="padding:8px 12px">${ic('speaker', 22)} Hear it</button>` : ''}<button class="btn w" id="nmRec" style="padding:8px 12px">${ic('record', 22)} ${S.nameRec ? 'Record again' : 'Record the name'}</button>${S.nameRec ? `<button class="btn w" id="nmDel" style="padding:8px 12px" aria-label="Delete recording">${ic('trash', 22)}</button>` : ''}</div>`;
 }
 function bindName(rerender) {
   const wire = () => {
@@ -1363,32 +1374,32 @@ async function recordName(btn, done) {
 const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 const MIC_FIX = isIOS
   ? 'On iPhone: Settings → Apps → Safari → Microphone → <b>Allow</b>, and Settings → General → Keyboard → <b>Enable Dictation</b>. Then reload the game.'
-  : 'Tap the 🔒 or ⓘ next to the web address, set Microphone to <b>Allow</b>, then reload the game.';
+  : `Tap the ${ic('lock', 16)} or ${ic('info', 16)} next to the web address, set Microphone to <b>Allow</b>, then reload the game.`;
 function micTestBlock() {
-  return `<div class="mictest" id="micTest"><b>Microphone test</b><br>Tap the button, then your child says <b>"cat"</b>.<div style="margin-top:8px"><button class="btn w" id="micTestGo" style="padding:8px 14px">🎤 Test the microphone</button></div><div id="micTestRes" style="margin-top:6px"></div></div>`;
+  return `<div class="mictest" id="micTest"><b>Microphone test</b><br>Tap the button, then your child says <b>"cat"</b>.<div style="margin-top:8px"><button class="btn w" id="micTestGo" style="padding:8px 14px">${ic('mic', 22)} Test the microphone</button></div><div id="micTestRes" style="margin-top:6px"></div></div>`;
 }
 function bindMicTest() {
   const b = $('#micTestGo'); if (!b) return;
   b.onclick = () => {   // listen() must start straight from the tap (iPhone rule)
     const out = $('#micTestRes');
-    if (!SR) { out.innerHTML = '❌ This browser can’t listen. ' + (isIOS ? 'Open the game in <b>Safari</b>.' : 'Open the game in <b>Chrome</b>.'); return; }
+    if (!SR) { out.innerHTML = ic('cross', 18) + ' This browser can’t listen. ' + (isIOS ? 'Open the game in <b>Safari</b>.' : 'Open the game in <b>Chrome</b>.'); return; }
     b.disabled = true; out.textContent = 'Getting ready…';
-    listen(5000, t => t.some(x => /\b(cat|kat|cats)\b/.test(norm(x))), () => { out.innerHTML = '🗣️ Say <b>"cat"</b> now!'; }).then(r => {
+    listen(5000, t => t.some(x => /\b(cat|kat|cats)\b/.test(norm(x))), () => { out.innerHTML = ic('speak', 20) + ' Say <b>"cat"</b> now!'; }).then(r => {
       b.disabled = false; setSession('playback');
       if (r.texts && r.texts.length) {
         const ok = r.texts.some(x => /\b(cat|kat|cats)\b/.test(norm(x)));
-        out.innerHTML = ok ? `✅ The microphone works. It heard: "${esc(r.texts[0])}"` : `⚠️ It heard "${esc(r.texts[0])}". The microphone works, but try again a bit closer and slower.`;
+        out.innerHTML = ok ? `${ic('check', 18)} The microphone works. It heard: "${esc(r.texts[0])}"` : `${ic('warn', 18)} It heard "${esc(r.texts[0])}". The microphone works, but try again a bit closer and slower.`;
         if (micBlocked) { micBlocked = false; }
-      } else if (['not-allowed', 'service-not-allowed'].includes(r.error)) out.innerHTML = '❌ The microphone is blocked. ' + MIC_FIX;
-      else out.innerHTML = '⚠️ Nothing heard. Hold the phone closer and try again. If it keeps happening: ' + MIC_FIX;
+      } else if (['not-allowed', 'service-not-allowed'].includes(r.error)) out.innerHTML = ic('cross', 18) + ' The microphone is blocked. ' + MIC_FIX;
+      else out.innerHTML = ic('warn', 18) + ' Nothing heard. Hold the phone closer and try again. If it keeps happening: ' + MIC_FIX;
     });
   };
 }
 const isStandalone = () => (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true;
 function homeTip() {
   if (isStandalone()) return '';
-  return `<div class="note">📲 <b>Put the game on the home screen</b> so it opens like an app: ${isIOS
-    ? 'in Safari tap <b>Share</b> (the square with an arrow ⬆️), then <b>Add to Home Screen</b>.'
+  return `<div class="note">${ic('phone', 22)} <b>Put the game on the home screen</b> so it opens like an app: ${isIOS
+    ? `in Safari tap <b>Share</b> (${ic('share', 18)}), then <b>Add to Home Screen</b>.`
     : 'in Chrome tap <b>⋮</b> (top right), then <b>Add to Home screen</b> or <b>Install app</b>.'}</div>`;
 }
 function pHelp() {
@@ -1397,9 +1408,9 @@ function pHelp() {
     ['My child read it right but the game said no', 'Phones sometimes mishear young children. Open <b>Progress → What the microphone heard</b> to see what the phone wrote. In <b>Settings</b>, keep <b>Microphone checking</b> on <b>Relaxed</b>.'],
     ['How do I add this week’s homework?', 'Open <b>Homework</b>, paste the words (commas between them) and each sentence on its own line, then tap <b>Save homework</b>. The game builds the races by itself.'],
     ['A word has a robot voice', 'The game has a natural voice for about 4,600 words. For others it uses the phone’s own voice. The Homework tab lists those words so you can tell us.'],
-    ['What are the daily goal and the 🔥 streak?', 'The goal is finishing today’s races (change it in <b>Settings</b>). Each day the goal is met adds 1 to the streak. Missing a day starts it again.'],
+    [`What are the daily goal and the ${ic('flame', 18)} streak?`, 'The goal is finishing today’s races (change it in <b>Settings</b>). Each day the goal is met adds 1 to the streak. Missing a day starts it again.'],
     ['What is “Done today”?', 'If you entered a class code, children who finished all of today’s races appear with their first name and car. No scores or ranking. Choose <b>No</b> for “Show my child on the list” to stay off it; your child then doesn’t see the list either.'],
-    ['My child plays on two phones', 'Open <b>Settings</b> on the first phone and copy the code under “Same child on another phone?”. Type it on the second phone and tap <b>🔗 Link</b>. After that, coins, medals, streaks and badges are added up across both phones, and they show once on the class list. Both phones need internet now and then to share.'],
+    ['My child plays on two phones', `Open <b>Settings</b> on the first phone and copy the code under “Same child on another phone?”. Type it on the second phone and tap <b>${ic('link', 16)} Link</b>. After that, coins, medals, streaks and badges are added up across both phones, and they show once on the class list. Both phones need internet now and then to share.`],
     ['Will we lose progress?', 'Progress is saved on the phone and, when online, a copy is kept in the class sheet. If you clear Safari/Chrome website data, use <b>Same child on another phone</b> with the code you wrote down to get it back, so it’s worth noting the code in Settings.'],
     ['Does it work without internet?', 'Yes, after the first visit. Only the “Done today” list needs internet.'],
   ];
@@ -1415,16 +1426,16 @@ function setupWizard(step = 0) {
   const N = 4, dots = `<div class="steps">${Array.from({ length: N }, (_, i) => `<i class="${i <= step ? 'on' : ''}"></i>`).join('')}</div>`;
   const nav = (next, label = 'Next →') => `<div style="display:flex;gap:10px;margin-top:6px">${step ? '<button class="btn w" style="flex:1" id="suBack">← Back</button>' : ''}<button class="btn g" style="flex:2" id="suNext">${label}</button></div>`;
   const body = [
-    () => `<h2>🏎️ Welcome to Word Racer</h2><p class="hint">A 1-minute setup for grown-ups. You can change everything later with ⚙️.</p>
+    () => `<h2 style="display:flex;align-items:center;gap:8px">${carSVG(0, 56)} Welcome to Word Racer</h2><p class="hint">A 1-minute setup for grown-ups. You can change everything later with ${ic('gear', 18)}.</p>
       <div class="panel" style="padding:0">${nameBlock()}</div>${nav()}`,
-    () => `<h2>📚 This week's homework</h2><p class="hint">Paste the words with commas between them, and each sentence on its own line. You can add or change it any time.</p>
+    () => `<h2 style="display:flex;align-items:center;gap:8px">${ic('books', 34)} This week's homework</h2><p class="hint">Paste the words with commas between them, and each sentence on its own line. You can add or change it any time.</p>
       <textarea class="hw" id="suHw" style="min-height:150px" spellcheck="false" autocapitalize="off" placeholder="Words: cat, hen, zip, fox
 Sentences:
 get a hat
 get a pen">${esc(S.homework)}</textarea>${nav()}`,
-    () => `<h2>🏆 Class list (optional)</h2><p class="hint">If your teacher gave you a class code, enter it to see who finished today. No code? Just tap Next.</p>
+    () => `<h2 style="display:flex;align-items:center;gap:8px">${ic('trophy', 34)} Class list (optional)</h2><p class="hint">If your teacher gave you a class code, enter it to see who finished today. No code? Just tap Next.</p>
       <div class="panel" style="padding:0">${classBlock()}</div>${nav()}`,
-    () => `<h2>🎤 Last step</h2>${micTestBlock()}<div style="height:8px"></div>${homeTip()}${nav(0, "Let's race! 🏁")}`,
+    () => `<h2 style="display:flex;align-items:center;gap:8px">${ic('mic', 34)} Last step</h2>${micTestBlock()}<div style="height:8px"></div>${homeTip()}${nav(0, `Let's race! ${ic('flag', 22)}`)}`,
   ];
   modal(dots + body[step]());
   if (step === 0) bindName();
@@ -1516,8 +1527,8 @@ function sync() {   // push this phone, then pull the others; refresh the home s
 /* same child on two phones: share one player code so they count as one */
 function linkBlock() {
   return `<div class="set" style="flex-wrap:wrap;border-bottom:0"><label>Same child on another phone?</label></div>
-    <div class="hint">This phone's code: <b style="font-size:20px;letter-spacing:2px;color:var(--ink)">${esc(S.lb.player)}</b><br>On the other phone, open ⚙️ Settings and type this code below, so your child shows up once on the list. After linking, coins, medals, streaks and badges are added up across both phones.</div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 12px"><input type="text" id="lnkIn" placeholder="Other phone’s code" autocapitalize="off" autocomplete="off" spellcheck="false" style="flex:1;min-width:160px;border:2px solid #dfe3f2;border-radius:10px;padding:8px;font-size:18px"><button class="btn w" id="lnkGo" style="padding:8px 14px">🔗 Link</button></div>`;
+    <div class="hint">This phone's code: <b style="font-size:20px;letter-spacing:2px;color:var(--ink)">${esc(S.lb.player)}</b><br>On the other phone, open ${ic('gear', 16)} Settings and type this code below, so your child shows up once on the list. After linking, coins, medals, streaks and badges are added up across both phones.</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 12px"><input type="text" id="lnkIn" placeholder="Other phone’s code" autocapitalize="off" autocomplete="off" spellcheck="false" style="flex:1;min-width:160px;border:2px solid #dfe3f2;border-radius:10px;padding:8px;font-size:18px"><button class="btn w" id="lnkGo" style="padding:8px 14px">${ic('link', 22)} Link</button></div>`;
 }
 function bindLink() {
   const go = $('#lnkGo'); if (!go) return;
@@ -1533,7 +1544,7 @@ function bindLink() {
 function classBlock() {
   return `<div class="set" style="flex-wrap:wrap"><label>Class code (for the "done today" list)</label><input type="text" id="clsIn" value="${esc(S.lb.cls)}" placeholder="optional" autocapitalize="characters" style="width:150px;border:2px solid #dfe3f2;border-radius:10px;padding:8px;font-size:18px"></div>
     <div class="set"><label>Show my child on the list</label><select id="clsOn"><option value="1" ${S.lb.on ? 'selected' : ''}>Yes</option><option value="0" ${S.lb.on ? '' : 'selected'}>No</option></select></div>
-    <div class="hint">When your child finishes all of today's races, their first name and car appear on the class list with a 🏆. No scores and no ranking. Choose "No" to stay off the list. Children who are off the list don't see it either.</div>
+    <div class="hint">When your child finishes all of today's races, their first name and car appear on the class list with a ${ic('trophy', 16)}. No scores and no ranking. Choose "No" to stay off the list. Children who are off the list don't see it either.</div>
     <div id="lbDup"></div>`;
 }
 function bindClass() {
@@ -1547,7 +1558,7 @@ function bindClass() {
 }
 
 $('#parentBtn').innerHTML = ic('gear', 32); $('#helpBtn').innerHTML = ic('speaker', 30); $('#exitRace').innerHTML = ic('close', 22);
-$('#boardBack').innerHTML = ic('home', 30); $('#boardRefresh').innerHTML = ic('refresh', 26);
+$('#boardBack').innerHTML = ic('home', 30); $('#parentBack').innerHTML = ic('back', 26); $('#boardRefresh').innerHTML = ic('refresh', 26);
 $('#boardBack').nextElementSibling.innerHTML = `<span style="display:inline-flex;align-items:center;gap:8px">${ic('trophy', 32)} Done today</span>`;
 renderHome(); show('home');
 // splash screen: until the game's voices are ready (at most 3 seconds)
