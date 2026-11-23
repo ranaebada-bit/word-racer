@@ -103,10 +103,6 @@ input,select,textarea{font-family:var(--ui);font-size:16px;-webkit-user-select:t
 .sentence{font-family:var(--read);font-size:clamp(40px,11vw,60px);font-weight:700;display:flex;flex-wrap:wrap;justify-content:center;gap:4px 18px;line-height:1.2}
 .sw{border-radius:10px;padding:0 4px;transition:background .2s}
 .sw.miss{color:var(--orange)}.sw.lit{background:var(--yellow)}.sw .word{font-size:inherit}
-.gu{margin-top:8px;background:#ffffff1f;color:#fff;border:2px solid #ffffff55;border-radius:14px;padding:9px 16px;font:inherit;font-size:15px;font-weight:700;position:relative;overflow:hidden;-webkit-user-select:none;user-select:none;touch-action:none}
-.gu i{position:absolute;left:0;top:0;bottom:0;width:0;background:#2bb673aa;z-index:0}
-.gu.hold i{width:100%;transition:width 1s linear}
-.gu span{position:relative;z-index:1}
 .controls{display:flex;align-items:center;justify-content:center;gap:18px;min-height:150px}
 .mic{width:140px;height:140px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#ff7a73,var(--red));color:#fff;font-size:66px;box-shadow:0 8px 0 #9e1d18,0 0 0 8px #ffffff33;display:grid;place-items:center}
 .mic.ready{animation:invite 1.6s infinite}
@@ -219,7 +215,6 @@ table{width:100%;border-collapse:collapse;font-size:15px}td,th{padding:6px 4px;b
   <div class="bubble-row"><div class="mascot" id="mascot"></div><div class="bubble" id="bubble"></div></div>
   <div class="card" id="card"></div>
   <div class="controls" id="controls"></div>
-  <div id="guWrap" style="display:flex;justify-content:center"></div>
 </section>
 
 <section id="results" class="screen"><div id="resBody"></div></section>
@@ -281,7 +276,7 @@ const CARS = [
 ];
 function fresh() {
   return { homework: '', name: '', nameRec: null, setupDone: false, review: [], lb: { cls: '', on: true, player: Math.random().toString(36).slice(2, 12) },
-    settings: { tries: { read: 1, fred: 1, sounds: 1, sound: 2 }, comebacks: 2, goal: 'all', useMic: true, dots: true, guBtn: true },
+    settings: { tries: { read: 1, fred: 1, sounds: 1, sound: 2 }, comebacks: 2, goal: 'all', useMic: true, dots: true },
     coins: 0, streak: 0, best: 0, lastGoalDay: null, days: {}, stats: {}, car: 0 };
 }
 function load() {
@@ -844,7 +839,6 @@ function setBusy(v) {
 
 async function nextItem() {
   if (!R || R.dead) return;
-  showGU(false);
   if (R.idx >= R.queue.length) return finishRace();
   const it = R.queue[R.idx];
   R.cur = { it, stage: 0, tries: 0, missing: [], modeled: false };
@@ -860,27 +854,9 @@ async function nextItem() {
   setBusy(false);
 }
 let micFails = 0;
-/* Grown-up ✓: after the game doesn't accept a try, a grown-up can HOLD this for 1 second to count it as right.
-   Holding (not tapping) stops little fingers from using it by accident. */
-function showGU(on) {
-  const w = $('#guWrap'); if (!w) return;
-  if (!on || S.settings.guBtn === false || !R || R.dead) { w.innerHTML = ''; return; }
-  w.innerHTML = '<button class="gu" id="guBtn" aria-label="Grown-up: hold to count it as right"><i></i><span>👍 Grown-up: hold if it was right</span></button>';
-  const b = $('#guBtn'); let t = null;
-  const cancel = () => { clearTimeout(t); t = null; b.classList.remove('hold'); };
-  b.addEventListener('pointerdown', e => { e.preventDefault(); if (busy) return; b.classList.add('hold'); t = setTimeout(guAccept, 1000); });
-  ['pointerup', 'pointerleave', 'pointercancel'].forEach(ev => b.addEventListener(ev, cancel));
-  b.addEventListener('contextmenu', e => e.preventDefault());
-}
-function guAccept() {
-  if (busy || !R || R.dead || !R.cur) return;
-  showGU(false); logHeard(R.cur.it.text, '(grown-up ✓)', true);
-  handleResult(true, {});
-}
 function logHeard(target, heard, ok) { (S.heard = S.heard || []).unshift({ t: target, h: heard, ok, at: new Date().toTimeString().slice(0, 5) }); S.heard = S.heard.slice(0, 40); save(); }
 function onMic() {   // stays synchronous until the mic has started (iPhone rule)
   if (busy) return;
-  showGU(false);
   setBusy(true); stopAudio();
   const it = R.cur.it, btn = $('#micBtn');
   if (btn) { btn.classList.remove('talking'); btn.textContent = '⏳'; btn.disabled = false; btn.classList.remove('ready'); }
@@ -896,14 +872,13 @@ async function afterListen(it, btn, r) {
   if (r.error && !(r.texts && r.texts.length)) {
     logHeard(it.text, '(' + r.error + ')', false);
     if (['not-allowed', 'service-not-allowed'].includes(r.error)) { micBlocked = true; renderControls(); await say('no_mic'); setBusy(false); return; }
-    await say(noHear++ >= 1 ? 'didnt_hear2' : 'didnt_hear'); setBusy(false); showGU(true); return;  // never counts as a wrong answer
+    await say(noHear++ >= 1 ? 'didnt_hear2' : 'didnt_hear'); setBusy(false); return;  // never counts as a wrong answer
   }
   noHear = 0;
   const res = check(it, r.texts);
   logHeard(it.text, r.texts.filter((t, i, x) => t && x.indexOf(t) === i).slice(0, 3).join(' · '), res.ok);   // everything it heard, not only the first guess
   setBusy(false);
-  await handleResult(res.ok, res);
-  if (!res.ok && R && !R.dead && !busy) showGU(true);
+  handleResult(res.ok, res);
 }
 async function handleResult(ok, res) {
   if (busy) return;
@@ -1046,7 +1021,7 @@ $('#exitRace').onclick = () => {
   modal(`<div class="bigrow" style="padding:10px 0"><button class="bigbtn r" id="mLeave" aria-label="Stop">🏠</button><button class="bigbtn g" id="mStay" aria-label="Keep racing">▶️</button></div>`);
   say('leave_q');
   $('#mStay').onclick = () => { closeModal(); };
-  $('#mLeave').onclick = () => { closeModal(); if (R) R.dead = true; showGU(false); try { currentRec && currentRec.abort(); } catch (e) {} stopAudio(); busy = false; renderHome(); show('home'); };
+  $('#mLeave').onclick = () => { closeModal(); if (R) R.dead = true; try { currentRec && currentRec.abort(); } catch (e) {} stopAudio(); busy = false; renderHome(); show('home'); };
 };
 
 /* ============ PARENT ============ */
@@ -1113,8 +1088,6 @@ function pSettings() {
     <p class="hint">After that the game says the sounds and the word, your child repeats it, and it comes back a few items later.</p>
     <div class="set"><label>Times a missed item comes back</label><select id="sCome">${[0, 1, 2, 3].map(v => opt(v, S.settings.comebacks)).join('')}</select></div>
     <div class="set"><label>Daily goal (for the streak)</label><select id="sGoal">${opt('all', S.settings.goal, 'All races')}${Array.from({ length: Math.max(0, n - 1) }, (_, i) => opt(i + 1, S.settings.goal, `${i + 1} race${i ? 's' : ''}`)).join('')}</select></div>
-    <div class="set"><label>Grown-up ✓ button</label><select id="sGU"><option value="1" ${S.settings.guBtn !== false ? 'selected' : ''}>On</option><option value="0" ${S.settings.guBtn !== false ? '' : 'selected'}>Off</option></select></div>
-    <p class="hint">When the game doesn't accept a word, a small "Grown-up: hold if it was right" button shows under the microphone. If your child read it right, hold it for 1 second and it counts as correct.</p>
     <div class="set"><label>Microphone checking</label><select id="sStrict"><option value="0" ${S.settings.strict ? '' : 'selected'}>Relaxed (recommended)</option><option value="1" ${S.settings.strict ? 'selected' : ''}>Strict</option></select></div>
     <p class="hint">Relaxed: if the phone mishears a vowel (e.g. writes “hell” or “heal” for <i>hill</i>), it still counts, unless the word it heard is also on the homework list.</p>
     <div class="set"><label>Sound dots under words</label><select id="sDots">${opt('1', S.settings.dots ? 1 : 0, 'Always')}${opt('0', S.settings.dots ? 1 : 0, 'Only when helping')}</select></div>
@@ -1125,7 +1098,7 @@ function pSettings() {
   bind('#tRead', v => t.read = +v); bind('#tFred', v => t.fred = +v); bind('#tSounds', v => t.sounds = +v);
   bind('#sCome', v => S.settings.comebacks = +v); bind('#sGoal', v => S.settings.goal = v === 'all' ? 'all' : +v);
   bindName(pSettings); bindClass(); bindLink(); checkDupName();
-  bind('#sDots', v => S.settings.dots = v === '1'); bind('#sStrict', v => S.settings.strict = v === '1'); bind('#sGU', v => S.settings.guBtn = v === '1');
+  bind('#sDots', v => S.settings.dots = v === '1'); bind('#sStrict', v => S.settings.strict = v === '1');
   $('#resetAll').onclick = () => {
     modal(`<h2>Reset coins, streak, cars and stats?</h2><p class="hint">The homework stays.</p><div style="display:flex;gap:10px"><button class="btn w" style="flex:1" onclick="closeModal()">Cancel</button><button class="btn r" style="flex:1" id="rsYes">Reset</button></div>`);
     $('#rsYes').onclick = () => { const keep = { homework: S.homework, review: S.review, settings: S.settings, name: S.name, nameRec: S.nameRec, lb: S.lb, setupDone: true }; S = { ...fresh(), ...keep }; save(); closeModal(); toast('Reset'); pSettings(); };
