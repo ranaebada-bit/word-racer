@@ -216,6 +216,7 @@ details.sec .sb{padding:0 2px 14px;display:flex;flex-direction:column;gap:8px}
 .slot.pop{animation:pop .8s 2}
 .res .slots .slot{background:#e4e7f2;border-color:#cfd5ea}.res .slots .slot.on{background:#ffd23f;border-color:#1b1b3a44}
 .bring{position:relative;width:48px;height:48px;display:grid;place-items:center}.bring>svg:first-child{position:absolute;inset:0}.bring .dot{position:absolute;top:0;right:0;width:12px;height:12px;border-radius:50%;background:#ef3e36;border:2px solid #fff}
+.testbadge{position:fixed;top:0;left:50%;transform:translateX(-50%);z-index:90;background:#ef3e36;color:#fff;font-weight:800;font-size:12px;padding:2px 10px;border-radius:0 0 8px 8px;pointer-events:none}
 .nleft{font-weight:800;font-size:14px;white-space:nowrap}
 .shopcars{display:flex;gap:6px;overflow-x:auto;padding:6px 2px;margin-top:4px}.shopcars button{flex:none;border-radius:12px;background:#f1f3ff;padding:2px;border:3px solid transparent}.shopcars button.on{border-color:var(--blue);background:#e1efff}
 .shopbtn{width:100%;margin:8px 0;display:flex;align-items:center;justify-content:center;gap:8px}
@@ -401,7 +402,12 @@ function hashStr(s) { let h = 7; for (const c of s) h = (h * 31 + c.charCodeAt(0
 function seeded(seed) { let x = seed || 1; return () => { x ^= x << 13; x ^= x >>> 17; x ^= x << 5; return ((x >>> 0) % 100000) / 100000; }; }
 
 /* ============ data ============ */
-const KEY = 'wordRacer.v2';
+// The test copy (…/word-racer/test/) is this same file. It keeps its own saved data, uses the live voice files,
+// and never writes to the class list or shared progress, so trying things out can't affect the families.
+const IS_TEST = /\/test\/?($|index\.html)/.test(location.pathname);
+const BASE = IS_TEST ? '../' : '';
+const APP_VERSION = '2026-11-23';
+const KEY = IS_TEST ? 'wordRacer.test' : 'wordRacer.v2';
 const DEFAULT_HW = `Speed sounds: n, e, p, a, h, g, t, c, b, r, o, f, j, v, k, l, y, u, w
 Words: red, jog, vet, run, jet, yes, rat, jam, yet, yum, win, web, wet, yap, van
 Words: zip, fox, mix, box, fix, egg, kiss, mess, doll, bell, yell, hill
@@ -628,11 +634,11 @@ function sfxCoin() { tone(988, .08, 'square', 0, .05); tone(1319, .2, 'square', 
 /* voices live in audio/*.json and load in the background, so the page opens at once */
 const packP = {};
 function loadPack(name) {
-  return packP[name] || (packP[name] = fetch('audio/' + name + '.json').then(r => r.ok ? r.json() : {}).then(o => { Object.assign(AUDIO, o); }).catch(() => { delete packP[name]; }));
+  return packP[name] || (packP[name] = fetch(BASE + 'audio/' + name + '.json').then(r => r.ok ? r.json() : {}).then(o => { Object.assign(AUDIO, o); }).catch(() => { delete packP[name]; }));
 }
 // Which words and names have a natural voice (small list; the clips themselves load one by one, when needed)
 let VOICE = { w: new Set(), n: new Set() };
-const voiceIndex = fetch('audio/index.json').then(r => r.ok ? r.json() : { w: [], n: [] }).then(o => { VOICE = { w: new Set(o.w), n: new Set(o.n) }; }).catch(() => {});
+const voiceIndex = fetch(BASE + 'audio/index.json').then(r => r.ok ? r.json() : { w: [], n: [] }).then(o => { VOICE = { w: new Set(o.w), n: new Set(o.n) }; }).catch(() => {});
 const allAudio = (async () => { for (const p of AUDIO_PACKS) await loadPack(p); })();
 const clipP = {};
 function b64(buf) { const u = new Uint8Array(buf); let s = ''; for (let i = 0; i < u.length; i += 0x8000) s += String.fromCharCode.apply(null, u.subarray(i, i + 0x8000)); return btoa(s); }
@@ -642,7 +648,7 @@ function loadClip(key) {   // key: w_<word> or n_<name>
   if (!/^[wn]_[a-z]+$/.test(key)) return Promise.resolve();
   return clipP[key] || (clipP[key] = voiceIndex.then(() => {
     if (!VOICE[kind].has(name)) return;
-    return fetch(`audio/${kind}/${name}.mp3`).then(r => r.ok ? r.arrayBuffer() : null).then(buf => { if (buf) AUDIO[key] = b64(buf); });
+    return fetch(`${BASE}audio/${kind}/${name}.mp3`).then(r => r.ok ? r.arrayBuffer() : null).then(buf => { if (buf) AUDIO[key] = b64(buf); });
   }).catch(() => { delete clipP[key]; }));
 }
 async function loadWordVoice(key) { if (!AUDIO[key]) await loadClip(key); }
@@ -1704,6 +1710,26 @@ function homeTip() {
     ? `in Safari tap <b>Share</b> (${ic('share', 18)}), then <b>Add to Home Screen</b>.`
     : 'in Chrome tap <b>⋮</b> (top right), then <b>Add to Home screen</b> or <b>Install app</b>.'}</div>`;
 }
+function feedbackBlock() {
+  return `<div class="mictest"><b>${ic('speak', 22)} Send feedback</b><br>Something not working, or an idea? Tell us here.
+    <textarea id="fbTx" rows="3" style="width:100%;margin-top:8px;border:2px solid #dfe3f2;border-radius:12px;padding:8px;font:inherit;font-size:16px" placeholder="For example: the word 'hill' sounds wrong"></textarea>
+    <button class="btn g" id="fbGo" style="margin-top:6px;width:100%">Send</button><div id="fbRes" class="hint" style="margin-top:4px"></div></div>`;
+}
+function bindFeedback() {
+  const go = $('#fbGo'); if (!go) return;
+  go.onclick = async () => {
+    const msg = $('#fbTx').value.trim(); if (!msg) return toast('Write something first');
+    go.disabled = true; $('#fbRes').textContent = 'Sending…';
+    const info = { name: S.name || '', cls: S.lb.cls || '', version: APP_VERSION + (IS_TEST ? ' (test)' : ''), phone: navigator.userAgent.slice(0, 180),
+      mic: SR ? (micBlocked ? 'blocked' : 'ok') : 'none', heard: (S.heard || []).slice(0, 5).map(x => `${x.t}>${x.h}`).join(' | ') };
+    try {
+      const r = await (await fetch(LB_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'feedback', message: msg.slice(0, 2000), info }) })).json();
+      if (r && r.ok) { $('#fbTx').value = ''; $('#fbRes').innerHTML = ic('check', 16) + ' Thank you! We got it.'; }
+      else throw new Error('not ok');
+    } catch (e) { $('#fbRes').textContent = 'Could not send. Check the internet and try again.'; }
+    go.disabled = false;
+  };
+}
 function pHelp() {
   const qa = [
     ['The microphone doesn’t work, or it keeps saying “I didn’t hear you”', `Use the test below. Speak close to the phone in a quiet room. ${MIC_FIX}`],
@@ -1720,9 +1746,10 @@ function pHelp() {
   $('#pbody').innerHTML = `<div class="panel">
     ${homeTip()}
     ${micTestBlock()}
+    ${feedbackBlock()}
     <div class="faq">${qa.map(([q, a]) => `<details><summary>${q}</summary><p>${a}</p></details>`).join('')}</div>
   </div>`;
-  bindMicTest();
+  bindMicTest(); bindFeedback();
 }
 function setupWizard(step = 0) {
   if (S.setupDone || (step === 0 && $('#modalBg').classList.contains('on'))) return;
@@ -1755,7 +1782,7 @@ get a pen">${esc(S.homework)}</textarea>${nav()}`,
 
 /* ---- class leaderboard (Google Sheet) ---- */
 const LB_URL = 'https://script.google.com/macros/s/AKfycby9VJJwcEd1syIe-3SuG4LYih2gHZfXIzFmFPTwpIZqtkqADomYTDlBNttWQ4srIDk/exec';
-const lbActive = () => !!(LB_URL.startsWith('https://') && S.lb.cls);
+const lbActive = () => !IS_TEST && !!(LB_URL.startsWith('https://') && S.lb.cls);
 function countRead(it) { const d = dayRec(); d.words = (d.words || 0) + (it.type === 'sentence' ? norm(plain(it.text)).split(' ').length : 1); }
 async function lbCall(params) {
   const q = new URLSearchParams({ class: S.lb.cls, day: today(), player: S.lb.player, ...params });
@@ -1807,10 +1834,12 @@ function ledger() {
 }
 let syncing = null;
 async function syncPush() {
+  if (IS_TEST) return;
   if (!LB_URL.startsWith('https://') || !navigator.onLine) return;
   try { await fetch(LB_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'push', player: S.lb.player, phone: S.lb.phone, data: ledger() }) }); } catch (e) {}
 }
 async function syncPull() {
+  if (IS_TEST) return false;
   if (!LB_URL.startsWith('https://') || !navigator.onLine) return false;
   const q = new URLSearchParams({ action: 'pull', player: S.lb.player });
   const ctl = new AbortController(); const t = setTimeout(() => ctl.abort(), 15000);
@@ -1868,7 +1897,8 @@ Promise.race([allAudio, sleep(3000)]).then(() => { const sp = $('#splash'); if (
 sync();
 document.addEventListener('visibilitychange', () => { if (!document.hidden) sync(); });
 // keep the game and voices on the phone: faster opening, less data, works offline
-if ('serviceWorker' in navigator) window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(() => {}); });
+if (IS_TEST) { const t = document.createElement('div'); t.className = 'testbadge'; t.textContent = 'TEST VERSION'; document.body.appendChild(t); }
+else if ('serviceWorker' in navigator) window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(() => {}); });
 </script>
 </body>
 </html>

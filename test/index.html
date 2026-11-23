@@ -1,0 +1,1904 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Word Racer">
+<meta name="theme-color" content="#14205c">
+<title>Word Racer</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Word Racer">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&family=Baloo+2:wght@600;800&display=swap" rel="stylesheet">
+<style>
+:root{--sky1:#14205c;--sky2:#2a3fa8;--road:#2b2d3a;--yellow:#ffd23f;--red:#ef3e36;--green:#2bb673;--blue:#1d7bf2;--orange:#ff8c1a;--ink:#1b1b3a;--card:#fffdf6;--muted:#6b6f8a;
+  --read:'Andika','Comic Sans MS','Trebuchet MS',sans-serif;--ui:'Baloo 2','Trebuchet MS',system-ui,sans-serif;}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%}
+body{font-family:var(--ui);color:var(--ink);background:var(--sky1);min-height:100dvh;overflow-x:hidden;-webkit-user-select:none;user-select:none;
+  padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+button{font-family:var(--ui);cursor:pointer;border:none}
+input,select,textarea{font-family:var(--ui);font-size:16px;-webkit-user-select:text;user-select:text}
+.bg{position:fixed;inset:0;pointer-events:none;z-index:-1;background-color:var(--sky1);
+  background-image:radial-gradient(2px 2px at 20% 15%,#fff8,transparent),radial-gradient(2px 2px at 70% 8%,#fff6,transparent),radial-gradient(1.5px 1.5px at 40% 30%,#fff5,transparent),radial-gradient(2px 2px at 85% 25%,#fff7,transparent),radial-gradient(1.5px 1.5px at 10% 40%,#fff5,transparent),linear-gradient(180deg,var(--sky1),var(--sky2) 70%,#3c55c9)}
+.screen{display:none;min-height:100dvh;max-width:560px;margin:0 auto;padding:14px 14px 24px;flex-direction:column;gap:12px}
+.screen.on{display:flex}
+.top{display:flex;align-items:center;gap:8px;color:#fff}
+.chip{background:#ffffff1f;border:2px solid #ffffff33;border-radius:999px;padding:4px 14px;font-weight:800;font-size:24px;color:#fff;display:flex;align-items:center;gap:6px}
+.chip.fire{background:#ff8c1a33;border-color:#ffb36a}
+.spacer{flex:1}
+.gear{background:none;font-size:22px;opacity:.55;padding:6px}
+.pop{animation:pop .5s}@keyframes pop{40%{transform:scale(1.35)}}
+.hero{border-radius:24px;padding:8px 10px 12px;text-align:center;color:#fff;background:radial-gradient(circle at 50% 110%,#ffd23f55,transparent 60%),#ffffff14;border:2px solid #ffffff2a}
+.week{display:flex;justify-content:center;gap:8px;margin-top:6px}
+.week b{width:32px;height:32px;border-radius:50%;background:#ffffff22;border:2px solid #ffffff44;display:grid;place-items:center;font-size:16px}
+.week b.ok{background:var(--yellow);border-color:#fff}
+.week b.today{box-shadow:0 0 0 3px #ffffff99}
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.races{display:flex;flex-direction:column;gap:10px}
+.rcard{display:flex;align-items:center;gap:12px;border-radius:22px;padding:8px 12px 8px 10px;box-shadow:0 6px 0 #0004;color:#fff;text-align:left;position:relative;overflow:hidden;width:100%}
+.rcard::after{content:'';position:absolute;right:-10px;top:0;bottom:0;width:46px;opacity:.18;background:repeating-conic-gradient(#fff 0 25%,#000 0 50%) 0 0/16px 16px}
+.rcard:active{transform:translateY(4px);box-shadow:0 2px 0 #0004}
+.rcard .badge{width:58px;height:58px;flex:none;border-radius:50%;background:#00000022;border:3px solid #ffffff88;display:grid;place-items:center;font-size:32px;position:relative}
+.rcard .badge .n{position:absolute;top:-6px;left:-6px;width:24px;height:24px;border-radius:50%;background:#fff;color:var(--ink);font-size:16px;font-weight:800;display:grid;place-items:center;box-shadow:0 2px 0 #0003}
+.rcard .info{flex:1;min-width:0;z-index:1}
+.rcard .nm{font-size:21px;font-weight:800;line-height:1.05;text-shadow:0 2px 0 #0003}
+.rcard .sub{font-size:14px;font-weight:700;opacity:.92;margin-top:3px}
+.rcard .go{font-size:30px;z-index:1;width:44px;text-align:center}
+.rcard.done .badge,.rcard.done .info{opacity:.6}
+.rcard.done .go{font-size:36px}
+.rcard.next{animation:glow2 1.4s infinite}
+@keyframes glow2{50%{box-shadow:0 6px 0 #0004,0 0 0 7px #ffd23faa}}
+.mini{position:fixed;left:0;right:0;bottom:0;z-index:20;display:grid;grid-template-columns:repeat(auto-fit,minmax(0,1fr));gap:4px;padding:8px 10px calc(8px + env(safe-area-inset-bottom));background:#0f1a4fee;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-top:1px solid #ffffff22}
+#home{padding-bottom:calc(96px + env(safe-area-inset-bottom))}
+.mtile{border-radius:16px;background:none!important;box-shadow:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:4px 2px;min-height:60px;font-size:28px;line-height:1;color:#fff;text-align:center}
+.mtile:active{background:#ffffff1f!important}
+.mtile b{font-size:12px;margin:0;line-height:1.1;font-weight:800;opacity:.9;white-space:nowrap}
+.mtile:active{transform:translateY(3px)}
+.week{align-items:flex-end}
+.wd{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:12px;font-weight:800;color:#fffc}
+.coin{display:inline-block;vertical-align:-.15em;flex:none}
+.tile{aspect-ratio:1;border-radius:24px;background:var(--card);box-shadow:0 6px 0 #0003;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;position:relative;font-weight:800;font-size:40px;color:var(--ink)}
+.tile:active{transform:translateY(4px);box-shadow:0 2px 0 #0003}
+.tile .num{font-size:22px;line-height:1;background:var(--ink);color:#fff;border-radius:999px;width:32px;height:32px;display:grid;place-items:center;position:absolute;top:8px;left:8px}
+.tile.done{background:#eafbf1}
+.tile.next{animation:glow 1.4s infinite;background:#fff6cf}
+@keyframes glow{50%{box-shadow:0 6px 0 #0003,0 0 0 8px #ffd23f88}}
+.tile.bonus{background:#efe2ff}.tile.garage{background:#e1efff}
+.bounce{animation:bob 1.6s ease-in-out infinite}@keyframes bob{50%{transform:translateY(-6px)}}
+/* race */
+.racebar{display:flex;align-items:center;gap:8px}
+.iconbtn{width:46px;height:46px;border-radius:50%;background:#ffffff22;color:#fff;font-size:22px;font-weight:800;flex:none}
+.track{flex:1;height:84px;background:var(--road);border-radius:14px;position:relative;overflow:hidden;border:3px solid #ffffff55}
+.lane{position:absolute;left:0;right:0;top:50%;height:3px;margin-top:-1px;background:repeating-linear-gradient(90deg,#fff9 0 14px,transparent 14px 26px)}
+.finish{position:absolute;right:0;top:0;bottom:0;width:14px;background:repeating-conic-gradient(#fff 0 25%,#222 0 50%) 0 0/14px 14px}
+.runner{position:absolute;left:0;width:64px;transition:left .9s cubic-bezier(.3,1.4,.6,1)}
+#runner{top:1px}#rival{top:42px}
+.runner.turbo::before{content:'🔥';position:absolute;left:-22px;top:6px;font-size:22px;animation:flick .2s infinite alternate}
+@keyframes flick{to{transform:scale(1.25)}}
+.racebar .track{flex:none;width:100%}
+.pdots{display:flex;justify-content:center;gap:5px;flex-wrap:wrap}
+.pdots b{width:12px;height:12px;border-radius:50%;background:#ffffff33}
+.pdots b.on{background:var(--yellow)}
+.pdots b.cur{background:#fff;box-shadow:0 0 0 3px #ffd23f99;animation:pop 1s infinite}
+.pdots b.pit{background:#ff8c1a55}.pdots b.pit.on{background:var(--orange)}
+.coins{min-width:64px;text-align:center;background:var(--yellow);color:var(--ink);border-radius:14px;padding:4px 8px;font-weight:800;font-size:20px}
+.bubble-row{display:flex;align-items:flex-end;gap:6px;min-height:76px}
+.mascot{width:90px;flex:none}
+.bubble{flex:1;background:#fff;border-radius:20px 20px 20px 4px;padding:10px 14px;font-size:19px;font-weight:700;line-height:1.2;min-height:52px;display:flex;align-items:center}
+.card{background:var(--card);border-radius:28px;min-height:220px;display:flex;align-items:center;justify-content:center;flex-direction:column;padding:22px 12px;box-shadow:0 8px 0 #0003;position:relative}
+.card.good{animation:goodflash .7s}.card.bad{animation:shake .5s ease-in-out}
+@keyframes goodflash{30%{background:#d7f8e5;transform:scale(1.03)}}
+@keyframes shake{25%{transform:translateX(-4px) rotate(-1deg)}75%{transform:translateX(4px) rotate(1deg)}}
+.tag{position:absolute;top:10px;left:14px;font-size:22px}
+.card.final{padding-top:40px}
+.card.final::before{content:'';position:absolute;left:0;right:0;top:0;height:26px;border-radius:28px 28px 0 0;background:repeating-conic-gradient(#1b1b3a 0 25%,#fff 0 50%) 0 0/26px 26px}
+.card.final::after{content:'🏁 FINISH 🏁';position:absolute;top:30px;left:50%;transform:translateX(-50%);font-size:15px;font-weight:800;color:var(--ink);letter-spacing:2px;white-space:nowrap}
+.word{font-family:var(--read);font-size:clamp(64px,20vw,100px);font-weight:700;display:flex;gap:2px;line-height:1.1}
+.g{position:relative;padding:0 2px 22px;border-radius:12px;transition:background .2s}
+.g i{position:absolute;left:50%;bottom:4px;transform:translateX(-50%)}
+.g i.dot{width:12px;height:12px;border-radius:50%;background:var(--ink)}
+.g i.dash{width:70%;height:6px;border-radius:3px;background:var(--ink)}
+.nodots .g{padding-bottom:4px}.nodots .g i{display:none}
+.g.lit{background:var(--yellow)}.g.lit i{background:var(--red)}
+.sentence{font-family:var(--read);font-size:clamp(40px,11vw,60px);font-weight:700;display:flex;flex-wrap:wrap;justify-content:center;gap:4px 18px;line-height:1.2}
+.sw{border-radius:10px;padding:0 4px;transition:background .2s}
+.sw.miss{color:var(--orange)}.sw.lit{background:var(--yellow)}.sw .word{font-size:inherit}
+.controls{display:flex;align-items:center;justify-content:center;gap:18px;min-height:150px}
+.mic{width:140px;height:140px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#ff7a73,var(--red));color:#fff;font-size:66px;box-shadow:0 8px 0 #9e1d18,0 0 0 8px #ffffff33;display:grid;place-items:center}
+.mic.ready{animation:invite 1.6s infinite}
+@keyframes invite{50%{box-shadow:0 8px 0 #9e1d18,0 0 0 18px #ffffff22}}
+.mic:active{transform:translateY(4px)}
+.mic.listening{animation:pulse 1s infinite;background:radial-gradient(circle at 35% 30%,#7dffb5,var(--green));box-shadow:0 8px 0 #157a48,0 0 0 8px #ffffff55}
+.mic:disabled{animation:none}
+.mic.talking{background:radial-gradient(circle at 35% 30%,#b9c6ff,#6f82e8);box-shadow:0 8px 0 #3d4fa8,0 0 0 8px #ffffff22;position:relative;overflow:visible}
+.mic.talking .ear{font-size:58px}
+.mic.talking i{position:absolute;inset:-6px;border-radius:50%;border:4px solid #ffffff99;animation:wave 1.4s ease-out infinite}
+.mic.talking i.w2{animation-delay:.7s}
+@keyframes wave{from{transform:scale(.85);opacity:1}to{transform:scale(1.35);opacity:0}}
+.mascot.talking{animation:talk .35s ease-in-out infinite alternate}
+@keyframes talk{to{transform:translateY(-5px) rotate(-3deg)}}
+@keyframes pulse{50%{box-shadow:0 8px 0 #157a48,0 0 0 22px #ffffff22}}
+.round{width:76px;height:76px;border-radius:50%;background:#fff;font-size:36px;box-shadow:0 6px 0 #0003;display:grid;place-items:center}
+.round:disabled{opacity:.4}
+.round.g{background:var(--green)}.round.r{background:var(--red)}
+.nomic{font-size:70px;text-align:center}
+/* results */
+.res{background:var(--card);border-radius:28px;padding:18px;text-align:center;box-shadow:0 8px 0 #0003}
+.medal{font-size:90px;line-height:1}
+.plus{font-size:34px;font-weight:800;color:var(--ink)}
+.practice{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:8px}
+.practice span{font-family:var(--read);font-size:28px;background:#fff1e0;border-radius:10px;padding:2px 12px}
+.unlock{background:linear-gradient(135deg,#ffd23f,#ff8c1a);border-radius:22px;padding:10px;text-align:center;font-size:40px;animation:pop .8s}
+.bigrow{display:flex;justify-content:center;gap:24px}
+.bigbtn{width:100px;height:100px;border-radius:28px;font-size:52px;box-shadow:0 6px 0 #0003;background:#fff}
+.bigbtn.y{background:var(--yellow)}.bigbtn.g{background:var(--green)}.bigbtn.r{background:var(--red)}
+.bigbtn:active{transform:translateY(4px)}
+/* modal */
+.modal-bg{position:fixed;inset:0;background:#0009;display:none;align-items:center;justify-content:center;padding:16px;z-index:50}
+.modal-bg.on{display:flex}
+.modal{background:#fff;border-radius:24px;padding:18px;max-width:520px;width:100%;max-height:88dvh;overflow:auto}
+.modal h2{margin:0 0 8px;font-size:24px}
+.garage{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.gcar{border-radius:18px;background:#f1f3ff;padding:6px;text-align:center;font-weight:800;font-size:18px;border:4px solid transparent}
+.gcar.sel{border-color:var(--blue);background:#e1efff}
+.gcar.locked{opacity:.6;position:relative}
+.gst{display:flex;align-items:center;justify-content:center;gap:4px;min-height:30px}
+.nextcar{display:flex;align-items:center;gap:8px;margin:8px auto 0;max-width:330px}
+.nextcar .bar{flex:1;height:16px;border-radius:999px;background:#ffffff26;overflow:hidden;border:2px solid #ffffff44}
+.nextcar .bar i{display:block;height:100%;background:linear-gradient(90deg,#ffd23f,#ff8c1a);border-radius:999px}
+.nextcar .nc{opacity:.75}
+/* parent */
+.faq details{border-bottom:1px solid #eee;padding:10px 0}.faq summary{font-weight:800;cursor:pointer;font-size:16px}.faq p{margin:8px 0 0;color:#444;font-size:15px;line-height:1.4}
+.wk{display:grid;grid-template-columns:1fr 1fr;gap:8px}.wk div{background:#f3f5ff;border-radius:14px;padding:10px;text-align:center;font-size:14px;color:#555}.wk b{display:block;font-size:24px;color:var(--ink)}
+.steps{display:flex;gap:6px;justify-content:center;margin:2px 0 8px}.steps i{width:28px;height:6px;border-radius:3px;background:#dfe3f2}.steps i.on{background:var(--blue)}
+.mictest{background:#f3f5ff;border-radius:14px;padding:10px;font-size:15px;line-height:1.4}
+.newbadges{display:flex;gap:10px;justify-content:center;margin-top:8px}.newbadges .bdg{width:110px}.bdg.pop{animation:pop .6s}
+.badges{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:8px}.bdg{background:#fff4cc;border-radius:16px;padding:10px 4px;text-align:center}.bdg span{font-size:38px;display:block}.bdg small{font-size:12px;font-weight:700;color:#555}.bdg.locked{background:#eee}.bdg.locked span{filter:grayscale(1);opacity:.35}
+.wash{position:fixed;inset:0;z-index:60;background:linear-gradient(#5ec8ff,#bfe9ff 60%,#7ad36b 60%);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;touch-action:none}
+.wash .stage{position:relative;width:320px;height:180px}
+.wash .stage svg{position:absolute;left:0;top:0}
+.wash canvas{position:absolute;left:0;top:0;width:320px;height:180px;touch-action:none}
+.wash .skip{position:absolute;top:calc(14px + env(safe-area-inset-top));right:14px;background:#ffffffcc;border-radius:999px;padding:8px 16px;font-weight:800;font-size:16px;color:var(--ink)}
+.wash .hand{font-size:46px;animation:bob 1s ease-in-out infinite}
+.ic{display:inline-block;vertical-align:middle;flex:none}
+.gobtn{display:inline-grid;place-items:center;width:44px;height:44px;border-radius:50%;background:#2bb673;box-shadow:0 3px 0 #0003}
+.gcarmini{height:36px;display:flex;align-items:center}
+.gear{opacity:.8}
+.mic .ic{color:#fff}
+.nmbtns .btn{white-space:nowrap;font-size:16px}
+.settings{gap:0;padding:6px 14px}
+details.sec{border-bottom:1px solid #eef0f7}details.sec:last-child{border-bottom:0}
+details.sec summary{list-style:none;display:flex;align-items:center;gap:10px;padding:14px 2px;cursor:pointer;font-weight:800;font-size:17px;color:var(--ink)}
+details.sec summary::-webkit-details-marker{display:none}
+details.sec summary .st{flex:1}
+details.sec summary .sv{font-weight:700;font-size:14px;color:#777;max-width:45%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+details.sec summary::after{content:'';width:9px;height:9px;border-right:3px solid #aab;border-bottom:3px solid #aab;transform:rotate(45deg);margin:0 4px 4px 2px;transition:transform .2s}
+details.sec[open] summary::after{transform:rotate(-135deg);margin-bottom:-4px}
+details.sec .sb{padding:0 2px 14px;display:flex;flex-direction:column;gap:8px}
+.nextbadge{display:flex;align-items:center;gap:8px;margin:6px auto 0;max-width:330px;width:100%;background:none;color:#fff;font-weight:800}
+.nextbadge .bar{flex:1;height:14px;border-radius:999px;background:#ffffff26;overflow:hidden;border:2px solid #ffffff44}
+.nextbadge .bar i{display:block;height:100%;background:linear-gradient(90deg,#7dffb5,#2bb673);border-radius:999px}
+.nextbadge .nbt{font-size:14px;min-width:54px;text-align:right}
+.blist{display:flex;flex-direction:column;gap:10px;margin-top:10px}
+.brow{display:flex;align-items:center;gap:12px;background:#f3f5ff;border-radius:18px;padding:10px;text-align:left;width:100%;color:var(--ink)}
+.brow .bi{flex:1;min-width:0}.brow .bi b{font-size:19px}.brow small{font-size:13px;color:#666;font-weight:700}
+.blv{display:flex;gap:4px;margin:4px 0}.blv i{width:22px;height:8px;border-radius:4px;border:1.5px solid #1b1b3a33}
+.bbar{height:12px;border-radius:999px;background:#dfe3f2;overflow:hidden;margin-bottom:2px}.bbar i{display:block;height:100%;background:linear-gradient(90deg,#7dffb5,#2bb673);border-radius:999px}
+.bsay{flex:none}
+.bwin{position:fixed;inset:0;z-index:70;background:radial-gradient(circle,#2d4bd8ee,#0f1a4fee);display:grid;place-items:center}
+.bwin-in{display:flex;flex-direction:column;align-items:center;gap:10px;color:#fff;text-align:center;animation:zoomin .6s cubic-bezier(.3,1.6,.5,1)}
+.bwin-t{font-size:34px;font-weight:800}.bwin-s{font-size:18px;opacity:.85;margin-bottom:10px}
+@keyframes zoomin{from{transform:scale(.2) rotate(-20deg);opacity:0}to{transform:none;opacity:1}}
+.wd b.sh{background:#e1f4ff;border-color:#5ec8ff}
+.report{white-space:pre-wrap;font:600 15px/1.5 inherit;font-family:inherit;background:#f3f5ff;border-radius:14px;padding:12px;margin:0;color:var(--ink)}
+#paintBtn{position:absolute;top:8px;left:8px;width:48px;height:48px;border-radius:50%;background:#ffffff26;display:grid;place-items:center}
+#paintBtn .dot{position:absolute;top:2px;right:2px;width:14px;height:14px;border-radius:50%;background:#ef3e36;border:2px solid #fff}
+#paintBtn.glow{animation:glow 1.4s infinite;background:#ffd23f55}
+.gtabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0 4px}
+.gtabs button{display:flex;align-items:center;justify-content:center;gap:6px;padding:8px;border-radius:16px;background:#f1f3ff;color:var(--ink);font-size:16px;min-height:52px}
+.gtabs button.on{background:#e1efff;box-shadow:inset 0 0 0 3px var(--blue)}
+.ghint{display:flex;align-items:center;gap:6px;margin:12px 0 4px;font-weight:800;color:#555;font-size:15px}
+.gcar.spc{background:linear-gradient(135deg,#fff6d6,#ffe1f2)}
+.gcar.spc.locked{opacity:1}
+.rtot{display:flex;align-items:center;gap:3px;font-weight:800;font-size:17px;background:#ffffff26;border-radius:999px;padding:2px 8px 2px 4px}
+.slots{display:flex;gap:3px;flex:1;justify-content:center}
+.slot{border-radius:6px;background:#ffffff26;border:2px solid #ffffff44;display:grid;place-items:center}
+.slot.on{background:#ffd23f;border-color:#fff}
+.slot.pop{animation:pop .8s 2}
+.res .slots .slot{background:#e4e7f2;border-color:#cfd5ea}.res .slots .slot.on{background:#ffd23f;border-color:#1b1b3a44}
+.bring{position:relative;width:48px;height:48px;display:grid;place-items:center}.bring>svg:first-child{position:absolute;inset:0}.bring .dot{position:absolute;top:0;right:0;width:12px;height:12px;border-radius:50%;background:#ef3e36;border:2px solid #fff}
+.testbadge{position:fixed;top:0;left:50%;transform:translateX(-50%);z-index:90;background:#ef3e36;color:#fff;font-weight:800;font-size:12px;padding:2px 10px;border-radius:0 0 8px 8px;pointer-events:none}
+.nleft{font-weight:800;font-size:14px;white-space:nowrap}
+.shopcars{display:flex;gap:6px;overflow-x:auto;padding:6px 2px;margin-top:4px}.shopcars button{flex:none;border-radius:12px;background:#f1f3ff;padding:2px;border:3px solid transparent}.shopcars button.on{border-color:var(--blue);background:#e1efff}
+.shopbtn{width:100%;margin:8px 0;display:flex;align-items:center;justify-content:center;gap:8px}
+.shopcar{display:flex;justify-content:center;background:radial-gradient(circle at 50% 80%,#ffd23f44,transparent 60%),#eef1ff;border-radius:20px;padding:10px 0;margin:8px 0}
+.shoptabs{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.shoptabs button{display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 2px;border-radius:14px;background:#f1f3ff;font-size:13px;color:var(--ink)}
+.shoptabs button.on{background:#e1efff;box-shadow:inset 0 0 0 3px var(--blue)}
+.swatches{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin:12px 0}
+.sw{width:46px;height:46px;border-radius:50%;border:3px solid #1b1b3a33;position:relative;display:grid;place-items:center;box-shadow:0 3px 0 #0002}
+.sw.wh{border:8px solid #2b2d3a}
+.sw.sel{outline:4px solid var(--blue);outline-offset:2px}
+.sw i{position:absolute;right:-6px;bottom:-6px;background:#fff;border-radius:50%;width:22px;height:22px;display:grid;place-items:center;box-shadow:0 1px 3px #0003}
+.shopact .btn{width:100%;display:flex;align-items:center;justify-content:center;gap:8px;font-size:20px}
+.panel{background:#fff;border-radius:22px;padding:14px;display:flex;flex-direction:column;gap:10px}
+.tabs{display:flex;gap:6px}
+.tabs button{flex:1;padding:10px 6px;border-radius:14px;background:#ffffff22;color:#fff;font-weight:800;font-size:16px}
+.tabs button.on{background:#fff;color:var(--ink)}
+.btn{border-radius:16px;padding:12px 16px;font-size:18px;font-weight:800;box-shadow:0 4px 0 #0003;color:#fff;background:var(--blue)}
+.btn.g{background:var(--green)}.btn.r{background:var(--red)}.btn.w{background:#fff;color:var(--ink);border:2px solid #ddd}
+.hw{width:100%;min-height:260px;border:2px solid #dfe3f2;border-radius:14px;padding:10px;font-family:var(--read);font-size:18px;line-height:1.4}
+.hint{color:var(--muted);font-size:14px;line-height:1.35}
+.note{background:#fff4cc;border-radius:14px;padding:10px;font-size:15px;line-height:1.35}
+.pv{display:flex;flex-wrap:wrap;gap:6px}
+.pv span{font-family:var(--read);font-size:17px;border-radius:8px;padding:1px 8px}
+.pv .s{background:#ffe3e1}.pv .r{color:var(--red);font-weight:700}
+.card.redcard{box-shadow:0 8px 0 #0003,inset 0 0 0 8px var(--red)}
+.word{position:relative}
+.splitline{position:absolute;bottom:0;height:16px;border:5px solid var(--ink);border-top:none;border-radius:0 0 20px 20px;pointer-events:none}
+.g.sp{padding-bottom:22px}.pv .w{background:#e1efff}.pv .t{background:#fff4cc}
+.pv span.nov{outline:2px dashed var(--orange)}
+.set{display:flex;justify-content:space-between;align-items:center;gap:10px;border-bottom:1px solid #eee;padding:8px 0}
+.set label{font-weight:700}
+.set select{border:2px solid #dfe3f2;border-radius:10px;padding:6px}
+table{width:100%;border-collapse:collapse;font-size:15px}td,th{padding:6px 4px;border-bottom:1px solid #eee;text-align:left}
+.lbrow{display:flex;align-items:center;gap:10px;background:var(--card);border-radius:20px;padding:8px 12px;box-shadow:0 4px 0 #0003;font-weight:800}
+.lbrow .rk{font-size:30px;width:44px;text-align:center}
+.lbrow .nm{flex:1;font-size:22px}
+.lbrow .wd{font-size:24px;background:#e1efff;border-radius:14px;padding:2px 12px}
+.lbrow.me{background:#fff6cf;box-shadow:0 4px 0 #0003,0 0 0 4px var(--yellow)}
+.lblist{display:flex;flex-direction:column;gap:10px}
+.toast{position:fixed;left:50%;bottom:30px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 18px;border-radius:14px;font-weight:700;z-index:60;opacity:0;transition:opacity .3s;pointer-events:none}
+.toast.on{opacity:1}
+.confetti{position:fixed;top:-20px;width:12px;height:16px;z-index:40;pointer-events:none;animation:fall 1.4s ease-in forwards;border-radius:3px}
+@keyframes fall{to{transform:translateY(105vh) rotate(720deg)}}
+.flash{position:fixed;left:50%;top:38%;transform:translate(-50%,-50%);font-size:64px;font-weight:800;color:var(--yellow);text-shadow:0 4px 0 #b34a00,0 0 20px #ff8c1a;z-index:45;pointer-events:none;animation:zoomout 1.2s forwards}
+@keyframes zoomout{0%{transform:translate(-50%,-50%) scale(.3);opacity:0}30%{transform:translate(-50%,-50%) scale(1.2);opacity:1}100%{transform:translate(-50%,-80%) scale(1);opacity:0}}
+.wheel{transform-box:fill-box;transform-origin:center}
+.driving .wheel{animation:spin .4s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
+.lboff{text-align:center;padding:30px 22px;margin:20px auto;max-width:460px;background:#ffffff1f;border-radius:22px;color:#fff;font-size:19px;line-height:1.45}
+.lboff p{margin:10px 0}
+</style>
+</head>
+<body>
+<div id="splash" style="position:fixed;inset:0;z-index:99;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;background:linear-gradient(160deg,#2d4bd8,#141f5c);transition:opacity .4s">
+  <img src="icon-512.png" alt="" style="width:150px;height:150px;border-radius:34px;box-shadow:0 10px 30px #0006">
+  <div style="font:800 38px 'Baloo 2',system-ui;color:#fff">Word Racer</div>
+  <div style="width:160px;height:8px;border-radius:4px;background:#ffffff33;overflow:hidden"><i style="display:block;height:100%;width:40%;background:#ffd23f;border-radius:4px;animation:load 1s ease-in-out infinite alternate"></i></div>
+</div>
+<style>@keyframes load{from{margin-left:0}to{margin-left:60%}}</style>
+<div class="bg"></div>
+
+<section id="home" class="screen">
+  <div class="top">
+    <div class="chip fire" id="streakChip"></div>
+    <div class="chip" id="coinChip"></div>
+    <div class="chip" id="nameChip" style="font-size:20px;display:none"></div>
+    <div class="spacer"></div>
+    <button class="gear" id="parentBtn" aria-label="Grown-ups"></button>
+  </div>
+  <div class="hero" style="position:relative">
+    <button id="paintBtn" aria-label="Paint my car"></button>
+    <button id="helpBtn" aria-label="What do I do?" style="position:absolute;top:8px;right:8px;width:44px;height:44px;border-radius:50%;background:#ffffff26;font-size:22px"></button>
+    <div class="bounce" id="heroCar" style="display:flex;justify-content:center"></div>
+    <div class="nextcar" id="nextCar"></div>
+    <button class="nextbadge" id="nextBadge" aria-label="Next badge"></button>
+    <div class="week" id="week"></div>
+  </div>
+  <div id="tiles" style="display:flex;flex-direction:column;gap:14px"></div>
+</section>
+
+<section id="race" class="screen">
+  <div class="racebar">
+    <button class="iconbtn" id="exitRace" aria-label="Stop"></button>
+    <div style="flex:1;display:flex;flex-direction:column;gap:6px"><div class="track"><div class="lane"></div><div class="finish"></div><div class="runner" id="runner"></div><div class="runner" id="rival"></div></div><div class="pdots" id="pdots"></div></div>
+    <div class="coins" id="raceCoins"></div>
+  </div>
+  <div class="bubble-row"><div class="mascot" id="mascot"></div><div class="bubble" id="bubble"></div></div>
+  <div class="card" id="card"></div>
+  <div class="controls" id="controls"></div>
+</section>
+
+<section id="results" class="screen"><div id="resBody"></div></section>
+
+<section id="board" class="screen">
+  <div class="top"><button class="iconbtn" id="boardBack" aria-label="Home"></button><div style="font-size:28px;font-weight:800;flex:1">Done today</div><button class="iconbtn" id="boardRefresh" aria-label="Refresh"></button></div>
+  <div id="boardBody"></div>
+</section>
+
+<section id="parent" class="screen">
+  <div class="top"><button class="iconbtn" id="parentBack" aria-label="Back"></button><div style="font-size:26px;font-weight:800">Grown-ups</div></div>
+  <div class="tabs" id="ptabs"><button data-t="homework" class="on">Homework</button><button data-t="progress">Progress</button><button data-t="settings">Settings</button><button data-t="help">Help</button></div>
+  <div id="pbody"></div>
+</section>
+
+<div class="modal-bg" id="modalBg"><div class="modal" id="modal"></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+const AUDIO = {};
+const AUDIO_PACKS = ["core2"];   // game phrases + letter sounds; each word and name is its own small file, fetched only when needed
+const PHRASES = {"read_word": "Read the word!", "read_sentence": "Read the sentence!", "what_sound": "What sound is this?", "pit": "Pit stop! This one came back. Can you read it?", "pit_sound": "Pit stop! What sound is this?", "fred_word": "Almost! Let's Fred Talk it. Say the sounds, then blend them.", "fred_sentence": "Almost! Let's Fred Talk the orange words, then read it again.", "again": "Nearly! Have another go.", "fred_again": "Fred Talk it again, then blend!", "sound_again": "Nearly! Say the sound again.", "sounds_intro": "Let's go sound by sound. Say each sound when it lights up.", "blend_now": "Now blend them! Tap and say the word.", "listen": "Listen to me.", "your_turn_word": "Your turn! Say the word.", "your_turn_sentence": "Your turn! Read it to me.", "your_turn_sound": "Now you say it!", "didnt_hear": "I didn't hear you. Tap and try again!", "didnt_hear2": "Say it nice and loud, close to the phone!", "good_try": "Good try! We'll come back to it.", "great_job": "Great job!", "pr1": "Brilliant!", "pr2": "Super reader!", "pr3": "Zoom zoom! Yes!", "pr4": "Fantastic!", "pr5": "You did it!", "pr6": "Amazing!", "pr7": "Turbo reading!", "pr8": "Wow, great blending!", "spr1": "Yes! That's the sound!", "spr2": "Great sound!", "spr3": "Perfect!", "turbo": "Turbo boost! Three in a row!", "race_done": "Race complete! You beat the truck!", "race_lost": "Race complete! Great driving!", "goal_done": "Amazing! You finished all your races today! Your streak is growing!", "new_car": "Wow! You unlocked a new car!", "start_home": "Tap a race to start!", "leave_q": "Do you want to stop racing?", "no_mic": "I can't use the microphone. Ask a grown-up for help.", "tap_mic": "Tap the microphone, then read!", "garage": "Pick your car!", "all_done": "All races done! Try a bonus lap for extra points!", "lets_race": "Ready, steady, go!", "finish_line": "Last one! Read it to cross the finish line!", "welcome": "Hello racer! Tap a race to start!", "hello": "Hello", "well_done": "Well done", "setup_hi": "Hello racer!", "red_word": "This is a red word. We can't Fred Talk it. Listen!", "cups_look": "Look who finished their reading today!", "cup_done": "Well done! You finished today's reading. Here's your cup!", "cup_todo": "Finish all your races today to get your cup!", "cup_none": "Nobody has finished yet. Be the first to get a cup!", "race0": "Rocket Race!", "race1": "Lightning Lap!", "race2": "Superhero Sprint!", "race3": "Police Chase!", "race4": "Dino Dash!", "race5": "Space Speedway!", "race6": "Fire Truck Rescue!", "race7": "Grand Prix!", "race8": "Moto Madness!", "race9": "Sky Rally!", "bonus_lap": "Bonus lap! Extra coins!", "fred_word_s": "Fred Talk it!", "fred_sentence_s": "Fred Talk the orange words!", "sounds_intro_s": "Sound by sound!", "blend_now_s": "Now blend!", "your_turn_s": "Your turn!", "didnt_hear_s": "Try again!", "good_try_s": "Good try!", "again_s": "Have another go!", "red_word_s": "Red word! Listen!", "pit_s": "Pit stop!", "fred_again_s": "Again! Fred Talk it!", "listen_s": "Listen!", "pr9": "Super speedy!", "pr10": "You're a reading star!", "pr11": "Vroom vroom! Brilliant!", "pr12": "Wow, you read it!", "pr13": "High five!", "pr14": "Awesome reading!", "pr15": "Yes! You nailed it!", "pr16": "Champion reader!", "badge_new": "Wow! You earned a new badge!", "badges": "These are your badges! Tap one to hear how to win it.", "help_home": "Tap the race with the arrow to start. The star is a bonus lap, and the car is your garage.", "help_results": "Tap the green arrow for the next race, or the house to go home.", "help_garage": "Pick your car! The locked cars need more coins.", "wash": "Your car is muddy! Rub it to wash it!", "wash_done": "Sparkly clean! Great job!", "b_book": "Bookworm badge! Read words in your races to fill it up.", "b_streak": "Super Streak badge! Finish all your races every day to fill it up.", "b_gold": "Gold Star badge! Win gold medals in your races to fill it up.", "b_almost": "Almost there!", "b_full": "You have the rainbow one! Amazing!", "won_book": "You won a Bookworm badge!", "won_streak": "You won a Super Streak badge!", "won_gold": "You won a Gold Star badge!", "tier1": "Bronze!", "tier2": "Silver!", "tier3": "Gold!", "tier4": "Rainbow!", "shop_hi": "Welcome to the paint shop! Pick something for your car.", "shop_buy": "Do you like it? Tap the green button to buy it.", "shop_more": "You need more coins for that one. Keep reading!", "shop_yay": "Wow! Your car looks amazing!", "more_1": "One more race to your next car!", "more_2": "Two more races to your next car!", "more_3": "Three more races to your next car!", "more_4": "Four more races to your next car!", "more_5": "Five more races to your next car!", "more_6": "Six more races to your next car!", "more_7": "Seven more races to your next car!", "more_8": "Eight more races to your next car!", "more_9": "Nine more races to your next car!", "more_10": "Ten more races to your next car!", "race_count": "Look how many races you have finished!"};
+</script>
+<script>
+"use strict";
+const $ = s => document.querySelector(s);
+/* Word Racer icons: one drawn style (thick dark outline, flat colours), like the cars and coins. */
+const INK = '#1b1b3a';
+const ICON = {
+  flame: `<path d="M24 4c6 8 14 13 14 25a14 14 0 0 1-28 0c0-6 3-10 7-14 0 5 2 8 5 9-1-8 0-14 2-20z" fill="#ff8c1a" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/><path d="M24 25c4 4 7 7 7 11a7 7 0 0 1-14 0c0-4 3-7 7-11z" fill="#ffd23f"/>`,
+  gear: `<g fill="#dfe4f7" stroke="${INK}" stroke-width="3" stroke-linejoin="round">${[0, 45, 90, 135, 180, 225, 270, 315].map(a => `<rect x="20" y="3" width="8" height="10" rx="2" transform="rotate(${a} 24 24)"/>`).join('')}<circle cx="24" cy="24" r="14"/></g><circle cx="24" cy="24" r="5.5" fill="#fff" stroke="${INK}" stroke-width="3"/>`,
+  speaker: `<path d="M7 18h8l11-9v30l-11-9H7z" fill="#1d7bf2" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/><path d="M32 17c3 4 3 10 0 14M37 12c6 7 6 17 0 24" fill="none" stroke="${INK}" stroke-width="3" stroke-linecap="round"/>`,
+  close: `<path d="M13 13l22 22M35 13L13 35" stroke="currentColor" stroke-width="5" stroke-linecap="round"/>`,
+  home: `<path d="M7 24L24 9l17 15" fill="none" stroke="${INK}" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 21v19h24V21" fill="#ef3e36" stroke="${INK}" stroke-width="3.5" stroke-linejoin="round"/><rect x="20" y="28" width="8" height="12" fill="#ffd23f" stroke="${INK}" stroke-width="3"/>`,
+  refresh: `<path d="M38 26A14 14 0 1 1 33 13" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"/><path d="M35 5v10H25" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>`,
+  trophy: `<path d="M13 9H5c0 9 4 13 10 14M35 9h8c0 9-4 13-10 14" fill="none" stroke="${INK}" stroke-width="3" stroke-linecap="round"/><path d="M13 5h22v13c0 9-5 15-11 15S13 27 13 18z" fill="#ffd23f" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/><rect x="20" y="33" width="8" height="5" fill="#ffb703" stroke="${INK}" stroke-width="3"/><rect x="13" y="38" width="22" height="7" rx="2" fill="#ff8c1a" stroke="${INK}" stroke-width="3"/><path d="M24 11l2 4.5 5 .4-3.8 3.3 1.2 4.8-4.4-2.7-4.4 2.7 1.2-4.8-3.8-3.3 5-.4z" fill="#fff6c2"/>`,
+  medal3: `<path d="M14 3l6 16M34 3l-6 16" stroke="#1d7bf2" stroke-width="6"/><circle cx="24" cy="31" r="13" fill="#ffd23f" stroke="${INK}" stroke-width="3"/><text x="24" y="37" text-anchor="middle" font-size="16" font-weight="900" fill="${INK}" font-family="system-ui,sans-serif">1</text>`,
+  medal2: `<path d="M14 3l6 16M34 3l-6 16" stroke="#1d7bf2" stroke-width="6"/><circle cx="24" cy="31" r="13" fill="#d6dbe8" stroke="${INK}" stroke-width="3"/><text x="24" y="37" text-anchor="middle" font-size="16" font-weight="900" fill="${INK}" font-family="system-ui,sans-serif">2</text>`,
+  medal1: `<path d="M14 3l6 16M34 3l-6 16" stroke="#1d7bf2" stroke-width="6"/><circle cx="24" cy="31" r="13" fill="#e0904f" stroke="${INK}" stroke-width="3"/><text x="24" y="37" text-anchor="middle" font-size="16" font-weight="900" fill="${INK}" font-family="system-ui,sans-serif">3</text>`,
+  rocket: `<path d="M24 4c8 6 10 16 8 26H16c-2-10 0-20 8-26z" fill="#fff" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/><circle cx="24" cy="17" r="4.5" fill="#5ec8ff" stroke="${INK}" stroke-width="3"/><path d="M16 24l-6 9 7-1M32 24l6 9-7-1" fill="#ef3e36" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/><path d="M19 32c1 5 3 9 5 12 2-3 4-7 5-12z" fill="#ff8c1a" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/>`,
+  bolt: `<path d="M28 3L10 27h12l-4 18 20-26H26z" fill="#ffd23f" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/>`,
+  hero: `<path d="M24 4l17 6v12c0 11-8 19-17 22C15 41 7 33 7 22V10z" fill="#ef3e36" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/><path d="M24 13l3 6.5 7 .6-5.3 4.6 1.6 6.9L24 28l-6.3 3.6 1.6-6.9L14 20.1l7-.6z" fill="#ffd23f" stroke="${INK}" stroke-width="2" stroke-linejoin="round"/>`,
+  siren: `<path d="M14 30v-8a10 10 0 0 1 20 0v8" fill="#ef3e36" stroke="${INK}" stroke-width="3"/><path d="M24 12a10 10 0 0 1 10 10v8H24z" fill="#1d7bf2"/><path d="M14 30v-8a10 10 0 0 1 20 0v8" fill="none" stroke="${INK}" stroke-width="3"/><rect x="9" y="30" width="30" height="8" rx="2" fill="#555b75" stroke="${INK}" stroke-width="3"/><path d="M24 3v4M8 10l3 3M40 10l-3 3M3 22h4M45 22h-4" stroke="#ffd23f" stroke-width="3.5" stroke-linecap="round"/>`,
+  dino: `<path d="M6 36c4 0 6-6 10-8 3-2 8-2 12-2V14c0-5 3-8 8-8s7 3 7 6-2 5-5 5h-2v13c0 7-5 12-12 12h-1l1 5h-5l-1-5h-3l1 5h-5l-1-6C8 41 6 39 6 36z" fill="#3ccf6e" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/><circle cx="37" cy="11" r="1.8" fill="${INK}"/>`,
+  ufo: `<ellipse cx="24" cy="29" rx="20" ry="7" fill="#a78bfa" stroke="${INK}" stroke-width="3"/><path d="M14 26a10 10 0 0 1 20 0" fill="#5ec8ff" stroke="${INK}" stroke-width="3"/><circle cx="14" cy="30" r="2" fill="#ffd23f"/><circle cx="24" cy="32" r="2" fill="#ffd23f"/><circle cx="34" cy="30" r="2" fill="#ffd23f"/><path d="M18 38l-3 6M30 38l3 6" stroke="#ffd23f" stroke-width="3" stroke-linecap="round"/>`,
+  firetruck: `<path d="M4 18h24v16H4z" fill="#ef3e36" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/><path d="M28 22h9l6 7v5H28z" fill="#ef3e36" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/><path d="M31 25h5l3 4h-8z" fill="#bfe9ff"/><path d="M5 12l22-4M5 12l1 6M27 8l1 10M11 11l1 7M17 10l1 8M22 9l1 9" stroke="${INK}" stroke-width="2.5" stroke-linecap="round"/><circle cx="12" cy="36" r="5" fill="#2b2d3a" stroke="${INK}" stroke-width="3"/><circle cx="35" cy="36" r="5" fill="#2b2d3a" stroke="${INK}" stroke-width="3"/>`,
+  flag: `<rect x="8" y="5" width="4" height="40" rx="2" fill="${INK}"/><path d="M12 7h28v20H12z" fill="#fff" stroke="${INK}" stroke-width="3"/><path d="M12 7h7v5h-7zM26 7h7v5h-7zM19 12h7v5h-7zM33 12h7v5h-7zM12 17h7v5h-7zM26 17h7v5h-7zM19 22h7v5h-7zM33 22h7v5h-7z" fill="${INK}"/>`,
+  moto: `<circle cx="11" cy="33" r="7" fill="#2b2d3a" stroke="${INK}" stroke-width="3"/><circle cx="37" cy="33" r="7" fill="#2b2d3a" stroke="${INK}" stroke-width="3"/><path d="M11 33l9-11h10l7 11M24 22l-3-6h-5M30 22l4-7h6" fill="none" stroke="${INK}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M18 22h14l-3 7H21z" fill="#ff7ab6" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/>`,
+  heli: `<path d="M6 8h36" stroke="${INK}" stroke-width="3.5" stroke-linecap="round"/><path d="M24 8v6" stroke="${INK}" stroke-width="3"/><path d="M10 26c0-7 6-12 14-12h4c7 0 12 5 12 12s-5 10-12 10H18c-5 0-8-4-8-10z" fill="#39b8ff" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/><path d="M28 18c5 0 8 3 8 8h-8z" fill="#bfe9ff" stroke="${INK}" stroke-width="2.5" stroke-linejoin="round"/><path d="M10 26H3M3 21v10" stroke="${INK}" stroke-width="3" stroke-linecap="round"/><path d="M16 42h20M20 36l-2 6M30 36l2 6" stroke="${INK}" stroke-width="3" stroke-linecap="round"/>`,
+  lock: `<path d="M16 22v-6a8 8 0 0 1 16 0v6" fill="none" stroke="${INK}" stroke-width="4"/><rect x="10" y="21" width="28" height="22" rx="4" fill="#ffd23f" stroke="${INK}" stroke-width="3"/><circle cx="24" cy="31" r="3" fill="${INK}"/><path d="M24 33v5" stroke="${INK}" stroke-width="3" stroke-linecap="round"/>`,
+  star: `<path d="M24 4l6 13 14 1.3-10.6 9.2 3.2 13.9L24 34l-12.6 7.4 3.2-13.9L4 18.3 18 17z" fill="#ffd23f" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/>`,
+  ribbon: `<path d="M15 4l7 16M33 4l-7 16" stroke="#ef3e36" stroke-width="7"/><circle cx="24" cy="30" r="13" fill="#ffd23f" stroke="${INK}" stroke-width="3"/><path d="M24 22l2.4 5 5.4.5-4.1 3.6 1.2 5.3L24 33.6l-4.9 2.8 1.2-5.3-4.1-3.6 5.4-.5z" fill="#fff6c2" stroke="#c98200" stroke-width="1.2"/>`,
+  lights: `<rect x="14" y="3" width="20" height="40" rx="6" fill="#555b75" stroke="${INK}" stroke-width="3"/><circle cx="24" cy="12" r="4.5" fill="#ef3e36" stroke="${INK}" stroke-width="2"/><circle cx="24" cy="23" r="4.5" fill="#ffd23f" stroke="${INK}" stroke-width="2"/><circle cx="24" cy="34" r="4.5" fill="#2bb673" stroke="${INK}" stroke-width="2"/>`,
+  book: `<path d="M24 12c-5-4-12-5-18-4v28c6-1 13 0 18 4 5-4 12-5 18-4V8c-6-1-13 0-18 4z" fill="#fff" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/><path d="M24 12v28" stroke="${INK}" stroke-width="3"/><path d="M10 15c3 0 7 1 10 2M10 21c3 0 7 1 10 2M28 17c3-1 7-2 10-2M28 23c3-1 7-2 10-2" stroke="#1d7bf2" stroke-width="2" stroke-linecap="round"/>`,
+  books: `<rect x="6" y="10" width="9" height="32" rx="2" fill="#ef3e36" stroke="${INK}" stroke-width="3"/><rect x="15" y="6" width="9" height="36" rx="2" fill="#1d7bf2" stroke="${INK}" stroke-width="3"/><rect x="26" y="12" width="9" height="31" rx="2" fill="#2bb673" stroke="${INK}" stroke-width="3" transform="rotate(-12 30 27)"/><path d="M6 42h36" stroke="${INK}" stroke-width="3" stroke-linecap="round"/>`,
+  bulb: `<path d="M24 5a13 13 0 0 1 8 23c-2 2-3 4-3 7H19c0-3-1-5-3-7a13 13 0 0 1 8-23z" fill="#ffd23f" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/><rect x="18" y="35" width="12" height="7" rx="2" fill="#aab4c3" stroke="${INK}" stroke-width="3"/><path d="M20 22l4 5 4-5" fill="none" stroke="#ff8c1a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>`,
+  shine: `<path d="M24 8l4.5 10 11 1-8.3 7.3 2.5 10.7L24 31.5 14.3 37l2.5-10.7L8.5 19l11-1z" fill="#ffd23f" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/><path d="M6 6l4 4M42 6l-4 4M24 1v3M4 30h3M44 30h-3" stroke="#ff8c1a" stroke-width="3" stroke-linecap="round"/>`,
+  rainbow: `<path d="M4 38a20 20 0 0 1 40 0" fill="none" stroke="#ef3e36" stroke-width="6"/><path d="M10 38a14 14 0 0 1 28 0" fill="none" stroke="#ffd23f" stroke-width="6"/><path d="M16 38a8 8 0 0 1 16 0" fill="none" stroke="#1d7bf2" stroke-width="6"/><path d="M1 35a23 23 0 0 1 46 0" fill="none" stroke="${INK}" stroke-width="2.5"/>`,
+  crown: `<path d="M6 36V14l10 9 8-13 8 13 10-9v22z" fill="#ffd23f" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/><rect x="6" y="36" width="36" height="6" rx="2" fill="#ff8c1a" stroke="${INK}" stroke-width="3"/><circle cx="24" cy="28" r="3" fill="#ef3e36"/>`,
+  play: `<path d="M16 9l24 15-24 15z" fill="#fff" stroke="${INK}" stroke-width="3.5" stroke-linejoin="round"/>`,
+  check: `<circle cx="24" cy="24" r="19" fill="#2bb673" stroke="${INK}" stroke-width="3"/><path d="M15 25l6 6 12-13" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>`,
+  wrench: `<path d="M30 5a10 10 0 0 0-9 14L6 34a4 4 0 0 0 6 6l15-15A10 10 0 0 0 41 15l-6 5-6-2-2-6 6-6c-1-1-2-1-3-1z" fill="#aab4c3" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/>`,
+  mic: `<rect x="17" y="4" width="14" height="24" rx="7" fill="#fff" stroke="${INK}" stroke-width="3"/><path d="M11 22a13 13 0 0 0 26 0M24 35v7M17 43h14" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"/>`,
+  ear: `<path d="M17 18a9 9 0 0 1 18 0c0 6-6 8-6 14a6 6 0 0 1-11 3" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"/><path d="M10 18a16 16 0 0 1 32 0c0 9-7 11-7 17a9 9 0 0 1-9 9" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"/><path d="M22 18a4 4 0 0 1 8 0" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>`,
+  speak: `<path d="M8 40c0-6 2-9 4-11-3-3-4-6-4-10a13 13 0 0 1 26 0v4l3 6h-3v5c0 2-2 3-4 3h-3v3z" fill="#fff" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/><path d="M40 12c2 2 3 5 3 8M37 15c1 1 2 3 2 5" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>`,
+  hourglass: `<path d="M12 5h24M12 43h24" stroke="${INK}" stroke-width="3.5" stroke-linecap="round"/><path d="M15 5c0 10 9 13 9 19s-9 9-9 19h18c0-10-9-13-9-19s9-9 9-19z" fill="#bfe9ff" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/><path d="M18 40c2-4 4-5 6-6 2 1 4 2 6 6z" fill="#ffd23f"/>`,
+  party: `<path d="M6 42l9-27 18 18z" fill="#ffd23f" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/><path d="M11 30l7 7M13 23l12 12" stroke="#ef3e36" stroke-width="3"/><circle cx="30" cy="9" r="2.5" fill="#1d7bf2"/><circle cx="40" cy="17" r="2.5" fill="#2bb673"/><circle cx="38" cy="7" r="2" fill="#ef3e36"/><path d="M22 6c2 3 0 6 2 9M34 26c3-1 6 1 9-1" fill="none" stroke="#a78bfa" stroke-width="3" stroke-linecap="round"/>`,
+  sponge: `<rect x="6" y="14" width="36" height="22" rx="6" fill="#ffd23f" stroke="${INK}" stroke-width="3"/><circle cx="15" cy="22" r="2.5" fill="#e0a800"/><circle cx="27" cy="28" r="3" fill="#e0a800"/><circle cx="35" cy="21" r="2" fill="#e0a800"/><circle cx="40" cy="9" r="4" fill="#bfe9ff" stroke="${INK}" stroke-width="2"/><circle cx="32" cy="6" r="2.5" fill="#bfe9ff" stroke="${INK}" stroke-width="2"/>`,
+  offline: `<path d="M6 18a26 26 0 0 1 36 0M12 25a17 17 0 0 1 24 0M18 32a8 8 0 0 1 12 0" fill="none" stroke="#aab4c3" stroke-width="4" stroke-linecap="round"/><circle cx="24" cy="38" r="3" fill="#aab4c3"/><circle cx="36" cy="36" r="9" fill="#ef3e36" stroke="${INK}" stroke-width="3"/><path d="M32 32l8 8M40 32l-8 8" stroke="#fff" stroke-width="3" stroke-linecap="round"/>`,
+  save: `<path d="M8 6h26l6 6v30H8z" fill="#1d7bf2" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/><rect x="14" y="6" width="16" height="11" fill="#dfe4f7" stroke="${INK}" stroke-width="3"/><rect x="14" y="26" width="20" height="16" fill="#fff" stroke="${INK}" stroke-width="3"/>`,
+  trash: `<path d="M8 12h32M18 12V7h12v5" fill="none" stroke="${INK}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M11 12l2 30h22l2-30z" fill="#ef3e36" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/><path d="M20 19v16M28 19v16" stroke="#fff" stroke-width="3" stroke-linecap="round"/>`,
+  back: `<path d="M30 10L16 24l14 14" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>`,
+  warn: `<path d="M24 5l20 36H4z" fill="#ffd23f" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/><path d="M24 18v11" stroke="${INK}" stroke-width="4" stroke-linecap="round"/><circle cx="24" cy="35" r="2.5" fill="${INK}"/>`,
+  cross: `<circle cx="24" cy="24" r="19" fill="#ef3e36" stroke="${INK}" stroke-width="3"/><path d="M17 17l14 14M31 17L17 31" stroke="#fff" stroke-width="5" stroke-linecap="round"/>`,
+  share: `<rect x="9" y="18" width="30" height="26" rx="5" fill="#fff" stroke="${INK}" stroke-width="3"/><path d="M24 4v24M16 12l8-8 8 8" fill="none" stroke="#1d7bf2" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>`,
+  phone: `<rect x="12" y="3" width="24" height="42" rx="5" fill="#2b2d3a" stroke="${INK}" stroke-width="3"/><rect x="15" y="9" width="18" height="28" rx="2" fill="#5ec8ff"/><rect x="18" y="13" width="5" height="5" rx="1.5" fill="#ffd23f"/><rect x="25" y="13" width="5" height="5" rx="1.5" fill="#ef3e36"/><rect x="18" y="21" width="5" height="5" rx="1.5" fill="#2bb673"/><circle cx="24" cy="41" r="1.6" fill="#fff"/>`,
+  link: `<path d="M20 28l8-8" stroke="${INK}" stroke-width="4" stroke-linecap="round"/><path d="M22 14l4-4a8 8 0 0 1 12 12l-4 4M26 34l-4 4a8 8 0 0 1-12-12l4-4" fill="none" stroke="#1d7bf2" stroke-width="5" stroke-linecap="round"/>`,
+  record: `<rect x="17" y="4" width="14" height="24" rx="7" fill="#fff" stroke="${INK}" stroke-width="3"/><path d="M11 22a13 13 0 0 0 26 0M24 35v7M17 43h14" fill="none" stroke="${INK}" stroke-width="3.5" stroke-linecap="round"/><circle cx="38" cy="9" r="5" fill="#ef3e36" stroke="${INK}" stroke-width="2"/>`,
+  info: `<circle cx="24" cy="24" r="19" fill="#1d7bf2" stroke="${INK}" stroke-width="3"/><circle cx="24" cy="15" r="2.8" fill="#fff"/><path d="M24 22v13" stroke="#fff" stroke-width="4.5" stroke-linecap="round"/>`,
+  shield: `<path d="M24 4l17 6v12c0 11-8 19-17 22C15 41 7 33 7 22V10z" fill="#5ec8ff" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/><path d="M16 23l6 6 11-12" fill="none" stroke="#fff" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>`,
+  brush: `<path d="M30 6l12 12-14 14-12-12z" fill="#1d7bf2" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/><path d="M16 20l12 12-4 4-12-12z" fill="#aab4c3" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/><path d="M12 24c-6 2-6 8-8 14 6-2 12-2 14-8" fill="#ef3e36" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/>`,
+  box: `<rect x="8" y="8" width="32" height="32" rx="6" fill="#ffffff55" stroke="#ffffffaa" stroke-width="3"/>`,
+};
+function ic(name, size = 28, extra = '') { return `<svg class="ic" width="${size}" height="${size}" viewBox="0 0 48 48" aria-hidden="true" ${extra}>${ICON[name] || ''}</svg>`; }
+
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const rand = (a, b) => a + Math.floor(Math.random() * (b - a + 1));
+const pick = a => a[Math.floor(Math.random() * a.length)];
+function dayKey(d = new Date()) { return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+function addDays(k, n) { const [y, m, d] = k.split('-').map(Number); const dt = new Date(y, m - 1, d); dt.setDate(dt.getDate() + n); return dayKey(dt); }
+function toast(t) { const el = $('#toast'); el.innerHTML = String(t).replace(/✓/g, ic('check', 20)); el.classList.add('on'); clearTimeout(toast._t); toast._t = setTimeout(() => el.classList.remove('on'), 2200); }
+function hashStr(s) { let h = 7; for (const c of s) h = (h * 31 + c.charCodeAt(0)) | 0; return h; }
+function seeded(seed) { let x = seed || 1; return () => { x ^= x << 13; x ^= x >>> 17; x ^= x << 5; return ((x >>> 0) % 100000) / 100000; }; }
+
+/* ============ data ============ */
+// The test copy (…/word-racer/test/) is this same file. It keeps its own saved data, uses the live voice files,
+// and never writes to the class list or shared progress, so trying things out can't affect the families.
+const IS_TEST = /\/test\/?($|index\.html)/.test(location.pathname);
+const BASE = IS_TEST ? '../' : '';
+const APP_VERSION = '2026-11-23';
+const KEY = IS_TEST ? 'wordRacer.test' : 'wordRacer.v2';
+const DEFAULT_HW = `Speed sounds: n, e, p, a, h, g, t, c, b, r, o, f, j, v, k, l, y, u, w
+Words: red, jog, vet, run, jet, yes, rat, jam, yet, yum, win, web, wet, yap, van
+Words: zip, fox, mix, box, fix, egg, kiss, mess, doll, bell, yell, hill
+Green words: pen, cat, hen, hat, get
+Sentences:
+get a hat
+get a hen
+get a cat
+get a pen`;
+const CARS = [
+  { name: 'Captain Zoom', body: '#ef3e36', accent: '#ffd23f', emblem: 'bolt', at: 0 },
+  { name: 'Blue Blaze', body: '#1d7bf2', accent: '#ffffff', emblem: 'star', at: 100 },
+  { name: 'Green Turbo', body: '#2bb673', accent: '#ffd23f', emblem: 'bolt', at: 250 },
+  { name: 'Night Flash', body: '#3a3f8f', accent: '#ff8c1a', emblem: 'moon', at: 450 },
+  { name: 'Sunny Rocket', body: '#ffb703', accent: '#ef3e36', emblem: 'flame', at: 700 },
+  { name: 'Purple Power', body: '#8e44ad', accent: '#5ef2d6', emblem: 'star', at: 1000 },
+  { name: 'Lava Racer', body: '#ff5a1f', accent: '#2b2d3a', emblem: 'flame', at: 1400 },
+  { name: 'Silver Shield', body: '#aab4c3', accent: '#1d7bf2', emblem: 'shield', at: 1900 },
+  { name: 'Gold Champion', body: '#f4c430', accent: '#8b5a00', emblem: 'crown', at: 2500 },
+  // second set: new shapes
+  { name: 'Mega Monster', shape: 'monster', body: '#2bb673', accent: '#ffd23f', emblem: 'bolt', at: 3000 },
+  { name: 'School Bus Buddy', shape: 'bus', body: '#ffc928', accent: '#1b1b3a', emblem: 'star', at: 3600 },
+  { name: 'Formula Flash', shape: 'f1', body: '#ef3e36', accent: '#ffffff', emblem: 'bolt', at: 4300 },
+  { name: 'Jungle Jeep', shape: 'jeep', body: '#6fa83a', accent: '#ffd23f', emblem: 'shield', at: 5100 },
+  { name: 'Ice Cream Dream', shape: 'van', body: '#ff9ecf', accent: '#5ec8ff', emblem: 'star', at: 6000 },
+  { name: 'Rocket Rider', shape: 'rocket', body: '#3a3f8f', accent: '#ff8c1a', emblem: 'moon', at: 7000 },
+  { name: 'Monster Blaze', shape: 'monster', body: '#ff5a1f', accent: '#2b2d3a', emblem: 'flame', at: 8200 },
+  { name: 'Turbo Formula', shape: 'f1', body: '#1d7bf2', accent: '#ffd23f', emblem: 'star', at: 9500 },
+  { name: 'Diamond Rocket', shape: 'rocket', body: '#5ef2d6', accent: '#8e44ad', emblem: 'crown', at: 11000 },
+  // special cars: bought in the garage with coins
+  { name: 'Golden Racer', body: '#ffd23f', accent: '#ff8c1a', emblem: 'crown', at: Infinity, price: 1500, special: true },
+  { name: 'Dragon Rocket', shape: 'rocket', body: '#2bb673', accent: '#ef3e36', emblem: 'flame', at: Infinity, price: 2500, special: true },
+  { name: 'Rainbow Monster', shape: 'monster', body: '#ff7ab6', accent: '#5ef2d6', emblem: 'star', at: Infinity, price: 3500, special: true },
+];
+// Switches for features that are built but not turned on yet
+const FEATURES = { shop: false, carsByRaces: false };
+const RACES_PER_CAR = 10;
+function carBase() {   // when "cars by races" starts: cars already unlocked by coins stay unlocked
+  if (!S.carBase) { const first = CARS.findIndex(c => !c.special && allCoins() < c.at); S.carBase = { races: totals().races, first: first < 0 ? CARS.length : first }; save(); }
+  return S.carBase;
+}
+const racesNeeded = i => { const b = carBase(); return b.races + RACES_PER_CAR * (i - b.first + 1); };
+function readingCarUnlocked(i) {
+  if (!FEATURES.carsByRaces) return allCoins() >= CARS[i].at;
+  const b = carBase(); return i < b.first || totals().races >= racesNeeded(i);
+}
+const hasCar = i => CARS[i] && (CARS[i].special ? !!(S.owned || {})['car|' + i] : readingCarUnlocked(i));
+function raceSlots(size = 22, justNow = false) {   // returns { html, left, total } for the next car
+  const ni = nextReadingCar(); if (ni < 0) return null;
+  const total = totals().races, left = Math.max(0, racesNeeded(ni) - total), filled = RACES_PER_CAR - left;
+  const html = `<div class="slots">${Array.from({ length: RACES_PER_CAR }, (_, i) => `<span class="slot ${i < filled ? 'on' : ''} ${justNow && i === filled - 1 ? 'pop' : ''}" style="width:${size}px;height:${size}px">${i < filled ? ic('flag', size - 6) : ''}</span>`).join('')}</div>`;
+  return { html, left, total, ni };
+}
+const nextReadingCar = () => CARS.findIndex((c, i) => !c.special && !hasCar(i));
+function fresh() {
+  return { homework: '', name: '', nameRec: null, setupDone: false, review: [], lb: { cls: '', on: true, player: Math.random().toString(36).slice(2, 12) },
+    settings: { tries: { read: 1, fred: 1, sounds: 1, sound: 2 }, comebacks: 2, goal: 'all', useMic: true, dots: true },
+    coins: 0, streak: 0, best: 0, lastGoalDay: null, days: {}, stats: {}, car: 0 };
+}
+function load() {
+  try { const r = localStorage.getItem(KEY); if (r) { const s = JSON.parse(r), f = fresh(); return { ...f, ...s, settings: { ...f.settings, ...s.settings, tries: { ...f.settings.tries, ...((s.settings || {}).tries || {}) } } }; } } catch (e) {}
+  return fresh();
+}
+let S = load();
+if (!S.lb || !S.lb.player) S.lb = { cls: '', on: true, player: Math.random().toString(36).slice(2, 12), ...(S.lb || {}) };
+if (!S.lb.phone) S.lb.phone = 'p' + Math.random().toString(36).slice(2, 11);   // this phone (one child can have several)
+function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
+try { navigator.storage && navigator.storage.persist && navigator.storage.persist(); } catch (e) {}
+const today = () => dayKey();
+function dayRec(k = today()) { return S.days[k] || (S.days[k] = { done: {}, coins: 0, goal: false }); }
+/* Progress shared between linked phones: each phone keeps and uploads only its OWN progress (S),
+   and the other phones' uploads sit in S.others. Everything the child sees is this phone + the others added up,
+   so no phone ever overwrites another. */
+const others = () => Object.values(S.others || {});
+function allSpent() { return (S.spent || 0) + others().reduce((t, o) => t + (o.spent || 0), 0); }
+function wallet() { return FEATURES.shop ? Math.max(0, allCoins() - allSpent()) : allCoins(); }   // coins he can spend; cars unlock by coins EARNED, so spending never locks a car
+function allCoins() { return (S.coins || 0) + others().reduce((t, o) => t + (o.coins || 0), 0); }
+function view(k = today()) {   // read-only merged day
+  const mine = S.days[k] || { done: {}, coins: 0, goal: false };
+  const v = { ...mine, done: { ...(mine.done || {}) }, help: { ...(mine.help || {}) }, words: mine.words || 0, coins: mine.coins || 0, goal: !!mine.goal };
+  others().forEach(o => { const d = o.days && o.days[k]; if (!d) return;
+    Object.entries(d.done || {}).forEach(([i, m]) => v.done[i] = Math.max(v.done[i] || 0, m));
+    Object.entries(d.help || {}).forEach(([w, n]) => v.help[w] = (v.help[w] || 0) + n);
+    v.words += d.words || 0; v.coins += d.coins || 0; v.goal = v.goal || !!d.goal; });
+  return v;
+}
+function allDayKeys() { const ks = new Set(Object.keys(S.days)); others().forEach(o => Object.keys(o.days || {}).forEach(k => ks.add(k))); return [...ks]; }
+function mergedStats() {
+  const out = {}; const add = st => Object.entries(st || {}).forEach(([w, x]) => { const o = out[w] || (out[w] = { seen: 0, first: 0, miss: 0 }); o.seen += x.seen || 0; o.first += x.first || 0; o.miss += x.miss || 0; });
+  add(S.stats); others().forEach(o => add(o.stats)); return out;
+}
+/* Streak with a shield: one missed day a week doesn't break it (at most one shielded day in any 7 days,
+   and never two missed days in a row). A busy evening shouldn't wipe out weeks of reading. */
+function streakFrom(k) {   // count back from day k; returns { n, shields: [day keys saved by the shield] }
+  let n = 0, last = null; const shields = [];
+  for (let guard = 0; guard < 3650; guard++) {
+    if (view(k).goal) n++;
+    else {
+      const prevDay = addDays(k, -1);
+      const free = !last || (new Date(last) - new Date(k)) / 864e5 >= 7;
+      if (free && view(prevDay).goal && (n > 0 || k !== today())) { shields.push(k); last = k; }
+      else break;
+    }
+    k = addDays(k, -1);
+  }
+  // a shield only counts if days were actually saved behind it
+  while (shields.length && !view(addDays(shields[shields.length - 1], -1)).goal) shields.pop();
+  return { n, shields };
+}
+function streakInfo() { const t = today(); return streakFrom(view(t).goal ? t : addDays(t, -1)); }
+function currentStreak() { return streakInfo().n; }   // days in a row with all races done, on any linked phone
+function bestStreak() {
+  let best = 0; allDayKeys().filter(k => view(k).goal).forEach(k => { best = Math.max(best, streakFrom(k).n); });
+  return Math.max(best, S.best || 0, ...others().map(o => o.best || 0));
+}
+
+/* ============ sounds & parsing ============ */
+const MULTI = ['tion','igh','air','ear','ure','ire','are','sh','ch','th','ng','nk','qu','ck','wh','ph','ay','ee','ow','oo','ar','or','ir','ur','er','ou','oy','ea','oi','aw','ai','oa','ew'];
+const RCTL = new Set(['ar','or','ir','ur','er','air','ear','ure','ire','are']);
+// Red words: can't be Fred Talked (no dots, the game just says them)
+const RED = new Set('i the to no of my said you your he she we me be was all are they her there what put so go some come one do does call ball tall small were where who why any many once school want watch wash here saw two four could would should through thought brother mother father love other water walk talk house son done today oh people friend again laugh buy eye half have give live gone none move whose lose sure because'.split(' '));
+let extraRed = new Set();
+const isRed = w => RED.has(w) || extraRed.has(w);
+const plain = t => t.replace(/-/g, '');
+function segment(word) {
+  const w = word.toLowerCase();
+  if (w.includes('-')) { let i = 0; return w.split('-').filter(Boolean).map(g => { const at = []; for (let k = 0; k < g.length; k++) at.push(i + k); i += g.length; return { g, at }; }); }
+  let split = null;
+  const m = w.match(/([^aeiou]|^)([aeiou])([bcdfghjklmnpstvz])e(s?)$/);
+  if (m && !/(are|ire|ure|ere|ore)s?$/.test(w) && !isRed(w)) { const e = w.length - 1 - m[4].length; split = [e - 2, e]; }
+  const units = []; let i = 0;
+  while (i < w.length) {
+    if (split && i === split[0]) { units.push({ g: w[i] + '-e', at: [i, split[1]], split: true }); i++; continue; }
+    if (split && i === split[1]) { i++; continue; }
+    let g = null;
+    for (const c of MULTI) {
+      if (!w.startsWith(c, i)) continue;
+      if (split && ((split[0] >= i && split[0] < i + c.length) || (split[1] >= i && split[1] < i + c.length))) continue;
+      const nx = w[i + c.length] || '';
+      if (RCTL.has(c) && nx && 'aeiouyr'.includes(nx)) continue;
+      g = c; break;
+    }
+    if (!g && i + 1 < w.length && w[i] === w[i + 1] && !'aeiou'.includes(w[i]) && !(split && i + 1 === split[1])) g = w[i] + w[i + 1];
+    if (!g) g = w[i];
+    units.push({ g, at: Array.from({ length: g.length }, (_, k) => i + k) }); i += g.length;
+  }
+  return units;
+}
+function wordHTML(word, dots) {
+  const w = plain(word), units = segment(word), red = isRed(norm(plain(word)));
+  const owner = []; units.forEach((u, k) => u.at.forEach(i => owner[i] = k));
+  let html = '', i = 0;
+  while (i < w.length) {
+    const k = owner[i], u = units[k]; let j = i;
+    if (!u.split) while (j + 1 < w.length && owner[j + 1] === k) j++;
+    const mk = u.split ? '' : `<i class="${u.at.length > 1 ? 'dash' : 'dot'}"></i>`;
+    html += `<span class="g${u.split ? ' sp' : ''}" data-u="${k}">${esc(w.slice(i, j + 1))}${mk}</span>`;
+    i = j + 1;
+  }
+  return `<span class="word ${dots && !red ? '' : 'nodots'}">${html}</span>`;
+}
+function drawSplits(root) {
+  root.querySelectorAll('.word:not(.nodots)').forEach(wd => {
+    const sp = [...wd.querySelectorAll('.g.sp')]; if (sp.length < 2) return;
+    const a = sp[0], b = sp[sp.length - 1], line = document.createElement('div'); line.className = 'splitline';
+    const l = a.offsetLeft + a.offsetWidth * .3; line.style.left = l + 'px'; line.style.width = (b.offsetLeft + b.offsetWidth * .7 - l) + 'px';
+    wd.appendChild(line);
+  });
+}
+// Single letters / sound spellings on their own are speed sounds: the game ignores them.
+const isSoundOnly = t => /^[a-z]$/.test(t) || MULTI.includes(t) || /^[aeiou]-e$/.test(t) || /^([b-df-hj-np-tv-z])\1$/.test(t);
+function parseHomework(txt) {
+  const words = [], sents = [], reds = []; const add = (a, x) => { if (!a.includes(x)) a.push(x); };
+  for (let line of (txt || '').split('\n')) {
+    line = line.trim(); if (!line) continue;
+    let label = '';
+    const ci = line.indexOf(':'); if (ci >= 0 && ci < 30) { label = line.slice(0, ci).toLowerCase(); line = line.slice(ci + 1).trim(); }
+    if (/sound/.test(label) || !line) continue;
+    for (let p of (line.includes(',') ? line.split(',') : [line])) {
+      p = p.trim().replace(/[.!?]+$/, '').replace(/\s+/g, ' '); if (!p) continue;
+      const low = p.toLowerCase();
+      if (p.includes(' ')) add(sents, p);
+      else if (isSoundOnly(low)) continue;
+      else { add(words, low); if (/red/.test(label)) add(reds, low); }
+    }
+  }
+  return { words, sents, reds };
+}
+function refreshRed() { extraRed = new Set(parseHomework(S.homework).reds); }
+refreshRed();
+function buildPlan() {
+  const hw = parseHomework(S.homework);
+  const rnd = seeded(hashStr(today() + S.homework));
+  const sh = a => { a = [...a]; for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(rnd() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+  const wo = sh(hw.words), se = sh(hw.sents);
+  if (!wo.length && !se.length) return [];
+  const n = Math.max(1, Math.ceil(wo.length / 8));
+  const races = [];
+  for (let r = 0; r < n; r++) races.push(wo.slice(Math.round(r * wo.length / n), Math.round((r + 1) * wo.length / n)).map(t => ({ text: t, type: 'word', red: isRed(norm(plain(t))) })));
+  if (se.length) { const m = Math.max(n, se.length); for (let i = 0; i < m; i++) races[i % n].push({ text: se[i % se.length], type: 'sentence' }); }
+  return races;
+}
+function todayPlan() {
+  const d = dayRec(); const key = hashStr(S.homework);
+  if (!d.plan || d.planKey !== key) {
+    // homework changed: build new races. Old medals are not copied onto the new races (that hid new words);
+    // if today's goal was already reached it stays reached, so the streak is safe.
+    d.plan = buildPlan(); d.planKey = key; d.done = {}; save();
+  }
+  return d.plan;
+}
+function goalNeeded() { const n = todayPlan().length; return S.settings.goal === 'all' ? n : Math.min(n, +S.settings.goal); }
+function doneToday() { return Object.keys(view().done).length; }
+
+/* ============ audio ============ */
+let actx = null;
+function ac() { if (!actx) { try { actx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) {} } if (actx && actx.state !== 'running') { try { actx.resume(); } catch (e) {} } return actx; }
+function tone(f, d, type = 'sine', when = 0, vol = .1) { const c = ac(); if (!c) return; const o = c.createOscillator(), g = c.createGain(); o.type = type; o.frequency.value = f; const t = c.currentTime + when; g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(vol, t + .02); g.gain.exponentialRampToValueAtTime(.001, t + d); o.connect(g); g.connect(c.destination); o.start(t); o.stop(t + d + .05); }
+function sfxWin() { [523, 659, 784, 1047].forEach((f, i) => tone(f, .18, 'triangle', i * .08)); }
+function sfxOops() { tone(523, .12, 'sine', 0, .05); tone(440, .18, 'sine', .1, .05); }   // soft 'hmm', not a buzzer
+function sfxVroom() { const c = ac(); if (!c) return; const o = c.createOscillator(), g = c.createGain(); o.type = 'sawtooth'; const t = c.currentTime; o.frequency.setValueAtTime(70, t); o.frequency.exponentialRampToValueAtTime(260, t + .5); g.gain.setValueAtTime(.05, t); g.gain.exponentialRampToValueAtTime(.001, t + .6); o.connect(g); g.connect(c.destination); o.start(t); o.stop(t + .65); }
+function sfxCoin() { tone(988, .08, 'square', 0, .05); tone(1319, .2, 'square', .07, .05); }
+
+/* voices live in audio/*.json and load in the background, so the page opens at once */
+const packP = {};
+function loadPack(name) {
+  return packP[name] || (packP[name] = fetch(BASE + 'audio/' + name + '.json').then(r => r.ok ? r.json() : {}).then(o => { Object.assign(AUDIO, o); }).catch(() => { delete packP[name]; }));
+}
+// Which words and names have a natural voice (small list; the clips themselves load one by one, when needed)
+let VOICE = { w: new Set(), n: new Set() };
+const voiceIndex = fetch(BASE + 'audio/index.json').then(r => r.ok ? r.json() : { w: [], n: [] }).then(o => { VOICE = { w: new Set(o.w), n: new Set(o.n) }; }).catch(() => {});
+const allAudio = (async () => { for (const p of AUDIO_PACKS) await loadPack(p); })();
+const clipP = {};
+function b64(buf) { const u = new Uint8Array(buf); let s = ''; for (let i = 0; i < u.length; i += 0x8000) s += String.fromCharCode.apply(null, u.subarray(i, i + 0x8000)); return btoa(s); }
+function loadClip(key) {   // key: w_<word> or n_<name>
+  if (AUDIO[key]) return Promise.resolve();
+  const kind = key[0], name = key.slice(2);
+  if (!/^[wn]_[a-z]+$/.test(key)) return Promise.resolve();
+  return clipP[key] || (clipP[key] = voiceIndex.then(() => {
+    if (!VOICE[kind].has(name)) return;
+    return fetch(`${BASE}audio/${kind}/${name}.mp3`).then(r => r.ok ? r.arrayBuffer() : null).then(buf => { if (buf) AUDIO[key] = b64(buf); });
+  }).catch(() => { delete clipP[key]; }));
+}
+async function loadWordVoice(key) { if (!AUDIO[key]) await loadClip(key); }
+async function ensureWords(list) {
+  await voiceIndex;
+  const keys = new Set(); (list || []).forEach(t => norm(plain(t)).split(' ').forEach(w => { if (w) keys.add('w_' + w); }));
+  const all = [...keys]; for (let i = 0; i < all.length; i += 8) await Promise.all(all.slice(i, i + 8).map(loadClip));   // 8 at a time
+}
+const bufCache = {};
+async function getBuf(key) {
+  if (!AUDIO[key]) await allAudio;
+  await loadWordVoice(key);
+  if (bufCache[key]) return bufCache[key];
+  const b64 = AUDIO[key], c = ac(); if (!b64 || !c) return null;
+  const bin = atob(b64), u = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i);
+  return bufCache[key] = new Promise(res => { try { c.decodeAudioData(u.buffer, b => res(b), () => res(null)); } catch (e) { res(null); } });
+}
+let curSrc = null;
+function stopAudio() { try { curSrc && curSrc.stop(); } catch (e) {} curSrc = null; try { player.pause(); } catch (e) {} if (curDone) curDone(); try { speechSynthesis.cancel(); } catch (e) {} }
+// Voice clips play through one normal <audio> player: on iPhone it ignores the silent switch
+// and keeps working after the microphone has been used. Web Audio is only a backup.
+function setSession(type) { try { if (navigator.audioSession) navigator.audioSession.type = type; } catch (e) {} }
+setSession('playback');
+const player = new Audio(); player.preload = 'auto'; player.setAttribute('playsinline', '');
+const urlCache = {};
+function clipUrl(key) {
+  if (urlCache[key] && urlCache[key].src === AUDIO[key]) return urlCache[key].url;
+  const b64 = AUDIO[key]; if (!b64) return null;
+  const bin = atob(b64), u = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i);
+  const type = key === '__name' && S.nameRec ? (S.nameRec.type || 'audio/mp4').split(';')[0] : 'audio/mpeg';
+  const url = URL.createObjectURL(new Blob([u], { type }));
+  urlCache[key] = { src: b64, url }; return url;
+}
+let curDone = null;   // finishes the clip that is playing now (used when something new starts or stopAudio)
+async function playKey(key) {
+  if (!AUDIO[key]) await allAudio;
+  await loadWordVoice(key);
+  const url = clipUrl(key); if (!url) return false;
+  setSession('playback');
+  if (curDone) curDone();
+  try { curSrc && curSrc.stop(); } catch (e) {}
+  try {
+    player.pause(); player.src = url; player.currentTime = 0; player.muted = false;
+    await player.play();
+  } catch (e) { return playKeyWA(key); }
+  await new Promise(r => {
+    let t;
+    const done = () => { clearTimeout(t); player.removeEventListener('ended', done); player.removeEventListener('error', done); if (curDone === done) curDone = null; r(); };
+    curDone = done;
+    player.addEventListener('ended', done); player.addEventListener('error', done);
+    const d = isFinite(player.duration) && player.duration > 0 ? player.duration : 8;
+    t = setTimeout(done, d * 1000 + 600);
+  });
+  return true;
+}
+async function playKeyWA(key) {
+  const buf = await getBuf(key); if (!buf) return false;
+  const c = ac(); if (c.state !== 'running') { try { await Promise.race([c.resume(), sleep(800)]); } catch (e) {} }
+  try { curSrc && curSrc.stop(); } catch (e) {}
+  const src = c.createBufferSource(); src.buffer = buf; src.connect(c.destination); curSrc = src;
+  await new Promise(r => { src.onended = r; src.start(); setTimeout(r, buf.duration * 1000 + 300); });
+  if (curSrc === src) curSrc = null; return true;
+}
+function deviceSpeak(text, rate = .85) {
+  return new Promise(res => {
+    if (!('speechSynthesis' in window)) return res();
+    let done = false; const fin = () => { if (!done) { done = true; res(); } };
+    try {
+      const vs = speechSynthesis.getVoices();
+      const v = vs.find(v => /en.GB/i.test(v.lang) && /enhanced|premium|Serena|Kate|Martha/i.test(v.name)) || vs.find(v => /en.GB/i.test(v.lang)) || vs.find(v => /^en/i.test(v.lang));
+      const u = new SpeechSynthesisUtterance(text); if (v) u.voice = v; u.lang = v ? v.lang : 'en-GB'; u.rate = rate;
+      u.onend = fin; u.onerror = fin; setTimeout(fin, 1500 + text.length * 120); speechSynthesis.speak(u);
+    } catch (e) { fin(); }
+  });
+}
+const hasWord = w => { const k = norm(w); return !!AUDIO['w_' + k] || VOICE.w.has(k); };
+async function sayWord(w) { w = norm(plain(w)); if (!(await playKey('w_' + w))) await deviceSpeak(w); }
+async function saySound(g) { if (!(await playKey('s_' + g))) await deviceSpeak(g); }
+async function saySentence(t) {
+  const key = 't_' + norm(plain(t)).replace(/ /g, '_');
+  if (await playKey(key)) return;
+  const ws = norm(plain(t)).split(' ');
+  if (ws.every(hasWord)) { for (const w of ws) { await playKey('w_' + w); await sleep(90); } return; }
+  await deviceSpeak(plain(t), .8);
+}
+// After a prompt has been heard once today, use its short version (keeps the game quick, stops nagging).
+const SHORT = { fred_word: 'fred_word_s', fred_sentence: 'fred_sentence_s', sounds_intro: 'sounds_intro_s', blend_now: 'blend_now_s',
+  your_turn_word: 'your_turn_s', your_turn_sentence: 'your_turn_s', didnt_hear: 'didnt_hear_s', good_try: 'good_try_s', again: 'again_s',
+  red_word: 'red_word_s', pit: 'pit_s', fred_again: 'fred_again_s', listen: 'listen_s', finish_line: null };
+async function say(id) {
+  if (SHORT[id]) { const d = dayRec(); d.said = d.said || {}; if (d.said[id]) id = SHORT[id]; else { d.said[id] = 1; save(); } }
+  $('#bubble').textContent = PHRASES[id] || '';
+  const m = $('#mascot'); m && m.classList.add('talking');
+  try { await playKey('p_' + id); } finally { m && m.classList.remove('talking'); }
+}
+const nameKey = n => norm(n || '').split(' ')[0] || '';
+function hasNameVoice() { return !!(S.nameRec || VOICE.n.has(nameKey(S.name))); }
+async function sayName() {
+  if (!S.name) return;
+  if (S.nameRec) { if (!AUDIO.__name || AUDIO.__nameSrc !== S.nameRec.b64) { AUDIO.__name = S.nameRec.b64; AUDIO.__nameSrc = S.nameRec.b64; delete bufCache.__name; } if (await playKey('__name')) return; }
+  await playKey('n_' + nameKey(S.name));
+}
+
+/* ============ speech recognition ============ */
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+let micBlocked = false;
+const micOn = () => !!SR && !micBlocked;
+let currentRec = null;
+// One listening session at a time. iPhone needs the previous session fully closed before a new one starts.
+let recEnded = Promise.resolve();
+// IMPORTANT: must run straight from the tap, with no waiting before rec.start(), or iPhone Safari refuses the mic.
+function listen(maxMs, isDone, onReady) {
+  // Noise-proof listening: a wrong guess from background noise no longer ends the turn. We keep every guess,
+  // restart the recogniser if it stops early (common in noise), and judge when the word is heard, when the
+  // child goes quiet for a moment, or when time runs out. The first start stays straight from the tap (iPhone rule).
+  setSession('play-and-record');   // let the mic in; switched back to loudspeaker 'playback' before the next clip
+  if (!SR) return Promise.resolve({ error: 'unsupported', texts: [] });
+  return new Promise(resolve => {
+    const all = []; let finished = false, ready = false, timer, safety, quiet, rec = null, restarts = 0, t0 = Date.now(), firstErr = null;
+    const handle = { abort: () => finish({ error: 'aborted', texts: [] }, true) };
+    const finish = (r, hard) => {
+      if (finished) return; finished = true; clearTimeout(timer); clearTimeout(safety); clearTimeout(quiet); currentRec = null;
+      try { hard ? rec && rec.abort() : rec && rec.stop(); } catch (e) {}
+      resolve(r);
+    };
+    const done = () => finish(all.length ? { texts: all.slice() } : { error: firstErr || (ready ? 'no-speech' : 'no-audio'), texts: [] });
+    const goReady = () => {
+      if (ready) return; ready = true; t0 = Date.now(); onReady && onReady();
+      timer = setTimeout(() => { try { rec.stop(); } catch (e) {} setTimeout(done, 1200); }, maxMs);
+    };
+    const start = first => {
+      let r; try { r = new SR(); } catch (e) { return first ? finish({ error: 'unsupported', texts: [] }) : done(); }
+      rec = r; currentRec = handle; r.lang = 'en-GB'; r.interimResults = true; r.continuous = false; r.maxAlternatives = 5;
+      let endDone; recEnded = new Promise(x => endDone = x);
+      r.onstart = () => setTimeout(goReady, 350);
+      r.onaudiostart = goReady;
+      r.onresult = e => {
+        if (finished || rec !== r) return;
+        const firstAlt = [], texts = [];
+        for (let i = 0; i < e.results.length; i++) { firstAlt.push(e.results[i][0].transcript); for (let j = 0; j < e.results[i].length; j++) texts.push(e.results[i][j].transcript); }
+        texts.unshift(firstAlt.join(' '));
+        texts.forEach(t => { if (t && !all.includes(t)) all.push(t); });
+        if (isDone(all)) return finish({ texts: all.slice() });
+        clearTimeout(quiet);
+        if (e.results[e.results.length - 1].isFinal) quiet = setTimeout(done, 1600);   // a moment to try again before judging
+      };
+      r.onerror = e => {
+        if (rec !== r || finished) return;
+        if (!first) return;   // errors from a restart never block the mic; we just judge what we heard
+        firstErr = e.error;
+        if (['not-allowed', 'service-not-allowed'].includes(e.error)) finish({ error: e.error, texts: all.slice() });
+      };
+      r.onend = () => {
+        endDone();
+        if (finished || rec !== r) return;
+        if (ready && Date.now() - t0 < maxMs - 700 && restarts < 4) { restarts++; start(false); return; }   // stopped early: listen again
+        done();
+      };
+      try { r.start(); } catch (e) { endDone(); if (first) finish({ error: 'start-failed', texts: [] }); else done(); }
+    };
+    safety = setTimeout(() => { try { rec && rec.abort(); } catch (e) {} done(); }, maxMs + 5000);
+    start(true);
+  });
+}
+const norm = s => String(s).toLowerCase().replace(/[^a-z' ]+/g, ' ').replace(/'/g, '').replace(/\s+/g, ' ').trim();
+const squash = w => w.replace(/(.)\1+/g, '$1');
+// spelling-blind compare: "kat" = "cat", "hil" = "hill", "phox" = "fox"
+const sp = w => squash(w.replace(/ph/g, 'f').replace(/ck/g, 'k').replace(/c(?=[aou]|$)/g, 'k').replace(/q/g, 'k').replace(/x/g, 'ks').replace(/wh/g, 'w').replace(/([^aeiou])e$/, '$1'));
+const ALIAS = { zag: ['zack', 'zac', 'zak'], six: ['sicks', 'sics'], fox: ['fawks'], chin: ['chinn'], red: ['read'], web: ['webb'], bell: ['belle'], jet: ['jett'], pen: ['penn'], yap: ['yapp'], jam: ['jamb'], win: ['wynn', 'wyn'], vet: ['vette'], doll: ['dahl'], box: ['bocks'], cat: ['kat'], mix: ['micks'], fix: ['ficks'], hen: ['hens'], son: ['sun'], sun: ['son'], to: ['two', 'too'], no: ['know'], be: ['bee'], see: ['sea'], i: ['eye'] };
+// Consonant outline of a word: hill / hell / heal / he'll -> "hl", yap / yup / yep -> "yp", egg -> "eg".
+// Phones often swap a child's vowel for a more common word, so the relaxed check compares outlines.
+const skel = w => { const s = sp(w); return s[0] + s.slice(1).replace(/[aeiouy]/g, '').replace(/(.)\1+/g, '$1'); };
+let hwWords = new Set();   // today's homework words: hearing one of THESE instead is a real mistake
+// "th" is the sound speech recognisers get wrong most (and young children often say it as f/v/d).
+// So for words with "th" we also accept the usual mishearings: thin -> fin/tin/thing, this -> dis/vis/these, with -> wif/wiv.
+const TH_ALIAS = { thin: ['fin', 'finn', 'fen', 'tin', 'thing', 'think', 'thins', 'sin', 'thinn'], this: ['dis', 'diss', 'these', 'vis', 'fis', 'fiss', 'thiss', 'tis', 'thus', 'thes'],
+  that: ['dat', 'vat', 'fat', 'thats'], then: ['den', 'ven', 'than', 'them'], them: ['dem', 'vem', 'then'], the: ['da', 'de', 'duh'], with: ['wif', 'wiv', 'wid', 'wit', 'width'],
+  thick: ['fick', 'tick', 'sick'], thing: ['fing', 'ting', 'think', 'thin'], think: ['fink', 'tink', 'thing', 'sink'], moth: ['mof', 'moff', 'mouth', 'mott'], bath: ['baf', 'barf', 'bat'],
+  path: ['paf', 'pat'], three: ['free', 'tree', 'fee'], thank: ['fank', 'tank'], cloth: ['clof', 'clot'], teeth: ['teef'], tooth: ['toof'], they: ['day', 'dey'], there: ['dare', 'their'] };
+function thOk(t, h) {
+  if (!t.includes('th') || hwWords.has(h)) return false;   // hearing another homework word is a real mistake
+  if ((TH_ALIAS[t] || []).includes(h)) return true;
+  if (['f', 'v', 'd', 't', 's'].some(x => t.replace(/th/g, x) === h)) return true;   // any other th-word
+  return /n$/.test(t) && (h === t + 'g' || h === t + 'k');                          // "thing" for thin
+}
+function exactOk(t, h) { return h === t || squash(h) === squash(t) || sp(h) === sp(t) || (ALIAS[t] || []).includes(h); }
+function wordOk(target, heard) {
+  const t = norm(plain(target)), h = norm(heard);
+  if (!h) return false;
+  if (exactOk(t, h) || thOk(t, h)) return true;
+  if (S.settings.strict || h.length < 2 || hwWords.has(h) || t.length < 2) return false;
+  if (h === t + 's') return true;                                              // "hills" for hill
+  if (h.length <= t.length + 2 && skel(h) === skel(t)) return true;            // "hell", "heal" for hill; "yup" for yap
+  const cons = w => sp(w).replace(/[aeiouy]/g, '');
+  if (t[0] === 'h' && h[0] !== 'h' && cons(h) === cons(t).slice(1) && h.length >= t.length - 1) return true;  // "ill" for hill (soft h)
+  return false;
+}
+const LENIENT = ['a', 'an', 'the'];
+function check(it, texts) {
+  hwWords = new Set(parseHomework(S.homework).words);
+  texts = (texts || []).filter(Boolean);
+  if (it.type === 'sentence') {
+    if (texts.length > 1) texts = [...texts, texts.join(' ')];
+    const tw = norm(plain(it.text)).split(' '); let best = null;
+    for (const tx of texts) { const hw = norm(tx).split(' '); const miss = tw.filter(w => !LENIENT.includes(w) && !hw.some(h => wordOk(w, h))); if (!best || miss.length < best.length) best = miss; }
+    best = best || tw.filter(w => !LENIENT.includes(w));
+    return { ok: best.length === 0, missing: best };
+  }
+  for (const tx of texts) for (const h of norm(tx).split(' ')) if (wordOk(it.text, h)) return { ok: true };
+  return { ok: false };
+}
+
+/* ============ art ============ */
+const EMBLEMS = {
+  bolt: '<path d="M2 -9 L-5 1 L0 1 L-2 9 L5 -1 L0 -1 Z" fill="#ffd23f" stroke="#1b1b3a" stroke-width="1.5" stroke-linejoin="round"/>',
+  star: '<path d="M0 -9 L2.6 -3 L9 -2.8 L4 1.4 L5.6 8 L0 4.4 L-5.6 8 L-4 1.4 L-9 -2.8 L-2.6 -3 Z" fill="#ffd23f" stroke="#1b1b3a" stroke-width="1.5" stroke-linejoin="round"/>',
+  moon: '<path d="M3 -8 A8 8 0 1 0 6 6 A6.5 6.5 0 1 1 3 -8 Z" fill="#ffd23f" stroke="#1b1b3a" stroke-width="1.5"/>',
+  flame: '<path d="M0 -9 C5 -3 7 1 5 5 C3 9 -3 9 -5 5 C-7 1 -3 -1 -2 -5 C-1 -2 1 -1 0 -9 Z" fill="#ff8c1a" stroke="#1b1b3a" stroke-width="1.5"/>',
+  shield: '<path d="M0 -9 L7 -6 L6 2 C5 6 2 8 0 9 C-2 8 -5 6 -6 2 L-7 -6 Z" fill="#1d7bf2" stroke="#1b1b3a" stroke-width="1.5"/>',
+  crown: '<path d="M-8 6 L-8 -5 L-4 -1 L0 -8 L4 -1 L8 -5 L8 6 Z" fill="#ffd23f" stroke="#1b1b3a" stroke-width="1.5" stroke-linejoin="round"/>',
+};
+const K = '#1b1b3a';
+let WHEEL = '#d6d9e6';   // hub colour of the car being drawn (paint shop)
+const wheelSVG = (x, y, r) => `<g class="wheel"><circle cx="${x}" cy="${y}" r="${r}" fill="#2b2d3a" stroke="${K}" stroke-width="3"/><circle cx="${x}" cy="${y}" r="${r * .42}" fill="${WHEEL}"/><path d="M${x} ${y - r + 3} L${x} ${y + r - 3} M${x - r + 3} ${y} L${x + r - 3} ${y}" stroke="#55586b" stroke-width="3"/></g>`;
+const faceSVG = (x, y) => `<ellipse cx="${x}" cy="${y}" rx="5.5" ry="6.5" fill="#fff"/><circle cx="${x + 2}" cy="${y + 1}" r="3.2" fill="${K}"/><ellipse cx="${x + 22}" cy="${y + 1}" rx="5.5" ry="6.5" fill="#fff"/><circle cx="${x + 24}" cy="${y + 2}" r="3.2" fill="${K}"/>`;
+const smileSVG = (x, y) => `<path d="M${x} ${y} Q${x + 14} ${y + 6} ${x + 30} ${y}" fill="none" stroke="${K}" stroke-width="3" stroke-linecap="round"/>`;
+const emblemSVG = (c, x, y) => `<g transform="translate(${x} ${y})"><circle r="12" fill="#fff" stroke="${K}" stroke-width="3"/>${EMBLEMS[c.emblem]}</g>`;
+const SHAPES = {
+  monster: c => `<ellipse cx="102" cy="106" rx="88" ry="5" fill="#0000003a"/>
+    <path d="M60 64 L62 80 M142 64 L140 80" stroke="#55586b" stroke-width="6" stroke-linecap="round"/>
+    <path d="M20 66 Q16 44 42 40 L70 36 Q82 12 112 12 L130 14 Q152 18 162 36 L180 40 Q192 44 190 66 Z" fill="${c.body}" stroke="${K}" stroke-width="4" stroke-linejoin="round"/>
+    <path d="M80 36 Q90 21 110 20 L128 22 Q142 25 148 36 Z" fill="#bfe9ff" stroke="${K}" stroke-width="3" stroke-linejoin="round"/>
+    ${faceSVG(110, 28)}${smileSVG(118, 46)}
+    <path d="M26 56 L184 56" stroke="${c.accent}" stroke-width="6" stroke-linecap="round"/>${emblemSVG(c, 54, 52)}
+    ${wheelSVG(54, 82, 24)}${wheelSVG(150, 82, 24)}`,
+  bus: c => `<ellipse cx="102" cy="104" rx="90" ry="6" fill="#0000003a"/>
+    <rect x="10" y="20" width="182" height="64" rx="14" fill="${c.body}" stroke="${K}" stroke-width="4"/>
+    ${[22, 52, 82, 112].map(x => `<rect x="${x}" y="30" width="24" height="20" rx="4" fill="#bfe9ff" stroke="${K}" stroke-width="3"/>`).join('')}
+    <rect x="144" y="30" width="40" height="24" rx="5" fill="#bfe9ff" stroke="${K}" stroke-width="3"/>
+    ${faceSVG(150, 40)}${smileSVG(150, 64)}
+    <path d="M14 62 L140 62" stroke="${c.accent}" stroke-width="5" stroke-linecap="round"/>
+    <circle cx="188" cy="74" r="4" fill="#fff6a8" stroke="${K}" stroke-width="2"/>
+    ${wheelSVG(48, 86, 15)}${wheelSVG(160, 86, 15)}`,
+  f1: c => `<ellipse cx="102" cy="104" rx="90" ry="5" fill="#0000003a"/>
+    <path d="M8 34 H40 V44 H8 Z" fill="${c.accent}" stroke="${K}" stroke-width="3.5" stroke-linejoin="round"/><path d="M26 44 V62" stroke="${K}" stroke-width="5"/>
+    <path d="M14 84 L16 62 L58 58 Q84 40 110 42 L124 58 L180 64 Q196 66 196 78 L196 84 Z" fill="${c.body}" stroke="${K}" stroke-width="4" stroke-linejoin="round"/>
+    <path d="M86 56 Q94 46 110 47 L118 58 Z" fill="#bfe9ff" stroke="${K}" stroke-width="3" stroke-linejoin="round"/>
+    ${faceSVG(136, 66)}<path d="M150 82 Q164 86 180 80" fill="none" stroke="${K}" stroke-width="3" stroke-linecap="round"/>
+    <path d="M176 86 H198" stroke="${c.accent}" stroke-width="6" stroke-linecap="round"/>${emblemSVG(c, 70, 72)}
+    ${wheelSVG(44, 84, 18)}${wheelSVG(158, 84, 18)}`,
+  jeep: c => `<ellipse cx="102" cy="104" rx="86" ry="6" fill="#0000003a"/>
+    <circle cx="14" cy="56" r="13" fill="#2b2d3a" stroke="${K}" stroke-width="3"/>
+    <path d="M20 84 V52 Q20 44 28 44 H62 L78 20 H138 Q144 20 146 26 L156 44 H182 Q192 44 192 54 V84 Z" fill="${c.body}" stroke="${K}" stroke-width="4" stroke-linejoin="round"/>
+    <path d="M84 26 H134 L142 42 H74 Z" fill="#bfe9ff" stroke="${K}" stroke-width="3" stroke-linejoin="round"/>
+    ${faceSVG(102, 32)}${smileSVG(150, 62)}
+    <path d="M24 66 L188 66" stroke="${c.accent}" stroke-width="6" stroke-linecap="round"/>${emblemSVG(c, 52, 58)}
+    <circle cx="186" cy="52" r="4" fill="#fff6a8" stroke="${K}" stroke-width="2"/>
+    ${wheelSVG(56, 86, 18)}${wheelSVG(156, 86, 18)}`,
+  van: c => `<ellipse cx="102" cy="104" rx="88" ry="6" fill="#0000003a"/>
+    <path d="M46 9 L66 9 L56 23 Z" fill="#f4c27a" stroke="${K}" stroke-width="3" stroke-linejoin="round"/><circle cx="56" cy="7" r="8" fill="#fff0f6" stroke="${K}" stroke-width="3"/><circle cx="53" cy="4" r="1.6" fill="#ef3e36"/><circle cx="59" cy="8" r="1.6" fill="#1d7bf2"/>
+    <path d="M14 84 V30 Q14 22 22 22 H136 Q146 22 152 32 L166 50 H184 Q194 50 194 60 V84 Z" fill="${c.body}" stroke="${K}" stroke-width="4" stroke-linejoin="round"/>
+    <rect x="28" y="34" width="70" height="24" rx="6" fill="#fff" stroke="${K}" stroke-width="3"/>
+    ${[36, 52, 68, 84].map((x, i) => `<circle cx="${x}" cy="46" r="5" fill="${['#ff8c1a', '#5ec8ff', '#2bb673', '#ef3e36'][i]}"/>`).join('')}
+    <path d="M112 32 H140 L156 50 H112 Z" fill="#bfe9ff" stroke="${K}" stroke-width="3" stroke-linejoin="round"/>
+    ${faceSVG(120, 40)}${smileSVG(150, 66)}
+    <path d="M18 72 L190 72" stroke="${c.accent}" stroke-width="6" stroke-linecap="round"/>
+    ${wheelSVG(52, 86, 16)}${wheelSVG(160, 86, 16)}`,
+  rocket: c => `<ellipse cx="104" cy="104" rx="84" ry="6" fill="#0000003a"/>
+    <path d="M4 56 Q18 48 30 58 Q18 64 4 72 Q14 64 4 56 Z" fill="#ff8c1a" stroke="${K}" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M28 42 L44 18 L56 46 Z" fill="${c.accent}" stroke="${K}" stroke-width="3.5" stroke-linejoin="round"/>
+    <path d="M26 82 Q22 50 52 46 L120 40 Q170 36 196 70 Q196 82 184 82 Z" fill="${c.body}" stroke="${K}" stroke-width="4" stroke-linejoin="round"/>
+    <path d="M104 44 Q130 32 154 44 L150 56 Q128 50 102 56 Z" fill="#bfe9ff" stroke="${K}" stroke-width="3" stroke-linejoin="round"/>
+    ${faceSVG(120, 50)}${smileSVG(146, 70)}
+    <path d="M32 72 L176 72" stroke="${c.accent}" stroke-width="6" stroke-linecap="round"/>${emblemSVG(c, 66, 64)}
+    ${wheelSVG(60, 86, 16)}${wheelSVG(160, 86, 16)}`,
+};
+function carSVG(i, w = 160, mine = true, preview = null) {   // mine: show this child's paint-shop changes
+  const c = { ...(CARS[i] || CARS[0]), ...(mine ? ((S.mods || {})[i] || {}) : {}), ...(preview || {}) };
+  WHEEL = c.wheel || '#d6d9e6';
+  if (c.shape && SHAPES[c.shape]) return `<svg viewBox="0 0 200 112" width="${w}" height="${w * 112 / 200}" aria-label="${esc(c.name)}">${SHAPES[c.shape](c)}</svg>`;
+  return `<svg viewBox="0 0 200 112" width="${w}" height="${w * 112 / 200}" aria-label="${esc(c.name)}">
+  <ellipse cx="102" cy="104" rx="84" ry="6" fill="#0000003a"/>
+  <path d="M10 48 L32 48 L36 60 L16 62 Z" fill="${c.accent}" stroke="#1b1b3a" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M18 82 Q14 60 40 56 L72 52 Q86 26 116 26 L134 28 Q156 32 168 52 L184 56 Q196 60 194 82 Z" fill="${c.body}" stroke="#1b1b3a" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M82 52 Q92 35 114 34 L131 36 Q145 39 153 52 Z" fill="#bfe9ff" stroke="#1b1b3a" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M100 40 Q122 36 150 42 L151 49 Q124 44 99 48 Z" fill="${c.accent}" stroke="#1b1b3a" stroke-width="2.5" stroke-linejoin="round"/>
+  <ellipse cx="114" cy="44" rx="5.5" ry="6.5" fill="#fff"/><circle cx="116" cy="45" r="3.2" fill="#1b1b3a"/>
+  <ellipse cx="136" cy="45" rx="5.5" ry="6.5" fill="#fff"/><circle cx="138" cy="46" r="3.2" fill="#1b1b3a"/>
+  <path d="M120 60 Q134 66 150 60" fill="none" stroke="#1b1b3a" stroke-width="3" stroke-linecap="round"/>
+  <path d="M28 70 L180 70" stroke="${c.accent}" stroke-width="6" stroke-linecap="round"/>
+  <circle cx="186" cy="66" r="4" fill="#fff6a8" stroke="#1b1b3a" stroke-width="2"/>
+  <g transform="translate(64 66)"><circle r="12" fill="#fff" stroke="#1b1b3a" stroke-width="3"/>${EMBLEMS[c.emblem]}</g>
+  <g class="wheel"><circle cx="58" cy="84" r="17" fill="#2b2d3a" stroke="#1b1b3a" stroke-width="3"/><circle cx="58" cy="84" r="7" fill="${WHEEL}"/><path d="M58 70 L58 98 M44 84 L72 84" stroke="#55586b" stroke-width="3"/></g>
+  <g class="wheel"><circle cx="156" cy="84" r="17" fill="#2b2d3a" stroke="#1b1b3a" stroke-width="3"/><circle cx="156" cy="84" r="7" fill="${WHEEL}"/><path d="M156 70 L156 98 M142 84 L170 84" stroke="#55586b" stroke-width="3"/></g>
+</svg>`;
+}
+function truckSVG(w = 64) {
+  return `<svg viewBox="0 0 200 112" width="${w}" height="${w * 112 / 200}" aria-label="truck">
+  <ellipse cx="100" cy="104" rx="86" ry="6" fill="#0000003a"/>
+  <rect x="12" y="22" width="110" height="62" rx="8" fill="#8a6a4a" stroke="#1b1b3a" stroke-width="4"/>
+  <path d="M122 40 L160 40 Q172 42 178 58 L188 62 L188 84 L122 84 Z" fill="#7d8597" stroke="#1b1b3a" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M130 46 L158 46 Q166 48 170 60 L130 60 Z" fill="#bfe9ff" stroke="#1b1b3a" stroke-width="3"/>
+  <path d="M138 50 L150 54 M166 50 L156 54" stroke="#1b1b3a" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="146" cy="56" r="3" fill="#1b1b3a"/><circle cx="160" cy="56" r="3" fill="#1b1b3a"/>
+  <path d="M146 72 Q156 66 166 72" fill="none" stroke="#1b1b3a" stroke-width="3" stroke-linecap="round"/>
+  <g class="wheel"><circle cx="48" cy="86" r="16" fill="#2b2d3a" stroke="#1b1b3a" stroke-width="3"/><circle cx="48" cy="86" r="6" fill="#d6d9e6"/></g>
+  <g class="wheel"><circle cx="156" cy="86" r="16" fill="#2b2d3a" stroke="#1b1b3a" stroke-width="3"/><circle cx="156" cy="86" r="6" fill="#d6d9e6"/></g>
+</svg>`;
+}
+function confetti(n = 26) {
+  const cols = ['#ef3e36', '#ffd23f', '#2bb673', '#1d7bf2', '#ff8c1a', '#8e44ad'];
+  for (let i = 0; i < n; i++) { const s = document.createElement('div'); s.className = 'confetti'; s.style.left = Math.random() * 100 + 'vw'; s.style.background = pick(cols); s.style.animationDelay = Math.random() * .3 + 's'; s.style.animationDuration = 1 + Math.random() * .8 + 's'; document.body.appendChild(s); setTimeout(() => s.remove(), 2400); }
+}
+function flash(t) { const d = document.createElement('div'); d.className = 'flash'; d.textContent = t; document.body.appendChild(d); setTimeout(() => d.remove(), 1300); }
+
+/* ============ screens ============ */
+function show(id) { document.querySelectorAll('.screen').forEach(s => s.classList.toggle('on', s.id === id)); window.scrollTo(0, 0); }
+function modal(html) { $('#modal').innerHTML = html; $('#modalBg').classList.add('on'); }
+function closeModal() { $('#modalBg').classList.remove('on'); }
+$('#modalBg').addEventListener('click', e => { if (e.target.id === 'modalBg') closeModal(); });
+let unlocked = false, welcomed = false;
+const SILENT = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAIA+AAACABAAZGF0YQAAAAA=';
+document.addEventListener('pointerdown', () => {
+  ac(); setSession('playback');
+  if (!unlocked) {
+    unlocked = true;
+    try { player.muted = true; player.src = SILENT; const p = player.play(); if (p) p.then(() => { player.pause(); player.muted = false; }).catch(() => { player.muted = false; unlocked = false; }); } catch (e) { player.muted = false; }
+    try { const u = new SpeechSynthesisUtterance(' '); u.volume = 0; speechSynthesis.speak(u); } catch (e) {}
+  }
+}, true);
+
+/* ============ HOME ============ */
+const MEDAL = { 3: ic('medal3', 40), 2: ic('medal2', 40), 1: ic('medal1', 40) };
+const bigMedal = m => ic('medal' + m, 110);
+const RACES = [
+  { icon: 'rocket', name: 'Rocket Race', bg: 'linear-gradient(135deg,#7b4dff,#2d6bff)' },
+  { icon: 'bolt', name: 'Lightning Lap', bg: 'linear-gradient(135deg,#ffb300,#ff6a00)' },
+  { icon: 'hero', name: 'Superhero Sprint', bg: 'linear-gradient(135deg,#ff3d6e,#c8174f)' },
+  { icon: 'siren', name: 'Police Chase', bg: 'linear-gradient(135deg,#2d8cff,#1a3d9e)' },
+  { icon: 'dino', name: 'Dino Dash', bg: 'linear-gradient(135deg,#3ccf6e,#138a52)' },
+  { icon: 'ufo', name: 'Space Speedway', bg: 'linear-gradient(135deg,#5b3bd6,#1b1464)' },
+  { icon: 'firetruck', name: 'Fire Truck Rescue', bg: 'linear-gradient(135deg,#ff5a36,#c21f1f)' },
+  { icon: 'flag', name: 'Grand Prix', bg: 'linear-gradient(135deg,#14c1b5,#0b7f8a)' },
+  { icon: 'moto', name: 'Moto Madness', bg: 'linear-gradient(135deg,#ff7ab6,#8e44ad)' },
+  { icon: 'heli', name: 'Sky Rally', bg: 'linear-gradient(135deg,#39b8ff,#1f6fd1)' },
+];
+function coin(size = 24) {
+  return `<svg class="coin" width="${size}" height="${size}" viewBox="0 0 40 40" aria-label="coins"><defs><radialGradient id="cg" cx="35%" cy="30%" r="75%"><stop offset="0" stop-color="#fff3a0"/><stop offset=".45" stop-color="#ffd23f"/><stop offset="1" stop-color="#e69a00"/></radialGradient></defs>
+    <circle cx="20" cy="20" r="18.5" fill="url(#cg)" stroke="#b36b00" stroke-width="2.5"/><circle cx="20" cy="20" r="13" fill="none" stroke="#c98200" stroke-width="2" opacity=".7"/>
+    <path d="M20 10.5 L22.6 16.6 L29.2 17 L24.1 21.2 L25.8 27.6 L20 24 L14.2 27.6 L15.9 21.2 L10.8 17 L17.4 16.6 Z" fill="#fff6c2" stroke="#c98200" stroke-width="1.2" stroke-linejoin="round"/></svg>`;
+}
+function renderHome() {
+  const st = currentStreak();
+  $('#streakChip').innerHTML = ic('flame', 32) + ' ' + st;
+  $('#coinChip').innerHTML = coin(26) + ' ' + wallet();
+  checkBadges();
+  const nc = $('#nameChip'); nc.style.display = S.name ? '' : 'none'; nc.textContent = S.name;
+  if (!S.setupDone) setTimeout(setupWizard, 50);
+  $('#heroCar').innerHTML = carSVG(S.car, 170);
+  const pb = $('#paintBtn'); pb.style.display = FEATURES.shop ? '' : 'none'; pb.innerHTML = ic('brush', 30) + (canBuySomething() ? '<i class="dot"></i>' : ''); pb.classList.toggle('glow', canBuySomething()); pb.onclick = () => { stopAudio(); paintShop(S.car); say('shop_hi'); };
+  const ni = nextReadingCar();
+  if (ni >= 0 && FEATURES.carsByRaces) {
+    const rs = raceSlots(20);
+    $('#nextCar').innerHTML = `<span class="rtot">${ic('flag', 22)}<b>${rs.total}</b></span>${rs.html}<span class="nc">${carSVG(ni, 56)}</span>`;
+    $('#nextCar').onclick = () => { stopAudio(); say('more_' + Math.min(10, Math.max(1, rs.left))); };
+  } else if (ni >= 0) {
+    const coinsNow = allCoins(), prev = ni > 0 ? CARS[ni - 1].at : 0, pct = Math.max(4, Math.min(100, (coinsNow - prev) / (CARS[ni].at - prev) * 100));
+    $('#nextCar').innerHTML = `${coin(22)}<div class="bar"><i style="width:${pct}%"></i></div><span class="nc">${carSVG(ni, 64)}</span>${ic('lock', 22)}`;
+  } else $('#nextCar').innerHTML = '';
+  const wk = [];
+  const L = ['S', 'M', 'T', 'W', 'T', 'F', 'S'], shielded = new Set(streakInfo().shields);
+  for (let i = 6; i >= 0; i--) {
+    const k = addDays(today(), -i), ok = view(k).goal, [y, m, dd] = k.split('-').map(Number);
+    wk.push(`<div class="wd"><b class="${ok ? 'ok' : shielded.has(k) ? 'sh' : ''} ${i === 0 ? 'today' : ''}">${ok ? ic('flame', 22) : shielded.has(k) ? ic('shield', 24) : ''}</b>${i === 0 ? 'Today' : L[new Date(y, m - 1, dd).getDay()]}</div>`);
+  }
+  $('#week').innerHTML = wk.join('');
+  const plan = todayPlan(), d = view();
+  const nextIdx = plan.findIndex((_, i) => !d.done[i]);
+  const cards = plan.map((r, i) => {
+    const m = d.done[i], th = RACES[i % RACES.length];
+    const nw = r.filter(x => x.type === 'word').length, ns = r.filter(x => x.type === 'sentence').length;
+    const sub = `${nw} word${nw === 1 ? '' : 's'}${ns ? ` + ${ns} sentence${ns === 1 ? '' : 's'}` : ''}`;
+    return `<button class="rcard ${m ? 'done' : ''} ${i === nextIdx ? 'next' : ''}" data-r="${i}" style="background:${th.bg}">
+      <div class="badge"><span class="n">${i + 1}</span>${ic(th.icon, 42)}</div>
+      <div class="info"><div class="nm">${th.name}</div><div class="sub">${sub}</div></div>
+      <div class="go">${m ? MEDAL[m] : i === nextIdx ? `<span class="gobtn">${ic('play', 26)}</span>` : ''}</div></button>`;
+  }).join('');
+  $('#tiles').innerHTML = `<div class="races">${cards || `<div class="mtile" style="font-size:16px;padding:14px">Grown-ups: tap ${ic('gear', 18)} and add the homework words.</div>`}</div>
+    <div class="mini">
+      <button class="mtile" id="bonusTile">${ic('star', 36)}<b>Bonus</b></button>
+      <button class="mtile" id="garageTile"><span class="gcarmini">${carSVG(S.car, 56)}</span><b>Garage</b></button>
+      <button class="mtile" id="badgeTile">${ic('ribbon', 36)}<b id="badgeCount">Badges</b></button>
+      ${lbActive() ? `<button class="mtile" id="boardTile">${ic('trophy', 36)}<b>Done today</b></button>` : ''}
+    </div>`;
+  document.querySelectorAll('[data-r]').forEach(b => b.onclick = () => { const i = +b.dataset.r; startRace(todayPlan()[i], { race: i, intro: 'race' + (i % RACES.length) }); });
+  $('#bonusTile').onclick = bonusLap; $('#garageTile').onclick = garage;
+  const bt = $('#boardTile'); if (bt) bt.onclick = openBoard;
+  $('#badgeTile').onclick = badgesModal; $('#badgeCount').textContent = 'Badges';
+  // the next badge lives on the Badges button (a ring that fills up), not under the car
+  $('#nextBadge').style.display = 'none';
+  const nb = nextBadge(), pct = nb ? nb.pct : 1, R0 = 21, C0 = 2 * Math.PI * R0;
+  $('#badgeTile').innerHTML = `<span class="bring"><svg width="48" height="48" viewBox="0 0 48 48"><circle cx="24" cy="24" r="${R0}" fill="none" stroke="#ffffff33" stroke-width="4"/><circle cx="24" cy="24" r="${R0}" fill="none" stroke="#2bb673" stroke-width="4" stroke-linecap="round" stroke-dasharray="${C0}" stroke-dashoffset="${C0 * (1 - pct)}" transform="rotate(-90 24 24)"/></svg>${nb ? medallion(nb.b, Math.min(4, nb.lvl + 1), 34) : ic('ribbon', 30)}${nb && nb.pct >= .75 ? '<i class="dot"></i>' : ''}</span><b>Badges</b>`;
+  ensureWords([...plan.flat().map(it => it.text), ...S.review]); // fetch any extra voices this homework needs, in the background
+  if (S.name && !S.nameRec) loadClip('n_' + nameKey(S.name));
+}
+document.getElementById('home').addEventListener('click', e => { if (!welcomed && !e.target.closest('button')) { welcomed = true; welcome(); } });
+async function welcome() { await allAudio; await voiceIndex; if (S.name && hasNameVoice()) { await playKey('p_hello'); await sayName(); await playKey('p_start_home'); } else await playKey('p_welcome'); }
+function bonusLap() {
+  const hw = parseHomework(S.homework); const pool = [];
+  hw.words.forEach(t => pool.push({ text: t, type: 'word', red: isRed(norm(plain(t))) }));
+  hw.sents.forEach(t => pool.push({ text: t, type: 'sentence' }));
+  S.review.forEach(t => { if (!isSoundOnly(t)) pool.push({ text: t, type: t.includes(' ') ? 'sentence' : 'word', red: isRed(t) }); });
+  if (!pool.length) return;
+  const ms = mergedStats(); const weight = it => { const s = ms[norm(plain(it.text))]; return 1 + (s ? s.miss * 3 : 2); };
+  const chosen = [], used = new Set();
+  while (chosen.length < Math.min(8, pool.length)) {
+    let tot = 0; pool.forEach((p, i) => { if (!used.has(i)) tot += weight(p); }); let r = Math.random() * tot;
+    for (let i = 0; i < pool.length; i++) { if (used.has(i)) continue; r -= weight(pool[i]); if (r <= 0) { used.add(i); chosen.push(pool[i]); break; } }
+  }
+  chosen.sort((a, b) => (a.type === 'sentence') - (b.type === 'sentence'));
+  startRace(chosen, { bonus: true, intro: 'bonus_lap' });
+}
+$('#helpBtn').onclick = () => { stopAudio(); say('help_home'); };
+/* ---- badges: 3 kinds the child can understand, each with 4 levels (bronze, silver, gold, rainbow) ---- */
+const BADGES = [
+  { id: 'book', name: 'Bookworm', icon: 'book', unit: 'words', steps: [50, 150, 400, 1000], val: t => t.words },
+  { id: 'streak', name: 'Super Streak', icon: 'flame', unit: 'days in a row', steps: [3, 7, 14, 30], val: t => t.streak },
+  { id: 'gold', name: 'Gold Star', icon: 'star', unit: 'gold medals', steps: [5, 15, 40, 100], val: t => t.gold },
+];
+const TIERS = ['', 'Bronze', 'Silver', 'Gold', 'Rainbow'];
+const TIER_FILL = ['#e4e7f2', '#e0904f', '#d6dbe8', '#ffd23f', 'url(#rbw)'];
+function totals() {
+  let words = 0, gold = 0, races = 0;
+  allDayKeys().forEach(k => { const d = view(k); words += d.words || 0; Object.values(d.done || {}).forEach(m => { races++; if (m === 3) gold++; }); });
+  const sum = f => (S[f] || 0) + others().reduce((t, o) => t + (o[f] || 0), 0);
+  return { words, gold, races: Math.max(races, sum('raceCount')), streak: Math.max(bestStreak(), currentStreak()), turbos: sum('turbos') };
+}
+function badgeState(b, t = totals()) {   // level reached (0-4), progress to the next level
+  const v = b.val(t), lvl = b.steps.filter(x => v >= x).length;
+  const prev = lvl ? b.steps[lvl - 1] : 0, next = b.steps[lvl];
+  return { v, lvl, next, pct: next ? Math.max(0, Math.min(1, (v - prev) / (next - prev))) : 1 };
+}
+function medallion(b, lvl, size = 64) {   // round badge: coloured by level, picture in the middle, grey when not won yet
+  return `<svg class="ic" width="${size}" height="${size}" viewBox="0 0 64 64" aria-hidden="true" ${lvl ? '' : 'style="opacity:.5"'}><defs><linearGradient id="rbw" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ef3e36"/><stop offset=".33" stop-color="#ffd23f"/><stop offset=".66" stop-color="#2bb673"/><stop offset="1" stop-color="#1d7bf2"/></linearGradient></defs>
+    ${lvl ? '<path d="M18 4l8 18M46 4l-8 18" stroke="#1d7bf2" stroke-width="7"/>' : ''}
+    <circle cx="32" cy="36" r="25" fill="${TIER_FILL[lvl || 1]}" stroke="#1b1b3a" stroke-width="3"/><circle cx="32" cy="36" r="17" fill="#fff" stroke="#1b1b3a" stroke-width="2.5"/>
+    <g transform="translate(18 22) scale(.583)">${ICON[b.icon]}</g></svg>`;
+}
+function checkBadges() {   // returns [{badge, lvl}] for levels won just now
+  S.badgeLv = S.badgeLv || {}; const t = totals(), fresh = [];
+  BADGES.forEach(b => { const { lvl } = badgeState(b, t); if (lvl > (S.badgeLv[b.id] || 0)) { S.badgeLv[b.id] = lvl; fresh.push({ b, lvl }); } });
+  if (fresh.length) save(); return fresh;
+}
+function badgeCount() { return Object.values(S.badgeLv || {}).reduce((a, n) => a + n, 0); }
+function sayBadge(b) { stopAudio(); const st = badgeState(b); (async () => { await say('b_' + b.id); if (!st.next) await say('b_full'); else if (st.pct >= .75) await say('b_almost'); })(); }
+function badgeRow(b) {
+  const st = badgeState(b);
+  return `<button class="brow" data-b="${b.id}">${medallion(b, st.lvl, 70)}<div class="bi"><b>${b.name}</b>
+    <div class="blv">${[1, 2, 3, 4].map(i => `<i style="background:${i <= st.lvl ? (i === 4 ? 'linear-gradient(90deg,#ef3e36,#ffd23f,#2bb673,#1d7bf2)' : TIER_FILL[i]) : '#e4e7f2'}"></i>`).join('')}</div>
+    ${st.next ? `<div class="bbar"><i style="width:${Math.round(st.pct * 100)}%"></i></div><small>${st.v} / ${st.next} ${b.unit}</small>` : '<small>All 4 won!</small>'}</div>
+    <span class="bsay">${ic('speaker', 30)}</span></button>`;
+}
+function badgesModal() {
+  checkBadges();
+  modal(`<div style="display:flex;justify-content:space-between;align-items:center"><h2 style="display:flex;align-items:center;gap:8px">${ic('ribbon', 34)} Badges</h2><button class="iconbtn" style="background:#eee;color:#333" onclick="closeModal()" aria-label="Close">${ic('close', 22)}</button></div>
+    <div class="blist">${BADGES.map(badgeRow).join('')}</div>`);
+  document.querySelectorAll('.brow').forEach(r => r.onclick = () => sayBadge(BADGES.find(b => b.id === r.dataset.b)));
+  say('badges');
+}
+function nextBadge() {   // the badge closest to its next level
+  const t = totals(); return BADGES.map(b => ({ b, ...badgeState(b, t) })).filter(x => x.next).sort((a, b) => b.pct - a.pct)[0];
+}
+async function celebrateBadges(list) {   // big moment for each badge level won
+  for (const { b, lvl } of list) {
+    await new Promise(res => {
+      const el = document.createElement('div'); el.className = 'bwin';
+      el.innerHTML = `<div class="bwin-in">${medallion(b, lvl, 200)}<div class="bwin-t">${TIERS[lvl]} ${b.name}!</div><div class="bwin-s">${b.steps[lvl - 1]} ${b.unit}</div><button class="btn g" style="font-size:22px;padding:12px 40px">${ic('check', 30)} Yay!</button></div>`;
+      document.body.appendChild(el); confetti(70); sfxWin();
+      let closed = false; const close = () => { if (closed) return; closed = true; stopAudio(); el.remove(); res(); };
+      el.querySelector('button').onclick = close;
+      (async () => { await say('won_' + b.id); await say('tier' + lvl); })();
+      setTimeout(close, 12000);
+    });
+  }
+}
+/* ---- car wash: a short reward after each race. The child rubs the mud off the car. ---- */
+function carWash() {
+  return new Promise(res => {
+    const W = 320, H = 180, el = document.createElement('div'); el.className = 'wash';
+    el.innerHTML = `<button class="skip" aria-label="Skip">Skip ➜</button><div class="stage">${carSVG(S.car, W)}<canvas width="${W * 2}" height="${H * 2}"></canvas></div><div class="hand">${ic('sponge', 64)}</div>`;
+    document.body.appendChild(el);
+    const cv = el.querySelector('canvas'), g = cv.getContext('2d'); g.scale(2, 2);
+    // mud: brown blobs over the car shape only
+    g.fillStyle = '#8a5a2b';
+    for (let i = 0; i < 70; i++) { g.beginPath(); g.arc(30 + Math.random() * 270, 40 + Math.random() * 120, 14 + Math.random() * 22, 0, 7); g.fill(); }
+    g.fillStyle = '#6b4220'; for (let i = 0; i < 40; i++) { g.beginPath(); g.arc(30 + Math.random() * 270, 40 + Math.random() * 120, 4 + Math.random() * 7, 0, 7); g.fill(); }
+    const start = g.getImageData(0, 0, W * 2, H * 2).data; let mud = 0; for (let i = 3; i < start.length; i += 64) if (start[i]) mud++;
+    let done = false, moves = 0, last = null;
+    const finish = async win => {
+      if (done) return; done = true; clearTimeout(tmo);
+      if (win) { g.clearRect(0, 0, W, H); confetti(24); sfxWin(); await say('wash_done'); }
+      el.remove(); res();
+    };
+    const rub = e => {
+      const r = cv.getBoundingClientRect(), x = (e.clientX - r.left) * W / r.width, y = (e.clientY - r.top) * H / r.height;
+      g.globalCompositeOperation = 'destination-out'; g.lineCap = 'round'; g.lineWidth = 46;
+      g.beginPath(); g.moveTo(last ? last.x : x, last ? last.y : y); g.lineTo(x, y); g.stroke(); last = { x, y };
+      if (++moves % 12 === 0) {   // how much mud is left?
+        const d = g.getImageData(0, 0, W * 2, H * 2).data; let left = 0; for (let i = 3; i < d.length; i += 64) if (d[i]) left++;
+        if (left < mud * .25) finish(true);
+        else if (moves % 36 === 0) tone(880 + Math.random() * 300, .06, 'sine', 0, .03);   // little squeaky bubbles
+      }
+    };
+    cv.addEventListener('pointerdown', e => { last = null; el.querySelector('.hand').style.visibility = 'hidden'; rub(e); });
+    cv.addEventListener('pointermove', e => { if (e.buttons || e.pointerType === 'touch') rub(e); });
+    cv.addEventListener('pointerup', () => last = null);
+    el.querySelector('.skip').onclick = () => { stopAudio(); finish(false); };
+    const tmo = setTimeout(() => finish(true), 20000);   // never keeps a child stuck
+    say('wash');
+  });
+}
+/* ---- paint shop: spend coins on looks for a car. Each thing is bought once per car and kept. ---- */
+const SHOP = [
+  { id: 'body', label: 'Paint', icon: 'brush', price: 150, opts: ['#ef3e36', '#ff8c1a', '#ffd23f', '#2bb673', '#14c1b5', '#1d7bf2', '#3a3f8f', '#8e44ad', '#ff7ab6', '#2b2d3a', '#ffffff', '#aab4c3'] },
+  { id: 'accent', label: 'Stripes', icon: 'flag', price: 100, opts: ['#ffffff', '#ffd23f', '#ef3e36', '#2bb673', '#1d7bf2', '#5ef2d6', '#ff7ab6', '#2b2d3a'] },
+  { id: 'emblem', label: 'Sticker', icon: 'star', price: 100, opts: Object.keys(EMBLEMS) },
+  { id: 'wheel', label: 'Wheels', icon: 'refresh', price: 300, opts: ['#d6d9e6', '#ffd23f', '#ef3e36', '#1d7bf2', '#2bb673', '#ff7ab6'] },
+];
+const ownedKey = (part, val) => `${part}|${val}`;   // bought once, usable on every car
+function owns(car, part, val) {
+  if (S.owned && !S.ownedV2) { const o = {}; Object.keys(S.owned).forEach(k => { const x = k.split('|'); o[x.length === 3 ? x[1] + '|' + x[2] : k] = 1; }); S.owned = o; S.ownedV2 = 1; save(); }
+  return (CARS[car] || {})[part] === val || !!(S.owned || {})[ownedKey(part, val)];
+}
+const unlockedCars = () => CARS.map((c, i) => i).filter(hasCar);
+function canBuySomething() { if (!FEATURES.shop) return false; return SHOP.some(t => wallet() >= t.price && t.opts.some(v => !owns(S.car, t.id, v))); }
+function paintShop(car = S.car, tab = 'body', pick = null) {
+  const t = SHOP.find(x => x.id === tab), cur = { ...CARS[car], ...((S.mods || {})[car] || {}) };
+  const val = pick ?? cur[tab], has = owns(car, tab, val), can = wallet() >= t.price, changed = val !== cur[tab];
+  const sw = v => tab === 'emblem'
+    ? `<button class="sw" data-v="${v}" style="background:#fff" aria-label="${v}"><svg width="34" height="34" viewBox="-12 -12 24 24">${EMBLEMS[v]}</svg><i>${ic(owns(car, tab, v) ? 'check' : 'lock', 16)}</i></button>`
+    : `<button class="sw ${tab === 'wheel' ? 'wh' : ''}" data-v="${v}" style="background:${v}" aria-label="colour"><i>${ic(owns(car, tab, v) ? 'check' : 'lock', 16)}</i></button>`;
+  modal(`<div style="display:flex;justify-content:space-between;align-items:center"><h2 style="display:flex;align-items:center;gap:8px">${coin(28)} ${wallet()}</h2><button class="iconbtn" style="background:#eee;color:#333" id="shopX" aria-label="Close">${ic('close', 22)}</button></div>
+    ${garageTabs('shop')}
+    <div class="shopcars">${unlockedCars().map(i => `<button class="${i === car ? 'on' : ''}" data-c="${i}" aria-label="${esc(CARS[i].name)}">${carSVG(i, 64)}</button>`).join('')}</div>
+    <div class="shopcar">${carSVG(car, 260, true, { [tab]: val })}</div>
+    <div class="shoptabs">${SHOP.map(x => `<button data-t="${x.id}" class="${x.id === tab ? 'on' : ''}">${ic(x.icon, 26)}<b>${x.label}</b></button>`).join('')}</div>
+    <div class="swatches">${[...t.opts].sort((a, b) => owns(car, tab, b) - owns(car, tab, a)).map(v => sw(v).replace('class="sw', `class="sw ${v === val ? 'sel' : ''}`)).join('')}</div>
+    <div class="shopact">${!changed ? `<div class="hint" style="text-align:center">Tap a ${t.label.toLowerCase()} to try it</div>`
+      : has ? `<button class="btn g" id="shopUse">${ic('check', 26)} Use it</button>`
+      : can ? `<button class="btn g" id="shopBuy">${ic('check', 26)} Buy ${coin(26)} ${t.price}</button>`
+      : `<button class="btn w" disabled style="opacity:.7">${ic('lock', 24)} ${coin(24)} ${t.price}</button>`}</div>`);
+  $('#shopX').onclick = closeModal; bindGarageTabs();
+  document.querySelectorAll('.shoptabs button').forEach(b => b.onclick = () => paintShop(car, b.dataset.t));
+  document.querySelectorAll('.shopcars button').forEach(b => b.onclick = () => { stopAudio(); paintShop(+b.dataset.c, tab); });
+  const onCar = document.querySelector('.shopcars button.on'); if (onCar) onCar.scrollIntoView({ inline: 'center', block: 'nearest' });
+  document.querySelectorAll('.swatches .sw').forEach(b => b.onclick = () => {
+    const v = b.dataset.v; paintShop(car, tab, v);
+    if (v === cur[tab]) return;
+    stopAudio(); say(owns(car, tab, v) ? 'shop_yay' : wallet() >= t.price ? 'shop_buy' : 'shop_more');
+  });
+  const apply = () => { S.mods = S.mods || {}; S.mods[car] = { ...(S.mods[car] || {}), [tab]: val }; save(); sfxWin(); confetti(30); stopAudio(); say('shop_yay'); renderHome(); paintShop(car, tab); };
+  const use = $('#shopUse'); if (use) use.onclick = apply;
+  const buy = $('#shopBuy'); if (buy) buy.onclick = () => {
+    if (wallet() < t.price) return;
+    S.spent = (S.spent || 0) + t.price; S.owned = S.owned || {}; S.ownedV2 = 1; S.owned[ownedKey(tab, val)] = 1; sfxCoin(); apply(); sync();
+  };
+}
+function garageTabs(on) {
+  if (!FEATURES.shop) return '';
+  return `<div class="gtabs"><button data-g="cars" class="${on === 'cars' ? 'on' : ''}">${carSVG(S.car, 44)}<b>Cars</b></button><button data-g="shop" class="${on === 'shop' ? 'on' : ''}">${ic('brush', 28)}<b>Paint shop</b></button></div>`;
+}
+function bindGarageTabs() {
+  document.querySelectorAll('.gtabs button').forEach(b => b.onclick = () => { stopAudio(); if (b.dataset.g === 'cars') garage(); else { paintShop(S.car); say('shop_hi'); } });
+}
+function garage() {
+  const card = i => {
+    const c = CARS[i], has = hasCar(i);
+    const st = has ? (i === S.car ? ic('check', 28) : ic('play', 26)) : c.special ? `${coin(20)} ${c.price}` : FEATURES.carsByRaces ? `${ic('lock', 22)} ${ic('flag', 20)} ${Math.max(0, racesNeeded(i) - totals().races)}` : `${ic('lock', 22)} ${coin(20)} ${c.at}`;
+    return `<button class="gcar ${i === S.car ? 'sel' : ''} ${has ? '' : 'locked'} ${c.special ? 'spc' : ''}" data-i="${i}">${carSVG(i, 130)}<div class="gst">${st}</div></button>`;
+  };
+  const all = CARS.map((c, i) => i), mine = all.filter(hasCar), toBuy = FEATURES.shop ? all.filter(i => CARS[i].special && !hasCar(i)) : [], toRead = all.filter(i => !CARS[i].special && !hasCar(i));
+  modal(`<div style="display:flex;justify-content:space-between;align-items:center"><h2 style="display:flex;align-items:center;gap:8px">${coin(28)} ${wallet()}</h2><button class="iconbtn" style="background:#eee;color:#333" onclick="closeModal()" aria-label="Close">${ic('close', 22)}</button></div>
+    ${garageTabs('cars')}
+    <p class="ghint">${ic('check', 20)} My cars</p><div class="garage">${mine.map(card).join('')}</div>
+    ${toBuy.length ? `<p class="ghint">${ic('shine', 20)} Buy with coins</p><div class="garage">${toBuy.map(card).join('')}</div>` : ''}
+    ${toRead.length ? `<p class="ghint">${ic(FEATURES.carsByRaces ? 'flag' : 'book', 20)} ${FEATURES.carsByRaces ? `Finish races to unlock · you have finished <b>&nbsp;${totals().races}&nbsp;</b> races` : 'Read to unlock'}</p><div class="garage">${toRead.map(card).join('')}</div>` : ''}`);
+  say('help_garage'); bindGarageTabs();
+  document.querySelectorAll('.gcar').forEach(b => b.onclick = () => {
+    const i = +b.dataset.i, c = CARS[i];
+    if (hasCar(i)) { S.car = i; save(); sfxVroom(); closeModal(); renderHome(); return; }
+    if (!c.special) { stopAudio(); say('help_garage'); return; }
+    if (wallet() < c.price) { stopAudio(); say('shop_more'); return; }
+    modal(`<div style="text-align:center">${carSVG(i, 240)}<h2 style="margin:6px 0">${esc(c.name)}</h2>
+      <div style="display:flex;gap:10px;margin-top:10px"><button class="btn w" style="flex:1" id="bcNo">${ic('close', 22)}</button><button class="btn g" style="flex:2;display:flex;align-items:center;justify-content:center;gap:6px" id="bcYes">${ic('check', 24)} Buy ${coin(24)} ${c.price}</button></div></div>`);
+    stopAudio(); say('shop_buy');
+    $('#bcNo').onclick = garage;
+    $('#bcYes').onclick = () => { if (wallet() < c.price) return; S.spent = (S.spent || 0) + c.price; S.owned = S.owned || {}; S.owned['car|' + i] = 1; S.car = i; save(); sfxCoin(); sfxWin(); confetti(60); say('new_car'); renderHome(); garage(); sync(); };
+  });
+}
+
+/* ============ RACE ============ */
+const STAGES = { word: ['read', 'fred', 'sounds', 'model'], red: ['read', 'model'], sentence: ['read', 'fred', 'model'] };
+const COINS = { word: { read: 3, fred: 2, sounds: 1, model: 0 }, red: { read: 3, model: 0 }, sentence: { read: 5, fred: 3, model: 0 } };
+const kindOf = it => it.type === 'sentence' ? 'sentence' : it.red ? 'red' : 'word';
+let R = null, busy = false, noHear = 0;
+function startRace(items, meta) {
+  ac(); stopAudio(); sfxVroom();
+  R = { meta, queue: items.map(it => ({ ...it, comeback: 0 })), idx: 0, coins: 0, firstTry: 0, scored: 0, missed: [], unlocked: null, rival: 0, combo: 0 };
+  $('#mascot').innerHTML = carSVG(S.car, 90); $('#runner').innerHTML = carSVG(S.car, 64); $('#rival').innerHTML = truckSVG(64);
+  $('#raceCoins').innerHTML = coin(22) + ' 0';
+  show('race'); moveCars();
+  const th = meta.race != null ? RACES[meta.race % RACES.length] : { icon: 'star', name: 'Bonus lap', bg: 'linear-gradient(135deg,#a86bff,#6a2bd9)' };
+  $('#card').classList.remove('redcard');
+  $('#card').innerHTML = `<div style="width:130px;height:130px;border-radius:50%;background:${th.bg};display:grid;place-items:center;font-size:72px;box-shadow:0 6px 0 #0003" class="bounce">${ic(th.icon, 80)}</div><div style="font-size:34px;font-weight:800;margin-top:12px">${th.name}</div>`;
+  $('#controls').innerHTML = '';
+  (async () => { setBusy(true); if (meta.intro) await say(meta.intro); await say('lets_race'); setBusy(false); nextItem(); })();
+}
+function moveCars() {
+  const n = R.queue.length || 1;
+  const p = Math.min(1, R.idx / n), q = Math.min(1, R.rival / n);
+  const r = $('#runner'); r.style.left = `calc(${p} * (100% - 64px))`;
+  $('#rival').style.left = `calc(${q} * (100% - 64px))`;
+  r.classList.add('driving'); setTimeout(() => r.classList.remove('driving'), 900);
+  $('#pdots').innerHTML = R.queue.map((it, i) => `<b class="${i < R.idx ? 'on' : ''} ${i === R.idx ? 'cur' : ''} ${it.comeback ? 'pit' : ''}"></b>`).join('');
+}
+
+const stageName = () => STAGES[kindOf(R.cur.it)][R.cur.stage];
+function renderCard() {
+  const c = R.cur, it = c.it, card = $('#card');
+  const final = R.idx === R.queue.length - 1 && R.queue.length > 1;
+  card.classList.toggle('final', final);
+  const tag = it.comeback ? `<div class="tag">${ic('wrench', 28)}</div>` : '';
+  card.classList.toggle('redcard', !!it.red);
+  if (it.type === 'word') {
+    card.innerHTML = tag + wordHTML(it.text, S.settings.dots || stageName() !== 'read');
+  } else {
+    const miss = c.missing || [];
+    card.innerHTML = tag + `<div class="sentence">${it.text.trim().split(/\s+/).map(w => {
+      const isMiss = miss.includes(norm(plain(w)));
+      const inner = isMiss && stageName() !== 'read' ? wordHTML(w, true) : esc(plain(w));
+      return `<span class="sw ${isMiss ? 'miss' : ''}" data-w="${esc(norm(plain(w)))}">${inner}</span>`;
+    }).join('')}</div>`;
+  }
+  drawSplits(card);
+}
+function renderControls() {
+  const st = stageName(), box = $('#controls');
+  const hear = st === 'model' ? `<button class="round" data-a="hear" aria-label="Hear again">${ic('speaker', 40)}</button>` : '';
+  const light = st === 'sounds' ? `<button class="round" data-a="light" aria-label="Light the sounds again">${ic('refresh', 38)}</button>` : '';
+  if (micOn()) box.innerHTML = `${light}${hear}<button class="mic" id="micBtn" data-a="mic" aria-label="Read">${ic('mic', 70)}</button>`;
+  else box.innerHTML = `<div style="display:flex;flex-direction:column;align-items:center;gap:10px;color:#fff;text-align:center">
+    <div style="display:flex;gap:14px;align-items:center">${hear}<button class="mic" data-a="retry" aria-label="Try the microphone again">${ic('refresh', 60)}</button></div>
+    <div style="background:#ffffff1f;border-radius:14px;padding:8px 12px;font-size:14px;line-height:1.35;max-width:340px">${SR
+      ? '<b>Grown-ups:</b> the microphone is off for this page. On iPhone: Settings → Apps → Safari → Microphone → Allow, and Settings → General → Keyboard → Enable Dictation. Then tap ' + ic('refresh', 16) + '.'
+      : '<b>Grown-ups:</b> this browser can’t listen. On iPhone, open the game in <b>Safari</b>.'}</div></div>`;
+}
+$('#race').addEventListener('click', e => {
+  const b = e.target.closest('[data-a]'); if (!b) return; const a = b.dataset.a;
+  if (a === 'hear') { if (currentRec) return; return hearModel(); }
+  if (busy) return;
+  if (a === 'mic') return onMic();
+  if (a === 'yes') return handleResult(true, {});
+  if (a === 'no') return handleResult(false, {});
+  if (a === 'light') return lightSounds(false);
+  if (a === 'retry') { micBlocked = false; renderControls(); return onMic(); }
+});
+function setBusy(v) {
+  busy = v;
+  document.querySelectorAll('#controls button').forEach(b => { if (b.dataset.a !== 'hear') b.disabled = v; });
+  const m = $('#micBtn');
+  if (m) { m.classList.toggle('ready', !v); m.classList.toggle('talking', v); if (!m.classList.contains('listening')) m.innerHTML = v ? `<span class="ear">${ic('ear', 64)}</span><i class="w1"></i><i class="w2"></i>` : ic('mic', 70); }
+}
+
+async function nextItem() {
+  if (!R || R.dead) return;
+  if (R.idx >= R.queue.length) return finishRace();
+  const it = R.queue[R.idx];
+  R.cur = { it, stage: 0, tries: 0, missing: [], modeled: false };
+  renderCard(); renderControls(); setBusy(true);
+  const prev = R.queue[R.idx - 1], last = R.idx === R.queue.length - 1;
+  let id = null;
+  if (it.comeback) id = 'pit';
+  else if (last && R.queue.length > 1) id = 'finish_line';
+  else if (!prev || prev.type !== it.type) id = it.type === 'sentence' ? 'read_sentence' : 'read_word';
+  if (id) await say(id); else $('#bubble').textContent = '';
+  if (R.dead) return;
+  if (!S.firstMicDone && micOn()) { S.firstMicDone = true; save(); await say('tap_mic'); }
+  setBusy(false);
+}
+let micFails = 0;
+function logHeard(target, heard, ok) { (S.heard = S.heard || []).unshift({ t: target, h: heard, ok, at: new Date().toTimeString().slice(0, 5) }); S.heard = S.heard.slice(0, 40); save(); }
+function onMic() {   // stays synchronous until the mic has started (iPhone rule)
+  if (busy) return;
+  setBusy(true); stopAudio();
+  const it = R.cur.it, btn = $('#micBtn');
+  if (btn) { btn.classList.remove('talking'); btn.innerHTML = ic('hourglass', 64); btn.disabled = false; btn.classList.remove('ready'); }
+  const p = listen(it.type === 'sentence' ? 9000 : 6000, texts => check(it, texts).ok,
+    () => { if (btn) { btn.classList.add('listening'); btn.innerHTML = ic('speak', 72); } });   // green: "speak now"   // turns green only when the mic is really on
+  const race = R;
+  p.then(r => { if (R === race && !race.dead) afterListen(it, btn, r); });
+}
+async function afterListen(it, btn, r) {
+  if (btn) btn.classList.remove('listening');
+  setBusy(true);   // show the "game is talking" look while it answers
+  await Promise.race([recEnded, sleep(1500)]);   // let the iPhone close this listening session before the next tap
+  if (r.error && !(r.texts && r.texts.length)) {
+    logHeard(it.text, '(' + r.error + ')', false);
+    if (['not-allowed', 'service-not-allowed'].includes(r.error)) { micBlocked = true; renderControls(); await say('no_mic'); setBusy(false); return; }
+    await say(noHear++ >= 1 ? 'didnt_hear2' : 'didnt_hear'); setBusy(false); return;  // never counts as a wrong answer
+  }
+  noHear = 0;
+  const res = check(it, r.texts);
+  logHeard(it.text, r.texts.filter((t, i, x) => t && x.indexOf(t) === i).slice(0, 3).join(' · '), res.ok);   // everything it heard, not only the first guess
+  setBusy(false);
+  handleResult(res.ok, res);
+}
+async function handleResult(ok, res) {
+  if (busy) return;
+  const c = R.cur;
+  if (ok) return correct();
+  setBusy(true);
+  if (c.modeled) {
+    stat(c.it, false, true); addMissed(c.it); countRead(c.it); if (!c.it.comeback) R.scored++; save();
+    await say('good_try'); if (R.dead) return; return advance();
+  }
+  sfxOops(); bump('bad'); R.combo = 0; $('#runner').classList.remove('turbo');
+  if (c.it.type === 'sentence') c.missing = (res.missing && res.missing.length) ? res.missing : norm(plain(c.it.text)).split(' ').filter(w => !LENIENT.includes(w));
+  c.tries++;
+  const st = stageName(), t = S.settings.tries;
+  const limit = { read: t.read, fred: t.fred, sounds: t.sounds }[st] || 1;
+  if (c.tries < limit) {
+    renderCard();
+    if (st === 'read') await say('again');
+    else if (st === 'fred') await say(c.it.type === 'sentence' ? 'fred_sentence' : 'fred_again');
+    else if (st === 'sounds') await lightSounds(true);
+    setBusy(false); return;
+  }
+  if (R.dead) return;
+  c.stage++; c.tries = 0; R.rival += .5; moveCars();
+  await enterStage(); setBusy(false);
+}
+async function enterStage() {
+  const c = R.cur, it = c.it, st = stageName();
+  renderCard(); renderControls(); setBusy(true);
+  if (st === 'fred') await say(it.type === 'sentence' ? 'fred_sentence' : 'fred_word');
+  else if (st === 'sounds') { await say('sounds_intro'); await lightSounds(true); }
+  else if (st === 'model') {
+    c.modeled = true; pitStop();
+    await say(it.red ? 'red_word' : 'listen'); await hearModel(true);
+    await say(it.type === 'sentence' ? 'your_turn_sentence' : 'your_turn_word');
+  }
+  setBusy(false);
+}
+async function lightSounds(auto) {
+  if (!auto) setBusy(true);
+  const all = [...document.querySelectorAll('#card .g')], n = all.length ? Math.max(...all.map(x => +x.dataset.u)) + 1 : 0;
+  const r0 = R;
+  for (let k = 0; k < n && !r0.dead; k++) { all.forEach(x => x.classList.toggle('lit', +x.dataset.u === k)); tone(660, .08, 'sine', 0, .05); await sleep(1300); }
+  all.forEach(x => x.classList.remove('lit')); await sleep(200);
+  await say('blend_now');
+  if (!auto) setBusy(false);
+}
+let modelPlaying = false;
+async function hearModel() {
+  if (modelPlaying) return; modelPlaying = true;
+  const it = R.cur.it;
+  try {
+    if (it.type === 'word') {
+      const units = segment(it.text), els = [...document.querySelectorAll('#card .g')];
+      if (!it.red) for (let k = 0; k < units.length; k++) { els.forEach(x => x.classList.toggle('lit', +x.dataset.u === k)); await saySound(units[k].g); await sleep(280); }
+      els.forEach(x => x.classList.add('lit')); await sleep(150); await sayWord(it.text); await sleep(150); els.forEach(x => x.classList.remove('lit'));
+    } else {
+      for (const w of R.cur.missing) {
+        const el = document.querySelector(`#card .sw[data-w="${w}"]`); el && el.classList.add('lit');
+        if (!isRed(w)) for (const u of segment(w)) { await saySound(u.g); await sleep(220); }
+        await sayWord(w); el && el.classList.remove('lit'); await sleep(250);
+      }
+      const sws = [...document.querySelectorAll('#card .sw')]; sws.forEach(x => x.classList.add('lit'));
+      await saySentence(it.text); sws.forEach(x => x.classList.remove('lit'));
+    }
+  } finally { modelPlaying = false; }
+}
+function pitStop() { const it = R.cur.it; if (it.comeback >= S.settings.comebacks) return; R.queue.splice(Math.min(R.idx + 3, R.queue.length), 0, { ...it, comeback: it.comeback + 1 }); }
+function award(n) {
+  if (!n) return; const before = allCoins();
+  S.coins += n; R.coins += n; dayRec().coins += n;
+  const after = allCoins(), unl = CARS.findIndex(c => before < c.at && after >= c.at); if (unl >= 0 && !FEATURES.carsByRaces) R.unlocked = unl;
+  const el = $('#raceCoins'); el.innerHTML = coin(22) + ' ' + R.coins; el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop'); sfxCoin(); save();
+}
+function stat(it, firstTry, missed) { const k = norm(plain(it.text)); const s = S.stats[k] || (S.stats[k] = { seen: 0, first: 0, miss: 0 }); s.seen++; if (firstTry) s.first++; if (missed) { s.miss++; const d = dayRec(); d.help = d.help || {}; d.help[k] = (d.help[k] || 0) + 1; } }
+function addMissed(it) { const d = plain(it.text); if (!R.missed.includes(d)) R.missed.push(d); }
+function bump(cls) { const card = $('#card'); card.classList.remove('good', 'bad'); void card.offsetWidth; card.classList.add(cls); }
+async function correct() {
+  setBusy(true);
+  const c = R.cur, it = c.it, st = stageName();
+  let n = COINS[kindOf(it)][st] || 0; if (it.comeback && !c.modeled) n += 2;
+  award(n); stat(it, c.stage === 0, c.stage > 0); countRead(it);
+  if (c.stage > 0) addMissed(it);
+  if (!it.comeback) { R.scored++; if (c.stage === 0) R.firstTry++; }
+  sfxWin(); confetti(c.stage === 0 ? 30 : 14); bump('good');
+  let turbo = false;
+  if (c.stage === 0) { R.combo++; if (R.combo % 3 === 0) turbo = true; } else R.combo = 0;
+  if (it.type === 'word') await sayWord(it.text);
+  if (c.modeled) await say('great_job');
+  else if (turbo) { S.turbos = (S.turbos || 0) + 1; $('#runner').classList.add('turbo'); flash('TURBO!'); award(3); await say('turbo'); }
+  else { await say(pick(['pr1', 'pr2', 'pr3', 'pr4', 'pr5', 'pr6', 'pr7', 'pr8', 'pr9', 'pr10', 'pr11', 'pr12', 'pr13', 'pr14', 'pr15', 'pr16'])); if (Math.random() < .35) await sayName(); }
+  if (R.dead) return;
+  advance();
+}
+function advance() { if (!R || R.dead) return; const r = R; setBusy(true); R.idx++; R.rival += .6; moveCars(); setTimeout(() => { if (R === r && !r.dead) nextItem(); }, 350); }
+async function finishRace() {
+  if (!R || R.dead) return;
+  R.dead = true; // finished: nothing from this race may run again
+  const m = R.meta; let bonus = 0, goalNow = false; const carBefore = FEATURES.carsByRaces ? nextReadingCar() : -1;
+  const ratio = R.scored ? R.firstTry / R.scored : 1;
+  const won = R.rival < R.queue.length;
+  const medal = won ? (ratio >= .8 ? 3 : ratio >= .5 ? 2 : 1) : 1;
+  if (m.race != null) {
+    const d = dayRec();
+    if (!d.done[m.race]) bonus = 5;
+    d.done[m.race] = Math.max(d.done[m.race] || 0, medal);
+    if (!view().goal && doneToday() >= goalNeeded()) {
+      d.goal = true; goalNow = true; bonus += 10;
+      S.streak = currentStreak(); S.lastGoalDay = today(); S.best = Math.max(S.best || 0, bestStreak());
+    }
+  } else bonus = 3;
+  S.raceCount = (S.raceCount || 0) + 1;
+  if (carBefore >= 0 && hasCar(carBefore)) R.unlocked = carBefore;
+  award(bonus); save(); if (goalNow) lbSubmit();
+  sync();
+  const newBadges = checkBadges();
+  sfxWin(); confetti(60);
+  const resSlots = FEATURES.carsByRaces && m.race != null && R.unlocked == null ? raceSlots(22, true) : null;
+  const plan = todayPlan(), d = view();
+  const next = plan.findIndex((_, i) => !d.done[i]);
+  $('#resBody').innerHTML = `<div class="res">
+      <div class="medal">${goalNow ? ic('trophy', 110) : bigMedal(medal)}</div>
+      <div style="display:flex;justify-content:center;align-items:flex-end;gap:6px">${carSVG(S.car, won ? 170 : 130)}${truckSVG(won ? 90 : 120)}</div>
+      ${S.name ? `<div style="font-size:30px;font-weight:800">${esc(S.name)}</div>` : ''}<div class="plus">+${R.coins} ${coin(34)}</div>
+      ${goalNow ? `<div style="font-size:40px;font-weight:800;display:flex;align-items:center;justify-content:center;gap:6px">${ic('flame', 42)} ${currentStreak()}</div>` : ''}
+      ${resSlots ? `<div style="display:flex;align-items:center;gap:6px;justify-content:center;margin-top:6px">${resSlots.html}${carSVG(resSlots.ni, 56)}</div>` : ''}
+      ${R.missed.length ? `<div class="practice">${R.missed.map(w => `<span data-say="${esc(w)}">${esc(w)} ${ic('speaker', 26)}</span>`).join('')}</div>` : ''}
+    </div>
+    ${R.unlocked != null ? `<button class="unlock" id="driveNew" style="width:100%;margin-top:12px">${ic('party', 48)} ${carSVG(R.unlocked, 160)}</button>` : ''}
+    <div class="bigrow" style="margin-top:16px">
+      <button class="bigbtn" id="resHome" aria-label="Home">${ic('home', 60)}</button>
+      <button class="bigbtn" id="resHelp" aria-label="What do I do?" style="flex:.6">${ic('speaker', 48)}</button>
+      ${next >= 0 ? `<button class="bigbtn g" id="resNext" aria-label="Next race">${ic('play', 60)}</button>` : `<button class="bigbtn y" id="resBonus" aria-label="Bonus">${ic('star', 60)}</button>`}
+    </div>`;
+  if (m.race != null && view().goal && !dayRec().washed) { dayRec().washed = 1; save(); await carWash(); }   // once a day, after the last race
+  show('results');
+  document.querySelectorAll('[data-say]').forEach(s => s.onclick = () => { const t = s.dataset.say; t.includes(' ') ? saySentence(t) : sayWord(t); });
+  $('#resHome').onclick = () => { stopAudio(); renderHome(); show('home'); };
+  $('#resHelp').onclick = () => { stopAudio(); say('help_results'); };
+  const nb = $('#resNext'); if (nb) nb.onclick = () => startRace(todayPlan()[next], { race: next, intro: 'race' + (next % RACES.length) });
+  const bb = $('#resBonus'); if (bb) bb.onclick = bonusLap;
+  const dn = $('#driveNew'); if (dn) dn.onclick = () => { S.car = R.unlocked; save(); sfxVroom(); dn.style.opacity = .6; };
+  await sayName(); await say(goalNow ? 'goal_done' : won ? 'race_done' : 'race_lost');
+  if (resSlots) await say('more_' + Math.min(10, Math.max(1, resSlots.left)));
+  if (newBadges.length) await celebrateBadges(newBadges);
+  if (R.unlocked != null) await say('new_car');
+  else if (next < 0 && !goalNow && m.race != null) await say('all_done');
+}
+$('#exitRace').onclick = () => {
+  modal(`<div class="bigrow" style="padding:10px 0"><button class="bigbtn r" id="mLeave" aria-label="Stop">${ic('home', 60)}</button><button class="bigbtn g" id="mStay" aria-label="Keep racing">${ic('play', 60)}</button></div>`);
+  say('leave_q');
+  $('#mStay').onclick = () => { closeModal(); };
+  $('#mLeave').onclick = () => { closeModal(); if (R) R.dead = true; try { currentRec && currentRec.abort(); } catch (e) {} stopAudio(); busy = false; renderHome(); show('home'); };
+};
+
+/* ============ PARENT ============ */
+$('#parentBtn').onclick = () => {
+  const a = rand(12, 39), b = rand(11, 28);
+  modal(`<h2>Grown-ups only</h2><p>What is ${a} + ${b}?</p><input id="gateIn" type="number" inputmode="numeric" style="width:100%;font-size:24px;padding:10px;border:2px solid #ddd;border-radius:12px"><div style="display:flex;gap:10px;margin-top:12px"><button class="btn w" style="flex:1" onclick="closeModal()">Cancel</button><button class="btn" style="flex:1" id="gateGo">Enter</button></div>`);
+  const go = () => { if (+$('#gateIn').value === a + b) { closeModal(); ptab = 'homework'; show('parent'); renderParent(); } else { toast('Not quite'); $('#gateIn').value = ''; } };
+  $('#gateGo').onclick = go; $('#gateIn').onkeydown = e => { if (e.key === 'Enter') go(); };
+  setTimeout(() => $('#gateIn').focus(), 100);
+};
+$('#parentBack').onclick = () => { renderHome(); show('home'); };
+let ptab = 'homework';
+$('#ptabs').onclick = e => { const b = e.target.closest('button'); if (!b) return; ptab = b.dataset.t; renderParent(); };
+function renderParent() { document.querySelectorAll('#ptabs button').forEach(b => b.classList.toggle('on', b.dataset.t === ptab)); ({ homework: pHomework, progress: pProgress, settings: pSettings, help: pHelp })[ptab](); }
+function preview(txt) {
+  const hw = parseHomework(txt);
+  const miss = [...hw.words, ...hw.sents.flatMap(s => norm(plain(s)).split(' '))].filter((w, i, a) => a.indexOf(w) === i && !hasWord(w));
+  return `<div class="hint"><b>${hw.words.length}</b> words · <b>${hw.sents.length}</b> sentences → <b>${hw.words.length ? Math.ceil(hw.words.length / 8) : hw.sents.length ? 1 : 0}</b> races a day · red words are shown in red</div>
+    <div class="pv">${hw.words.map(s => `<span class="w ${hasWord(s) ? '' : 'nov'} ${RED.has(s) || hw.reds.includes(s) ? 'r' : ''}">${esc(s)}</span>`).join('')}${hw.sents.map(s => `<span class="t">${esc(s)}</span>`).join('')}</div>
+    ${miss.length ? `<div class="note">The game's voice doesn't have: <b>${miss.map(esc).join(', ')}</b>. It will use the phone's voice for these. Send them to Claude to add the natural voice.</div>` : ''}`;
+}
+function pHomework() {
+  $('#pbody').innerHTML = `<div class="panel">
+    <div class="hint">Paste the teacher's new homework here: commas between words, each sentence on its own line. Common red words (the, said, you…) are known already; for others, start a line with <b>Red words:</b>. The game builds the races by itself.</div>
+    <textarea class="hw" id="hwTx" spellcheck="false" autocapitalize="off">${esc(S.homework)}</textarea>
+    <div id="hwPv">${preview(S.homework)}</div>
+    <button class="btn g" id="hwSave">${ic('save', 24)} Save homework</button>
+  </div>`;
+  const refreshPv = () => { const t = $('#hwTx'); if (!t) return; const hw = parseHomework(t.value); ensureWords([...hw.words, ...hw.sents]).then(() => { const t2 = $('#hwTx'); if (t2) $('#hwPv').innerHTML = preview(t2.value); }); };
+  $('#hwTx').oninput = e => { $('#hwPv').innerHTML = preview(e.target.value); clearTimeout(refreshPv._t); refreshPv._t = setTimeout(refreshPv, 600); };
+  refreshPv();
+  $('#hwSave').onclick = () => {
+    const oldHw = parseHomework(S.homework), nu = parseHomework($('#hwTx').value);
+    [...oldHw.words, ...oldHw.sents].forEach(t => { if (!nu.words.includes(t) && !nu.sents.includes(t) && !S.review.includes(t)) S.review.push(t); });
+    S.review = S.review.slice(-150);
+    S.homework = $('#hwTx').value; refreshRed(); save(); toast('Saved ✓ New races are ready');
+  };
+}
+function weekSummary() {
+  let goal = 0, races = 0, words = 0, coins = 0; const help = {};
+  for (let i = 0; i < 7; i++) {
+    const d = view(addDays(today(), -i));
+    if (d.goal) goal++; races += Object.keys(d.done || {}).length; words += d.words || 0; coins += d.coins || 0;
+    Object.entries(d.help || {}).forEach(([w, n]) => help[w] = (help[w] || 0) + n);
+  }
+  const top = Object.entries(help).sort((a, b) => b[1] - a[1]).slice(0, 6).map(([w]) => w);
+  return `<h3 style="margin:0">This week (last 7 days)</h3>
+    <div class="wk"><div><b>${goal}/7</b>days all races done</div><div><b>${races}</b>races finished</div><div><b>${words}</b>words read</div><div><b>${coins}</b>coins earned</div></div>
+    <p class="hint" style="margin:0">${top.length ? `Needed help with: <b style="font-family:var(--read);color:var(--ink)">${top.map(esc).join(', ')}</b>` : 'No words needed help this week.'}</p>`;
+}
+function weeklyReport() {   // short text a parent can send to family or the teacher
+  let goal = 0, races = 0, words = 0, coins = 0; const help = {};
+  for (let i = 0; i < 7; i++) {
+    const d = view(addDays(today(), -i));
+    if (d.goal) goal++; races += Object.keys(d.done || {}).length; words += d.words || 0; coins += d.coins || 0;
+    Object.entries(d.help || {}).forEach(([w, n]) => help[w] = (help[w] || 0) + n);
+  }
+  const fmt = k => { const [y, m, d] = k.split('-').map(Number); return new Date(y, m - 1, d).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }); };
+  const top = Object.entries(help).sort((a, b) => b[1] - a[1]).slice(0, 5).map(([w]) => w);
+  const won = BADGES.map(b => ({ b, l: (S.badgeLv || {})[b.id] || 0 })).filter(x => x.l).map(x => `${TIERS[x.l]} ${x.b.name}`);
+  return [`${S.name || 'Our racer'}'s reading week (${fmt(addDays(today(), -6))} to ${fmt(today())})`,
+    `✅ All races done on ${goal} of 7 days`, `🏁 ${races} races finished`, `📖 ${words} words read`, `🔥 Streak: ${currentStreak()} day${currentStreak() === 1 ? '' : 's'}`,
+    won.length ? `🏅 Badges: ${won.join(', ')}` : '', top.length ? `💪 Practising: ${top.join(', ')}` : '', '', 'From Word Racer'].filter((l, i, a) => l || (i === a.length - 2)).join('\n');
+}
+async function shareReport() {
+  const text = weeklyReport();
+  try { if (navigator.share) { await navigator.share({ text }); return; } } catch (e) { if (e && e.name === 'AbortError') return; }
+  try { await navigator.clipboard.writeText(text); toast('Copied ✓ Paste it in WhatsApp'); } catch (e) { window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank'); }
+}
+function pProgress() {
+  const rows = []; for (let i = 0; i < 14; i++) { const k = addDays(today(), -i); const d = view(k); if (d && (d.coins || Object.keys(d.done).length)) rows.push(`<tr><td>${k}</td><td>${Object.keys(d.done).length}${d.plan ? '/' + d.plan.length : ''}</td><td>${d.coins}</td><td>${d.goal ? ic('flame', 20) : ''}</td></tr>`); }
+  const tricky = Object.entries(mergedStats()).filter(([, s]) => s.miss > 0).map(([w, s]) => ({ w, ...s, rate: s.first / s.seen })).sort((a, b) => a.rate - b.rate || b.miss - a.miss).slice(0, 15);
+  const heard = S.heard || [], missed = heard.filter(x => !x.ok).length;
+  $('#pbody').innerHTML = `<div class="panel settings">
+    ${secBlock('week', ic('flame', 26), 'This week', `Streak ${currentStreak()} · best ${bestStreak()}`, weekSummary().replace('<h3 style="margin:0">This week (last 7 days)</h3>', '') + `<p class="hint" style="margin:0">${coin(16)} ${allCoins()} coins in total</p>`)}
+    ${secBlock('tricky', ic('bulb', 26), 'Tricky words', tricky.length ? tricky.slice(0, 3).map(t => esc(t.w)).join(', ') : 'None yet',
+      tricky.length ? `<table><tr><th>Word</th><th>Read alone</th><th>Needed help</th></tr>${tricky.map(t => `<tr><td style="font-family:var(--read);font-size:18px">${esc(t.w)}</td><td>${t.first}/${t.seen}</td><td>${t.miss}</td></tr>`).join('')}</table>` : '<p class="hint">Nothing tricky yet.</p>')}
+    ${secBlock('heard', ic('mic', 26), 'What the mic heard', heard.length ? `${missed} not accepted` : 'Nothing yet',
+      `<p class="hint" style="margin:0">The last 40 tries. If your child read a word right but it shows ${ic('cross', 16)}, the phone misheard. "(no-speech)" means it heard nothing.</p>
+      ${heard.length ? `<table><tr><th>Time</th><th>Word</th><th>Heard</th><th></th></tr>${heard.map(x => `<tr><td>${x.at}</td><td style="font-family:var(--read)">${esc(x.t)}</td><td>${esc(x.h)}</td><td>${x.ok ? ic('check', 20) : ic('cross', 20)}</td></tr>`).join('')}</table>` : ''}`)}
+    ${secBlock('days', ic('flag', 26), 'Last 14 days', `${rows.length} day${rows.length === 1 ? '' : 's'} played`,
+      rows.length ? `<table><tr><th>Day</th><th>Races</th><th>Coins</th><th>Goal</th></tr>${rows.join('')}</table>` : '<p class="hint">No races yet.</p>')}
+  </div>`;
+  trackSecs();
+}
+let secOpen = new Set(['child', 'week']);   // which Settings/Progress sections are open (kept while the page is open)
+const secBlock = (id, icon, title, sum, body) => `<details class="sec" data-sec="${id}" ${secOpen.has(id) ? 'open' : ''}><summary>${icon}<span class="st">${title}</span><span class="sv">${sum}</span></summary><div class="sb">${body}</div></details>`;
+function trackSecs() { document.querySelectorAll('details.sec').forEach(d => d.addEventListener('toggle', () => { d.open ? secOpen.add(d.dataset.sec) : secOpen.delete(d.dataset.sec); })); }
+function pSettings() {
+  const t = S.settings.tries, n = todayPlan().length;
+  const opt = (v, cur, label) => `<option value="${v}" ${String(cur) === String(v) ? 'selected' : ''}>${label ?? v}</option>`;
+  const sec = secBlock;
+  const goalLabel = S.settings.goal === 'all' ? 'All races' : `${S.settings.goal} race${S.settings.goal > 1 ? 's' : ''}`;
+  $('#pbody').innerHTML = `<div class="panel settings">
+    ${sec('child', ic('star', 26), 'Child', esc(S.name || 'Not set'), nameBlock())}
+    ${sec('class', ic('trophy', 26), 'Class list', S.lb.cls ? esc(S.lb.cls) + (S.lb.on ? ' · on list' : ' · off') : 'Off', classBlock())}
+    ${sec('phone', ic('link', 26), 'Another phone', 'Link phones', linkBlock())}
+    ${sec('game', ic('flag', 26), 'Races and help', `Goal: ${goalLabel}`, `
+      <div class="set"><label>Daily goal (for the streak)</label><select id="sGoal">${opt('all', S.settings.goal, 'All races')}${Array.from({ length: Math.max(0, n - 1) }, (_, i) => opt(i + 1, S.settings.goal, `${i + 1} race${i ? 's' : ''}`)).join('')}</select></div>
+      <p class="hint" style="margin:6px 0 0"><b>Tries before each help step</b></p>
+      <div class="set"><label>1. Read it alone</label><select id="tRead">${[1, 2, 3].map(v => opt(v, t.read)).join('')}</select></div>
+      <div class="set"><label>2. "Fred Talk it"</label><select id="tFred">${[1, 2, 3].map(v => opt(v, t.fred)).join('')}</select></div>
+      <div class="set"><label>3. Sounds light up</label><select id="tSounds">${[1, 2, 3].map(v => opt(v, t.sounds)).join('')}</select></div>
+      <p class="hint">Then the game says it and your child repeats it.</p>
+      <div class="set"><label>Missed words come back</label><select id="sCome">${[0, 1, 2, 3].map(v => opt(v, S.settings.comebacks, v + (v === 1 ? ' time' : ' times'))).join('')}</select></div>
+      <div class="set"><label>Sound dots under words</label><select id="sDots">${opt('1', S.settings.dots ? 1 : 0, 'Always')}${opt('0', S.settings.dots ? 1 : 0, 'When helping')}</select></div>`)}
+    ${sec('mic', ic('mic', 26), 'Microphone', S.settings.strict ? 'Strict' : 'Relaxed', `
+      <div class="set"><label>Word checking</label><select id="sStrict"><option value="0" ${S.settings.strict ? '' : 'selected'}>Relaxed (recommended)</option><option value="1" ${S.settings.strict ? 'selected' : ''}>Strict</option></select></div>
+      <p class="hint">Relaxed: small mishearings like “hell” for <i>hill</i> still count.</p>
+      ${micTestBlock()}
+      ${SR ? '' : '<div class="note"><b>This browser can’t listen.</b> On iPhone, open the game in Safari.</div>'}${micBlocked ? '<div class="note">The microphone was blocked on this page.</div>' : ''}`)}
+    ${sec('reset', ic('trash', 26), 'Start over', '', `<p class="hint">Clears coins, streak, cars and stats on this phone. The homework and name stay.</p><button class="btn r" id="resetAll">Reset coins, streak and stats</button>`)}
+  </div>`;
+  trackSecs();
+  const bind = (id, fn) => $(id).onchange = e => { fn(e.target.value); save(); toast('Saved ✓'); };
+  bind('#tRead', v => t.read = +v); bind('#tFred', v => t.fred = +v); bind('#tSounds', v => t.sounds = +v);
+  bind('#sCome', v => S.settings.comebacks = +v); bind('#sGoal', v => S.settings.goal = v === 'all' ? 'all' : +v);
+  bindName(pSettings); bindClass(); bindLink(); checkDupName();
+  bind('#sDots', v => S.settings.dots = v === '1'); bind('#sStrict', v => S.settings.strict = v === '1'); bindMicTest();
+  $('#resetAll').onclick = () => {
+    modal(`<h2>Reset coins, streak, cars and stats?</h2><p class="hint">The homework stays.</p><div style="display:flex;gap:10px"><button class="btn w" style="flex:1" onclick="closeModal()">Cancel</button><button class="btn r" style="flex:1" id="rsYes">Reset</button></div>`);
+    $('#rsYes').onclick = () => { const keep = { homework: S.homework, review: S.review, settings: S.settings, name: S.name, nameRec: S.nameRec, lb: S.lb, setupDone: true }; S = { ...fresh(), ...keep }; save(); closeModal(); toast('Reset'); pSettings(); };
+  };
+}
+
+/* ---- child's name + first-run setup ---- */
+function nameBlock() {
+  const known = VOICE.n.has(nameKey(S.name));
+  return `<div class="set" style="flex-wrap:wrap"><label>Child's name</label><input type="text" id="nmIn" value="${esc(S.name)}" placeholder="e.g. Omar" style="width:150px;border:2px solid #dfe3f2;border-radius:10px;padding:8px;font-size:18px"></div>
+    <div id="nmVoice" class="hint">${nameVoiceHint()}</div>`;
+}
+function nameVoiceHint() {
+  if (!S.name) return 'The game shows the name and says it out loud.';
+  const known = VOICE.n.has(nameKey(S.name));
+  return `${S.nameRec ? 'The game uses your recording of the name.' : known ? 'The game knows how to say this name.' : '<b>The game’s voice doesn’t know this name</b>, so it will only show it. You can record it (3 seconds).'}
+    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:6px" class="nmbtns">${hasNameVoice() ? `<button class="btn w" id="nmPlay" style="padding:8px 12px">${ic('speaker', 22)} Hear it</button>` : ''}<button class="btn w" id="nmRec" style="padding:8px 12px">${ic('record', 22)} ${S.nameRec ? 'Record again' : 'Record the name'}</button>${S.nameRec ? `<button class="btn w" id="nmDel" style="padding:8px 12px" aria-label="Delete recording">${ic('trash', 22)}</button>` : ''}</div>`;
+}
+function bindName(rerender) {
+  const wire = () => {
+    const p = $('#nmPlay'); if (p) p.onclick = () => { ac(); sayName(); };
+    const d = $('#nmDel'); if (d) d.onclick = () => { S.nameRec = null; save(); $('#nmVoice').innerHTML = nameVoiceHint(); wire(); };
+    const r = $('#nmRec'); if (r) r.onclick = () => recordName(r, () => { $('#nmVoice').innerHTML = nameVoiceHint(); wire(); });
+  };
+  $('#nmIn').oninput = e => { S.name = e.target.value.trim(); save(); $('#nmVoice').innerHTML = nameVoiceHint(); wire(); };
+  wire();
+}
+let nameMR = null;
+async function recordName(btn, done) {
+  if (nameMR) return;
+  if (!navigator.mediaDevices || !window.MediaRecorder) return toast("Recording isn't available here");
+  let stream; try { stream = await navigator.mediaDevices.getUserMedia({ audio: true }); } catch (e) { return toast("Can't use the microphone here"); }
+  let type = ''; for (const t of ['audio/mp4', 'audio/webm;codecs=opus', 'audio/webm']) { try { if (MediaRecorder.isTypeSupported(t)) { type = t; break; } } catch (e) {} }
+  const chunks = [], mr = new MediaRecorder(stream, type ? { mimeType: type } : undefined); nameMR = mr;
+  mr.ondataavailable = e => { if (e.data && e.data.size) chunks.push(e.data); };
+  mr.onstop = async () => {
+    stream.getTracks().forEach(t => t.stop()); nameMR = null;
+    const buf = new Uint8Array(await new Blob(chunks).arrayBuffer()); let s = ''; for (let i = 0; i < buf.length; i++) s += String.fromCharCode(buf[i]);
+    S.nameRec = { b64: btoa(s), type: mr.mimeType || type }; save(); toast('Saved ✓'); done();
+  };
+  btn.textContent = '⏺ Say the name now…'; mr.start(); setTimeout(() => { if (mr.state === 'recording') mr.stop(); }, 2500);
+}
+/* ---- microphone test (setup, settings and help) ---- */
+const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+const MIC_FIX = isIOS
+  ? 'On iPhone: Settings → Apps → Safari → Microphone → <b>Allow</b>, and Settings → General → Keyboard → <b>Enable Dictation</b>. Then reload the game.'
+  : `Tap the ${ic('lock', 16)} or ${ic('info', 16)} next to the web address, set Microphone to <b>Allow</b>, then reload the game.`;
+function micTestBlock() {
+  return `<div class="mictest" id="micTest"><b>Microphone test</b><br>Tap the button, then your child says <b>"cat"</b>.<div style="margin-top:8px"><button class="btn w" id="micTestGo" style="padding:8px 14px">${ic('mic', 22)} Test the microphone</button></div><div id="micTestRes" style="margin-top:6px"></div></div>`;
+}
+function bindMicTest() {
+  const b = $('#micTestGo'); if (!b) return;
+  b.onclick = () => {   // listen() must start straight from the tap (iPhone rule)
+    const out = $('#micTestRes');
+    if (!SR) { out.innerHTML = ic('cross', 18) + ' This browser can’t listen. ' + (isIOS ? 'Open the game in <b>Safari</b>.' : 'Open the game in <b>Chrome</b>.'); return; }
+    b.disabled = true; out.textContent = 'Getting ready…';
+    listen(5000, t => t.some(x => /\b(cat|kat|cats)\b/.test(norm(x))), () => { out.innerHTML = ic('speak', 20) + ' Say <b>"cat"</b> now!'; }).then(r => {
+      b.disabled = false; setSession('playback');
+      if (r.texts && r.texts.length) {
+        const ok = r.texts.some(x => /\b(cat|kat|cats)\b/.test(norm(x)));
+        out.innerHTML = ok ? `${ic('check', 18)} The microphone works. It heard: "${esc(r.texts[0])}"` : `${ic('warn', 18)} It heard "${esc(r.texts[0])}". The microphone works, but try again a bit closer and slower.`;
+        if (micBlocked) { micBlocked = false; }
+      } else if (['not-allowed', 'service-not-allowed'].includes(r.error)) out.innerHTML = ic('cross', 18) + ' The microphone is blocked. ' + MIC_FIX;
+      else out.innerHTML = ic('warn', 18) + ' Nothing heard. Hold the phone closer and try again. If it keeps happening: ' + MIC_FIX;
+    });
+  };
+}
+const isStandalone = () => (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true;
+function homeTip() {
+  if (isStandalone()) return '';
+  return `<div class="note">${ic('phone', 22)} <b>Put the game on the home screen</b> so it opens like an app: ${isIOS
+    ? `in Safari tap <b>Share</b> (${ic('share', 18)}), then <b>Add to Home Screen</b>.`
+    : 'in Chrome tap <b>⋮</b> (top right), then <b>Add to Home screen</b> or <b>Install app</b>.'}</div>`;
+}
+function feedbackBlock() {
+  return `<div class="mictest"><b>${ic('speak', 22)} Send feedback</b><br>Something not working, or an idea? Tell us here.
+    <textarea id="fbTx" rows="3" style="width:100%;margin-top:8px;border:2px solid #dfe3f2;border-radius:12px;padding:8px;font:inherit;font-size:16px" placeholder="For example: the word 'hill' sounds wrong"></textarea>
+    <button class="btn g" id="fbGo" style="margin-top:6px;width:100%">Send</button><div id="fbRes" class="hint" style="margin-top:4px"></div></div>`;
+}
+function bindFeedback() {
+  const go = $('#fbGo'); if (!go) return;
+  go.onclick = async () => {
+    const msg = $('#fbTx').value.trim(); if (!msg) return toast('Write something first');
+    go.disabled = true; $('#fbRes').textContent = 'Sending…';
+    const info = { name: S.name || '', cls: S.lb.cls || '', version: APP_VERSION + (IS_TEST ? ' (test)' : ''), phone: navigator.userAgent.slice(0, 180),
+      mic: SR ? (micBlocked ? 'blocked' : 'ok') : 'none', heard: (S.heard || []).slice(0, 5).map(x => `${x.t}>${x.h}`).join(' | ') };
+    try {
+      const r = await (await fetch(LB_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'feedback', message: msg.slice(0, 2000), info }) })).json();
+      if (r && r.ok) { $('#fbTx').value = ''; $('#fbRes').innerHTML = ic('check', 16) + ' Thank you! We got it.'; }
+      else throw new Error('not ok');
+    } catch (e) { $('#fbRes').textContent = 'Could not send. Check the internet and try again.'; }
+    go.disabled = false;
+  };
+}
+function pHelp() {
+  const qa = [
+    ['The microphone doesn’t work, or it keeps saying “I didn’t hear you”', `Use the test below. Speak close to the phone in a quiet room. ${MIC_FIX}`],
+    ['My child read it right but the game said no', 'Phones sometimes mishear young children. Open <b>Progress → What the microphone heard</b> to see what the phone wrote. In <b>Settings</b>, keep <b>Microphone checking</b> on <b>Relaxed</b>.'],
+    ['How do I add this week’s homework?', 'Open <b>Homework</b>, paste the words (commas between them) and each sentence on its own line, then tap <b>Save homework</b>. The game builds the races by itself.'],
+    ['A word has a robot voice', 'The game has a natural voice for about 4,600 words. For others it uses the phone’s own voice. The Homework tab lists those words so you can tell us.'],
+    [`What are the daily goal and the ${ic('flame', 18)} streak?`, 'The goal is finishing today’s races (change it in <b>Settings</b>). Each day the goal is met adds 1 to the streak. One missed day a week is saved by a shield (shown on the home screen), so the streak carries on. Missing two days in a row, or two in one week, starts it again.'],
+    ['What is “Done today”?', 'If you entered a class code, children who finished all of today’s races appear with their first name and car. No scores or ranking. Choose <b>No</b> for “Show my child on the list” to stay off it; your child then doesn’t see the list either.'],
+    ['My child plays on two phones', `Open <b>Settings</b> on the first phone and copy the code under <b>Another phone</b>. Type it on the second phone and tap <b>${ic('link', 16)} Link</b>. After that, coins, medals, streaks and badges are added up across both phones, and they show once on the class list. Both phones need internet now and then to share.`],
+    ['Will we lose progress?', 'Progress is saved on the phone and, when online, a copy is kept in the class sheet. If you clear Safari/Chrome website data, use <b>Another phone</b> in Settings with the code you wrote down to get it back, so it’s worth noting the code in Settings.'],
+    ['How do badges work?', 'There are 3 badges: <b>Bookworm</b> (words read), <b>Super Streak</b> (days in a row with all races done) and <b>Gold Star</b> (gold medals). Each has 4 levels: bronze, silver, gold and rainbow. The home screen shows the next one and how close your child is; tapping it, or any badge, says how to win it.'],
+    ['Does it work without internet?', 'Yes, after the first visit. Only the “Done today” list needs internet.'],
+  ];
+  $('#pbody').innerHTML = `<div class="panel">
+    ${homeTip()}
+    ${micTestBlock()}
+    ${feedbackBlock()}
+    <div class="faq">${qa.map(([q, a]) => `<details><summary>${q}</summary><p>${a}</p></details>`).join('')}</div>
+  </div>`;
+  bindMicTest(); bindFeedback();
+}
+function setupWizard(step = 0) {
+  if (S.setupDone || (step === 0 && $('#modalBg').classList.contains('on'))) return;
+  const N = 4, dots = `<div class="steps">${Array.from({ length: N }, (_, i) => `<i class="${i <= step ? 'on' : ''}"></i>`).join('')}</div>`;
+  const nav = (next, label = 'Next →') => `<div style="display:flex;gap:10px;margin-top:6px">${step ? '<button class="btn w" style="flex:1" id="suBack">← Back</button>' : ''}<button class="btn g" style="flex:2" id="suNext">${label}</button></div>`;
+  const body = [
+    () => `<h2 style="display:flex;align-items:center;gap:8px">${carSVG(0, 56)} Welcome to Word Racer</h2><p class="hint">A 1-minute setup for grown-ups. You can change everything later with ${ic('gear', 18)}.</p>
+      <div class="panel" style="padding:0">${nameBlock()}</div>${nav()}`,
+    () => `<h2 style="display:flex;align-items:center;gap:8px">${ic('books', 34)} This week's homework</h2><p class="hint">Paste the words with commas between them, and each sentence on its own line. You can add or change it any time.</p>
+      <textarea class="hw" id="suHw" style="min-height:150px" spellcheck="false" autocapitalize="off" placeholder="Words: cat, hen, zip, fox
+Sentences:
+get a hat
+get a pen">${esc(S.homework)}</textarea>${nav()}`,
+    () => `<h2 style="display:flex;align-items:center;gap:8px">${ic('trophy', 34)} Class list (optional)</h2><p class="hint">If your teacher gave you a class code, enter it to see who finished today. No code? Just tap Next.</p>
+      <div class="panel" style="padding:0">${classBlock()}</div>${nav()}`,
+    () => `<h2 style="display:flex;align-items:center;gap:8px">${ic('mic', 34)} Last step</h2>${micTestBlock()}<div style="height:8px"></div>${homeTip()}${nav(0, `Let's race! ${ic('flag', 22)}`)}`,
+  ];
+  modal(dots + body[step]());
+  if (step === 0) bindName();
+  if (step === 2) bindClass();
+  if (step === 3) bindMicTest();
+  const keepHw = () => { const t = $('#suHw'); if (t) { S.homework = t.value; refreshRed(); save(); } };
+  const back = $('#suBack'); if (back) back.onclick = () => { keepHw(); setupWizard(step - 1); };
+  $('#suNext').onclick = () => {
+    keepHw();
+    if (step < N - 1) return setupWizard(step + 1);
+    S.setupDone = true; save(); closeModal(); renderHome();
+  };
+}
+
+/* ---- class leaderboard (Google Sheet) ---- */
+const LB_URL = 'https://script.google.com/macros/s/AKfycby9VJJwcEd1syIe-3SuG4LYih2gHZfXIzFmFPTwpIZqtkqADomYTDlBNttWQ4srIDk/exec';
+const lbActive = () => !IS_TEST && !!(LB_URL.startsWith('https://') && S.lb.cls);
+function countRead(it) { const d = dayRec(); d.words = (d.words || 0) + (it.type === 'sentence' ? norm(plain(it.text)).split(' ').length : 1); }
+async function lbCall(params) {
+  const q = new URLSearchParams({ class: S.lb.cls, day: today(), player: S.lb.player, ...params });
+  const ctl = new AbortController(); const t = setTimeout(() => ctl.abort(), 15000);
+  try { const r = await fetch(LB_URL + '?' + q.toString(), { signal: ctl.signal }); return await r.json(); } catch (e) { return null; } finally { clearTimeout(t); }
+}
+// Sends "finished today" only when the daily goal is done and the parent allows it.
+function lbSubmit() {
+  if (!lbActive() || !S.lb.on || !view().goal) return Promise.resolve(null);
+  return lbCall({ action: 'done', name: S.name || 'Racer', car: S.car });
+}
+async function openBoard() {
+  show('board'); stopAudio();
+  if (!S.lb.on) { // opted out: they don't see the list and aren't on it
+    $('#boardBody').innerHTML = `<div class="lboff"><div>${ic('lock', 80)}</div><p><b>${esc(S.name || 'This racer')} is not on the class list.</b></p><p>A grown-up chose "No" for "Show my child on the list". To see who finished today, a grown-up can tap ${ic('gear', 20)}, open <b>Settings</b> and choose <b>Yes</b>.</p></div>`;
+    return;
+  }
+  $('#boardBody').innerHTML = `<div style="text-align:center;padding:40px" class="bounce">${carSVG(S.car, 150)}</div>`;
+  const res = (await lbSubmit()) || await lbCall({ action: 'list' });
+  if (!res || !res.ok) { $('#boardBody').innerHTML = `<div style="text-align:center;padding:40px">${ic('offline', 90)}</div>`; return; }
+  const list = res.list || [], d = view(), plan = todayPlan(), done = doneToday(), need = goalNeeded();
+  dupNote(list);
+  const meDone = !!d.goal;
+  const mine = meDone ? '' : `<div class="lbrow me">${carSVG(S.car, 70)}<div class="nm">${esc(S.name || '')}</div><div style="display:flex;gap:2px">${Array.from({ length: need }, (_, i) => i < done ? ic('flag', 26) : ic('box', 26)).join('')}</div></div>`;
+  $('#boardBody').innerHTML = `<div class="lblist">${mine}${list.map(x => `<div class="lbrow ${x.player === S.lb.player ? 'me' : ''}"><div class="rk">${ic('trophy', 36)}</div>${carSVG(x.car, 70, false)}<div class="nm">${esc(x.name)}</div></div>`).join('')}</div>`;
+  if (meDone) await say('cup_done');
+  else { await say(list.length ? 'cups_look' : 'cup_none'); await say('cup_todo'); }
+}
+$('#boardBack').onclick = () => { stopAudio(); renderHome(); show('home'); };
+$('#boardRefresh').onclick = openBoard;
+/* same name as another child on today's list: suggest a last initial (never blocks) */
+const sameName = (a, b) => String(a || '').trim().toLowerCase() === String(b || '').trim().toLowerCase();
+function dupNote(list) {
+  const el = $('#lbDup'); if (!el) return;
+  const nm = (S.name || '').trim();
+  const dup = nm && (list || []).some(x => x.player !== S.lb.player && sameName(x.name, nm));
+  el.innerHTML = dup ? `<div class="note">Another child on today's list is also called <b>${esc(nm)}</b>. Add a last initial to the name (for example <b>${esc(nm.split(' ')[0])} A.</b>) so the children can tell who is who.</div>` : '';
+}
+async function checkDupName() {
+  if (!lbActive() || !S.lb.on || !S.name) return dupNote([]);
+  const res = await lbCall({ action: 'list' });
+  if (res && res.ok) dupNote(res.list);
+}
+/* ---- progress sharing: upload this phone's own progress, download the child's other phones ---- */
+function ledger() {
+  const days = {}; Object.keys(S.days).sort().slice(-120).forEach(k => { const d = S.days[k]; days[k] = { done: d.done || {}, coins: d.coins || 0, goal: !!d.goal, words: d.words || 0, help: d.help || {} }; });
+  const stats = {}; Object.entries(S.stats || {}).sort((a, b) => b[1].seen - a[1].seen).slice(0, 400).forEach(([w, x]) => stats[w] = x);
+  return { coins: S.coins || 0, spent: S.spent || 0, raceCount: S.raceCount || 0, turbos: S.turbos || 0, best: S.best || 0, days, stats };
+}
+let syncing = null;
+async function syncPush() {
+  if (IS_TEST) return;
+  if (!LB_URL.startsWith('https://') || !navigator.onLine) return;
+  try { await fetch(LB_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'push', player: S.lb.player, phone: S.lb.phone, data: ledger() }) }); } catch (e) {}
+}
+async function syncPull() {
+  if (IS_TEST) return false;
+  if (!LB_URL.startsWith('https://') || !navigator.onLine) return false;
+  const q = new URLSearchParams({ action: 'pull', player: S.lb.player });
+  const ctl = new AbortController(); const t = setTimeout(() => ctl.abort(), 15000);
+  try {
+    const r = await (await fetch(LB_URL + '?' + q, { signal: ctl.signal })).json();
+    if (!r || !r.ok || !Array.isArray(r.phones)) return false;   // older sheet script: nothing to share yet
+    const o = {}; r.phones.forEach(x => { if (x.phone && x.phone !== S.lb.phone && x.data) o[x.phone] = x.data; });
+    const before = JSON.stringify(S.others || {}); S.others = o; save();
+    return JSON.stringify(o) !== before;
+  } catch (e) { return false; } finally { clearTimeout(t); }
+}
+function sync() {   // push this phone, then pull the others; refresh the home screen if something changed
+  if (syncing) return syncing;
+  syncing = (async () => { await syncPush(); const changed = await syncPull(); if (changed && $('#home').classList.contains('on')) renderHome(); })().finally(() => { syncing = null; });
+  return syncing;
+}
+/* same child on two phones: share one player code so they count as one */
+function linkBlock() {
+  return `<div class="hint">This phone's code: <b style="font-size:20px;letter-spacing:2px;color:var(--ink)">${esc(S.lb.player)}</b><br>On the other phone, open ${ic('gear', 16)} Settings and type this code below, so your child shows up once on the list. After linking, coins, medals, streaks and badges are added up across both phones.</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 12px"><input type="text" id="lnkIn" placeholder="Other phone’s code" autocapitalize="off" autocomplete="off" spellcheck="false" style="flex:1;min-width:160px;border:2px solid #dfe3f2;border-radius:10px;padding:8px;font-size:18px"><button class="btn w" id="lnkGo" style="padding:8px 14px">${ic('link', 22)} Link</button></div>`;
+}
+function bindLink() {
+  const go = $('#lnkGo'); if (!go) return;
+  go.onclick = () => {
+    const code = $('#lnkIn').value.trim().toLowerCase().replace(/\s+/g, '');
+    if (!/^[a-z0-9]{4,20}$/.test(code)) return toast('Check the code: letters and numbers only');
+    if (code === S.lb.player) return toast('That is this phone’s own code');
+    S.lb.player = code; save(); toast('Linked ✓'); sync();
+    if (view().goal) lbSubmit(); // already finished today: show up under the shared code
+    pSettings();
+  };
+}
+function classBlock() {
+  return `<div class="set" style="flex-wrap:wrap"><label>Class code (for the "done today" list)</label><input type="text" id="clsIn" value="${esc(S.lb.cls)}" placeholder="optional" autocapitalize="characters" style="width:150px;border:2px solid #dfe3f2;border-radius:10px;padding:8px;font-size:18px"></div>
+    <div class="set"><label>Show my child on the list</label><select id="clsOn"><option value="1" ${S.lb.on ? 'selected' : ''}>Yes</option><option value="0" ${S.lb.on ? '' : 'selected'}>No</option></select></div>
+    <div class="hint">When your child finishes all of today's races, their first name and car appear on the class list with a ${ic('trophy', 16)}. No scores and no ranking. Choose "No" to stay off the list. Children who are off the list don't see it either.</div>
+    <div id="lbDup"></div>`;
+}
+function bindClass() {
+  const ni = $('#nmIn'); if (ni) ni.addEventListener('change', () => checkDupName());
+  $('#clsIn').onchange = e => { S.lb.cls = e.target.value.trim().toUpperCase(); save(); };
+  $('#clsOn').onchange = e => {
+    const on = e.target.value === '1';
+    if (!on && S.lb.on && S.lb.cls && LB_URL.startsWith('https://')) lbCall({ action: 'leave' });
+    S.lb.on = on; save(); toast(on ? 'On the list ✓' : 'Removed from the list');
+  };
+}
+
+$('#parentBtn').innerHTML = ic('gear', 32); $('#helpBtn').innerHTML = ic('speaker', 30); $('#exitRace').innerHTML = ic('close', 22);
+$('#boardBack').innerHTML = ic('home', 30); $('#parentBack').innerHTML = ic('back', 26); $('#boardRefresh').innerHTML = ic('refresh', 26);
+$('#boardBack').nextElementSibling.innerHTML = `<span style="display:inline-flex;align-items:center;gap:8px">${ic('trophy', 32)} Done today</span>`;
+renderHome(); show('home');
+// splash screen: until the game's voices are ready (at most 3 seconds)
+Promise.race([allAudio, sleep(3000)]).then(() => { const sp = $('#splash'); if (sp) { sp.style.opacity = 0; setTimeout(() => sp.remove(), 450); } });
+sync();
+document.addEventListener('visibilitychange', () => { if (!document.hidden) sync(); });
+// keep the game and voices on the phone: faster opening, less data, works offline
+if (IS_TEST) { const t = document.createElement('div'); t.className = 'testbadge'; t.textContent = 'TEST VERSION'; document.body.appendChild(t); }
+else if ('serviceWorker' in navigator) window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(() => {}); });
+</script>
+</body>
+</html>

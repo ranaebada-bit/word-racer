@@ -7,8 +7,9 @@
 //   Finished  - one row per child per day when they finish all races: first name and car only. Kept 30 days.
 //   Progress  - one row per phone: that phone's coins, medals and tricky words. Kept until the child hasn't played for 180 days.
 //   Classes   - class codes allowed to use the "done today" list. To add a class, type its code in column A.
+//   Feedback  - messages parents send from Help > Send feedback, with the phone type and app version.
 
-const FINISHED = 'Finished', PROGRESS = 'Progress', CLASSES = 'Classes';
+const FINISHED = 'Finished', PROGRESS = 'Progress', CLASSES = 'Classes', FEEDBACK = 'Feedback';
 const KEEP_FINISHED_DAYS = 30, KEEP_PROGRESS_DAYS = 180;
 
 function tab_(name, header) {
@@ -56,6 +57,7 @@ function doPost(e) {
   let b = {};
   try { b = JSON.parse(e.postData.contents); } catch (err) { return out_({ ok: false, error: 'bad' }); }
   if (b.action === 'push') return push_(clean_(b.player), clean_(b.phone), b.data);
+  if (b.action === 'feedback') return feedback_(b);
   return out_({ ok: false, error: 'action' });
 }
 
@@ -139,6 +141,23 @@ function pull_(player) {
     return { phone: String(r[2]), updated: r[3], data: data };
   });
   return out_({ ok: true, phones: phones });
+}
+
+/* ---------- feedback from parents ---------- */
+function feedback_(b) {
+  const msg = String(b.message || '').replace(/[<>]/g, '').trim().slice(0, 2000);
+  if (!msg) return out_({ ok: false, error: 'empty' });
+  const i = b.info || {}, s = v => String(v || '').replace(/[<>]/g, '').slice(0, 300);
+  const lock = LockService.getScriptLock();
+  lock.waitLock(10000);
+  try {
+    const sh = tab_(FEEDBACK, ['time', 'name', 'class', 'message', 'app version', 'mic', 'last words heard', 'phone']);
+    if (sh.getLastRow() > 2000) sh.deleteRows(2, 500);   // keep the tab small
+    sh.appendRow([new Date(), s(i.name), s(i.cls), msg, s(i.version), s(i.mic), s(i.heard), s(i.phone)]);
+  } finally {
+    lock.releaseLock();
+  }
+  return out_({ ok: true });
 }
 
 /* ---------- housekeeping ---------- */
