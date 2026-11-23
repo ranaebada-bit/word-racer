@@ -217,6 +217,15 @@ details.sec .sb{padding:0 2px 14px;display:flex;flex-direction:column;gap:8px}
 .res .slots .slot{background:#e4e7f2;border-color:#cfd5ea}.res .slots .slot.on{background:#ffd23f;border-color:#1b1b3a44}
 .bring{position:relative;width:48px;height:48px;display:grid;place-items:center}.bring>svg:first-child{position:absolute;inset:0}.bring .dot{position:absolute;top:0;right:0;width:12px;height:12px;border-radius:50%;background:#ef3e36;border:2px solid #fff}
 .testbadge{position:fixed;top:0;left:50%;transform:translateX(-50%);z-index:90;background:#ef3e36;color:#fff;font-weight:800;font-size:12px;padding:2px 10px;border-radius:0 0 8px 8px;pointer-events:none}
+/* small phones (iPhone SE / mini): keep the top bar, tabs and garage inside the screen */
+.top .chip{flex:none}
+#nameChip{flex:0 1 auto !important;min-width:0;max-width:34vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block}
+.gear{flex:none}
+@media (max-width:389px){.top .chip{font-size:20px;padding:3px 10px;gap:4px}.top{gap:6px}#nameChip{font-size:17px !important}}
+@media (max-width:359px){.top .chip{font-size:17px;padding:2px 8px}.tabs{gap:4px}.tabs button{font-size:12px;padding:9px 1px;min-width:0}.garage{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.gcar svg{max-width:100%;height:auto}}
+.garage{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.gcar{min-width:0}.gcar svg{max-width:100%;height:auto}
+.toast{bottom:calc(100px + env(safe-area-inset-bottom)) !important}
+.set{flex-wrap:wrap}.set label{min-width:0}.set select{max-width:100%}
 .nleft{font-weight:800;font-size:14px;white-space:nowrap}
 .shopcars{display:flex;gap:6px;overflow-x:auto;padding:6px 2px;margin-top:4px}.shopcars button{flex:none;border-radius:12px;background:#f1f3ff;padding:2px;border:3px solid transparent}.shopcars button.on{border-color:var(--blue);background:#e1efff}
 .shopbtn{width:100%;margin:8px 0;display:flex;align-items:center;justify-content:center;gap:8px}
