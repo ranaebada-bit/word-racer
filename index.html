@@ -1299,23 +1299,26 @@ function weekSummary() {
 function pProgress() {
   const rows = []; for (let i = 0; i < 14; i++) { const k = addDays(today(), -i); const d = view(k); if (d && (d.coins || Object.keys(d.done).length)) rows.push(`<tr><td>${k}</td><td>${Object.keys(d.done).length}${d.plan ? '/' + d.plan.length : ''}</td><td>${d.coins}</td><td>${d.goal ? ic('flame', 20) : ''}</td></tr>`); }
   const tricky = Object.entries(mergedStats()).filter(([, s]) => s.miss > 0).map(([w, s]) => ({ w, ...s, rate: s.first / s.seen })).sort((a, b) => a.rate - b.rate || b.miss - a.miss).slice(0, 15);
-  $('#pbody').innerHTML = `<div class="panel">
-    ${weekSummary()}
-    <div style="display:flex;gap:8px;flex-wrap:wrap"><div class="chip" style="color:var(--ink);background:#fff4cc;font-size:17px">${ic('flame', 22)} Streak ${currentStreak()}</div><div class="chip" style="color:var(--ink);background:#e1efff;font-size:17px">Best ${bestStreak()}</div><div class="chip" style="color:var(--ink);background:#eafbf1;font-size:17px">${coin(20)} ${allCoins()}</div></div>
-    <h3 style="margin:6px 0 0">Tricky ones</h3>
-    ${tricky.length ? `<table><tr><th>Item</th><th>Read alone</th><th>Needed help</th></tr>${tricky.map(t => `<tr><td style="font-family:var(--read);font-size:18px">${esc(t.w)}</td><td>${t.first}/${t.seen}</td><td>${t.miss}</td></tr>`).join('')}</table>` : '<p class="hint">Nothing tricky yet.</p>'}
-    <h3 style="margin:6px 0 0">What the microphone heard</h3>
-    <p class="hint">The last 40 tries. If he read a word right but it shows ${ic('cross', 16)}, the phone misheard him. "(no-speech)" means it heard nothing.</p>
-    ${(S.heard || []).length ? `<table><tr><th>Time</th><th>Word</th><th>Heard</th><th></th></tr>${S.heard.map(x => `<tr><td>${x.at}</td><td style="font-family:var(--read)">${esc(x.t)}</td><td>${esc(x.h)}</td><td>${x.ok ? ic('check', 20) : ic('cross', 20)}</td></tr>`).join('')}</table>` : '<p class="hint">Nothing yet.</p>'}
-    <h3 style="margin:6px 0 0">Last 14 days</h3>
-    ${rows.length ? `<table><tr><th>Day</th><th>Races</th><th>Coins</th><th>Goal</th></tr>${rows.join('')}</table>` : '<p class="hint">No races yet.</p>'}
+  const heard = S.heard || [], missed = heard.filter(x => !x.ok).length;
+  $('#pbody').innerHTML = `<div class="panel settings">
+    ${secBlock('week', ic('flame', 26), 'This week', `Streak ${currentStreak()} · best ${bestStreak()}`, weekSummary().replace('<h3 style="margin:0">This week (last 7 days)</h3>', '') + `<p class="hint" style="margin:0">${coin(16)} ${allCoins()} coins in total</p>`)}
+    ${secBlock('tricky', ic('bulb', 26), 'Tricky words', tricky.length ? tricky.slice(0, 3).map(t => esc(t.w)).join(', ') : 'None yet',
+      tricky.length ? `<table><tr><th>Word</th><th>Read alone</th><th>Needed help</th></tr>${tricky.map(t => `<tr><td style="font-family:var(--read);font-size:18px">${esc(t.w)}</td><td>${t.first}/${t.seen}</td><td>${t.miss}</td></tr>`).join('')}</table>` : '<p class="hint">Nothing tricky yet.</p>')}
+    ${secBlock('heard', ic('mic', 26), 'What the mic heard', heard.length ? `${missed} not accepted` : 'Nothing yet',
+      `<p class="hint" style="margin:0">The last 40 tries. If your child read a word right but it shows ${ic('cross', 16)}, the phone misheard. "(no-speech)" means it heard nothing.</p>
+      ${heard.length ? `<table><tr><th>Time</th><th>Word</th><th>Heard</th><th></th></tr>${heard.map(x => `<tr><td>${x.at}</td><td style="font-family:var(--read)">${esc(x.t)}</td><td>${esc(x.h)}</td><td>${x.ok ? ic('check', 20) : ic('cross', 20)}</td></tr>`).join('')}</table>` : ''}`)}
+    ${secBlock('days', ic('flag', 26), 'Last 14 days', `${rows.length} day${rows.length === 1 ? '' : 's'} played`,
+      rows.length ? `<table><tr><th>Day</th><th>Races</th><th>Coins</th><th>Goal</th></tr>${rows.join('')}</table>` : '<p class="hint">No races yet.</p>')}
   </div>`;
+  trackSecs();
 }
-let secOpen = new Set(['child']);   // which Settings sections are open (kept while the page is open)
+let secOpen = new Set(['child', 'week']);   // which Settings/Progress sections are open (kept while the page is open)
+const secBlock = (id, icon, title, sum, body) => `<details class="sec" data-sec="${id}" ${secOpen.has(id) ? 'open' : ''}><summary>${icon}<span class="st">${title}</span><span class="sv">${sum}</span></summary><div class="sb">${body}</div></details>`;
+function trackSecs() { document.querySelectorAll('details.sec').forEach(d => d.addEventListener('toggle', () => { d.open ? secOpen.add(d.dataset.sec) : secOpen.delete(d.dataset.sec); })); }
 function pSettings() {
   const t = S.settings.tries, n = todayPlan().length;
   const opt = (v, cur, label) => `<option value="${v}" ${String(cur) === String(v) ? 'selected' : ''}>${label ?? v}</option>`;
-  const sec = (id, icon, title, sum, body) => `<details class="sec" data-sec="${id}" ${secOpen.has(id) ? 'open' : ''}><summary>${icon}<span class="st">${title}</span><span class="sv">${sum}</span></summary><div class="sb">${body}</div></details>`;
+  const sec = secBlock;
   const goalLabel = S.settings.goal === 'all' ? 'All races' : `${S.settings.goal} race${S.settings.goal > 1 ? 's' : ''}`;
   $('#pbody').innerHTML = `<div class="panel settings">
     ${sec('child', ic('star', 26), 'Child', esc(S.name || 'Not set'), nameBlock())}
@@ -1337,7 +1340,7 @@ function pSettings() {
       ${SR ? '' : '<div class="note"><b>This browser can’t listen.</b> On iPhone, open the game in Safari.</div>'}${micBlocked ? '<div class="note">The microphone was blocked on this page.</div>' : ''}`)}
     ${sec('reset', ic('trash', 26), 'Start over', '', `<p class="hint">Clears coins, streak, cars and stats on this phone. The homework and name stay.</p><button class="btn r" id="resetAll">Reset coins, streak and stats</button>`)}
   </div>`;
-  document.querySelectorAll('details.sec').forEach(d => d.addEventListener('toggle', () => { d.open ? secOpen.add(d.dataset.sec) : secOpen.delete(d.dataset.sec); }));
+  trackSecs();
   const bind = (id, fn) => $(id).onchange = e => { fn(e.target.value); save(); toast('Saved ✓'); };
   bind('#tRead', v => t.read = +v); bind('#tFred', v => t.fred = +v); bind('#tSounds', v => t.sounds = +v);
   bind('#sCome', v => S.settings.comebacks = +v); bind('#sGoal', v => S.settings.goal = v === 'all' ? 'all' : +v);
