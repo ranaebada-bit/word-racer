@@ -200,6 +200,17 @@ details.sec .sb{padding:0 2px 14px;display:flex;flex-direction:column;gap:8px}
 @keyframes zoomin{from{transform:scale(.2) rotate(-20deg);opacity:0}to{transform:none;opacity:1}}
 .wd b.sh{background:#e1f4ff;border-color:#5ec8ff}
 .report{white-space:pre-wrap;font:600 15px/1.5 inherit;font-family:inherit;background:#f3f5ff;border-radius:14px;padding:12px;margin:0;color:var(--ink)}
+.shopbtn{width:100%;margin:8px 0;display:flex;align-items:center;justify-content:center;gap:8px}
+.shopcar{display:flex;justify-content:center;background:radial-gradient(circle at 50% 80%,#ffd23f44,transparent 60%),#eef1ff;border-radius:20px;padding:10px 0;margin:8px 0}
+.shoptabs{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.shoptabs button{display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 2px;border-radius:14px;background:#f1f3ff;font-size:13px;color:var(--ink)}
+.shoptabs button.on{background:#e1efff;box-shadow:inset 0 0 0 3px var(--blue)}
+.swatches{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin:12px 0}
+.sw{width:46px;height:46px;border-radius:50%;border:3px solid #1b1b3a33;position:relative;display:grid;place-items:center;box-shadow:0 3px 0 #0002}
+.sw.wh{border:8px solid #2b2d3a}
+.sw.sel{outline:4px solid var(--blue);outline-offset:2px}
+.sw i{position:absolute;right:-6px;bottom:-6px;background:#fff;border-radius:50%;width:22px;height:22px;display:grid;place-items:center;box-shadow:0 1px 3px #0003}
+.shopact .btn{width:100%;display:flex;align-items:center;justify-content:center;gap:8px;font-size:20px}
 .panel{background:#fff;border-radius:22px;padding:14px;display:flex;flex-direction:column;gap:10px}
 .tabs{display:flex;gap:6px}
 .tabs button{flex:1;padding:10px 6px;border-radius:14px;background:#ffffff22;color:#fff;font-weight:800;font-size:16px}
@@ -296,7 +307,7 @@ table{width:100%;border-collapse:collapse;font-size:15px}td,th{padding:6px 4px;b
 <script>
 const AUDIO = {};
 const AUDIO_PACKS = ["core2"];   // game phrases + letter sounds; each word and name is its own small file, fetched only when needed
-const PHRASES = {"read_word": "Read the word!", "read_sentence": "Read the sentence!", "what_sound": "What sound is this?", "pit": "Pit stop! This one came back. Can you read it?", "pit_sound": "Pit stop! What sound is this?", "fred_word": "Almost! Let's Fred Talk it. Say the sounds, then blend them.", "fred_sentence": "Almost! Let's Fred Talk the orange words, then read it again.", "again": "Nearly! Have another go.", "fred_again": "Fred Talk it again, then blend!", "sound_again": "Nearly! Say the sound again.", "sounds_intro": "Let's go sound by sound. Say each sound when it lights up.", "blend_now": "Now blend them! Tap and say the word.", "listen": "Listen to me.", "your_turn_word": "Your turn! Say the word.", "your_turn_sentence": "Your turn! Read it to me.", "your_turn_sound": "Now you say it!", "didnt_hear": "I didn't hear you. Tap and try again!", "didnt_hear2": "Say it nice and loud, close to the phone!", "good_try": "Good try! We'll come back to it.", "great_job": "Great job!", "pr1": "Brilliant!", "pr2": "Super reader!", "pr3": "Zoom zoom! Yes!", "pr4": "Fantastic!", "pr5": "You did it!", "pr6": "Amazing!", "pr7": "Turbo reading!", "pr8": "Wow, great blending!", "spr1": "Yes! That's the sound!", "spr2": "Great sound!", "spr3": "Perfect!", "turbo": "Turbo boost! Three in a row!", "race_done": "Race complete! You beat the truck!", "race_lost": "Race complete! Great driving!", "goal_done": "Amazing! You finished all your races today! Your streak is growing!", "new_car": "Wow! You unlocked a new car!", "start_home": "Tap a race to start!", "leave_q": "Do you want to stop racing?", "no_mic": "I can't use the microphone. Ask a grown-up for help.", "tap_mic": "Tap the microphone, then read!", "garage": "Pick your car!", "all_done": "All races done! Try a bonus lap for extra points!", "lets_race": "Ready, steady, go!", "finish_line": "Last one! Read it to cross the finish line!", "welcome": "Hello racer! Tap a race to start!", "hello": "Hello", "well_done": "Well done", "setup_hi": "Hello racer!", "red_word": "This is a red word. We can't Fred Talk it. Listen!", "cups_look": "Look who finished their reading today!", "cup_done": "Well done! You finished today's reading. Here's your cup!", "cup_todo": "Finish all your races today to get your cup!", "cup_none": "Nobody has finished yet. Be the first to get a cup!", "race0": "Rocket Race!", "race1": "Lightning Lap!", "race2": "Superhero Sprint!", "race3": "Police Chase!", "race4": "Dino Dash!", "race5": "Space Speedway!", "race6": "Fire Truck Rescue!", "race7": "Grand Prix!", "race8": "Moto Madness!", "race9": "Sky Rally!", "bonus_lap": "Bonus lap! Extra coins!", "fred_word_s": "Fred Talk it!", "fred_sentence_s": "Fred Talk the orange words!", "sounds_intro_s": "Sound by sound!", "blend_now_s": "Now blend!", "your_turn_s": "Your turn!", "didnt_hear_s": "Try again!", "good_try_s": "Good try!", "again_s": "Have another go!", "red_word_s": "Red word! Listen!", "pit_s": "Pit stop!", "fred_again_s": "Again! Fred Talk it!", "listen_s": "Listen!", "pr9": "Super speedy!", "pr10": "You're a reading star!", "pr11": "Vroom vroom! Brilliant!", "pr12": "Wow, you read it!", "pr13": "High five!", "pr14": "Awesome reading!", "pr15": "Yes! You nailed it!", "pr16": "Champion reader!", "badge_new": "Wow! You earned a new badge!", "badges": "These are your badges! Tap one to hear how to win it.", "help_home": "Tap the race with the arrow to start. The star is a bonus lap, and the car is your garage.", "help_results": "Tap the green arrow for the next race, or the house to go home.", "help_garage": "Pick your car! The locked cars need more coins.", "wash": "Your car is muddy! Rub it to wash it!", "wash_done": "Sparkly clean! Great job!", "b_book": "Bookworm badge! Read words in your races to fill it up.", "b_streak": "Super Streak badge! Finish all your races every day to fill it up.", "b_gold": "Gold Star badge! Win gold medals in your races to fill it up.", "b_almost": "Almost there!", "b_full": "You have the rainbow one! Amazing!", "won_book": "You won a Bookworm badge!", "won_streak": "You won a Super Streak badge!", "won_gold": "You won a Gold Star badge!", "tier1": "Bronze!", "tier2": "Silver!", "tier3": "Gold!", "tier4": "Rainbow!"};
+const PHRASES = {"read_word": "Read the word!", "read_sentence": "Read the sentence!", "what_sound": "What sound is this?", "pit": "Pit stop! This one came back. Can you read it?", "pit_sound": "Pit stop! What sound is this?", "fred_word": "Almost! Let's Fred Talk it. Say the sounds, then blend them.", "fred_sentence": "Almost! Let's Fred Talk the orange words, then read it again.", "again": "Nearly! Have another go.", "fred_again": "Fred Talk it again, then blend!", "sound_again": "Nearly! Say the sound again.", "sounds_intro": "Let's go sound by sound. Say each sound when it lights up.", "blend_now": "Now blend them! Tap and say the word.", "listen": "Listen to me.", "your_turn_word": "Your turn! Say the word.", "your_turn_sentence": "Your turn! Read it to me.", "your_turn_sound": "Now you say it!", "didnt_hear": "I didn't hear you. Tap and try again!", "didnt_hear2": "Say it nice and loud, close to the phone!", "good_try": "Good try! We'll come back to it.", "great_job": "Great job!", "pr1": "Brilliant!", "pr2": "Super reader!", "pr3": "Zoom zoom! Yes!", "pr4": "Fantastic!", "pr5": "You did it!", "pr6": "Amazing!", "pr7": "Turbo reading!", "pr8": "Wow, great blending!", "spr1": "Yes! That's the sound!", "spr2": "Great sound!", "spr3": "Perfect!", "turbo": "Turbo boost! Three in a row!", "race_done": "Race complete! You beat the truck!", "race_lost": "Race complete! Great driving!", "goal_done": "Amazing! You finished all your races today! Your streak is growing!", "new_car": "Wow! You unlocked a new car!", "start_home": "Tap a race to start!", "leave_q": "Do you want to stop racing?", "no_mic": "I can't use the microphone. Ask a grown-up for help.", "tap_mic": "Tap the microphone, then read!", "garage": "Pick your car!", "all_done": "All races done! Try a bonus lap for extra points!", "lets_race": "Ready, steady, go!", "finish_line": "Last one! Read it to cross the finish line!", "welcome": "Hello racer! Tap a race to start!", "hello": "Hello", "well_done": "Well done", "setup_hi": "Hello racer!", "red_word": "This is a red word. We can't Fred Talk it. Listen!", "cups_look": "Look who finished their reading today!", "cup_done": "Well done! You finished today's reading. Here's your cup!", "cup_todo": "Finish all your races today to get your cup!", "cup_none": "Nobody has finished yet. Be the first to get a cup!", "race0": "Rocket Race!", "race1": "Lightning Lap!", "race2": "Superhero Sprint!", "race3": "Police Chase!", "race4": "Dino Dash!", "race5": "Space Speedway!", "race6": "Fire Truck Rescue!", "race7": "Grand Prix!", "race8": "Moto Madness!", "race9": "Sky Rally!", "bonus_lap": "Bonus lap! Extra coins!", "fred_word_s": "Fred Talk it!", "fred_sentence_s": "Fred Talk the orange words!", "sounds_intro_s": "Sound by sound!", "blend_now_s": "Now blend!", "your_turn_s": "Your turn!", "didnt_hear_s": "Try again!", "good_try_s": "Good try!", "again_s": "Have another go!", "red_word_s": "Red word! Listen!", "pit_s": "Pit stop!", "fred_again_s": "Again! Fred Talk it!", "listen_s": "Listen!", "pr9": "Super speedy!", "pr10": "You're a reading star!", "pr11": "Vroom vroom! Brilliant!", "pr12": "Wow, you read it!", "pr13": "High five!", "pr14": "Awesome reading!", "pr15": "Yes! You nailed it!", "pr16": "Champion reader!", "badge_new": "Wow! You earned a new badge!", "badges": "These are your badges! Tap one to hear how to win it.", "help_home": "Tap the race with the arrow to start. The star is a bonus lap, and the car is your garage.", "help_results": "Tap the green arrow for the next race, or the house to go home.", "help_garage": "Pick your car! The locked cars need more coins.", "wash": "Your car is muddy! Rub it to wash it!", "wash_done": "Sparkly clean! Great job!", "b_book": "Bookworm badge! Read words in your races to fill it up.", "b_streak": "Super Streak badge! Finish all your races every day to fill it up.", "b_gold": "Gold Star badge! Win gold medals in your races to fill it up.", "b_almost": "Almost there!", "b_full": "You have the rainbow one! Amazing!", "won_book": "You won a Bookworm badge!", "won_streak": "You won a Super Streak badge!", "won_gold": "You won a Gold Star badge!", "tier1": "Bronze!", "tier2": "Silver!", "tier3": "Gold!", "tier4": "Rainbow!", "shop_hi": "Welcome to the paint shop! Pick something for your car.", "shop_buy": "Do you like it? Tap the green button to buy it.", "shop_more": "You need more coins for that one. Keep reading!", "shop_yay": "Wow! Your car looks amazing!"};
 </script>
 <script>
 "use strict";
@@ -355,6 +366,7 @@ const ICON = {
   record: `<rect x="17" y="4" width="14" height="24" rx="7" fill="#fff" stroke="${INK}" stroke-width="3"/><path d="M11 22a13 13 0 0 0 26 0M24 35v7M17 43h14" fill="none" stroke="${INK}" stroke-width="3.5" stroke-linecap="round"/><circle cx="38" cy="9" r="5" fill="#ef3e36" stroke="${INK}" stroke-width="2"/>`,
   info: `<circle cx="24" cy="24" r="19" fill="#1d7bf2" stroke="${INK}" stroke-width="3"/><circle cx="24" cy="15" r="2.8" fill="#fff"/><path d="M24 22v13" stroke="#fff" stroke-width="4.5" stroke-linecap="round"/>`,
   shield: `<path d="M24 4l17 6v12c0 11-8 19-17 22C15 41 7 33 7 22V10z" fill="#5ec8ff" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/><path d="M16 23l6 6 11-12" fill="none" stroke="#fff" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>`,
+  brush: `<path d="M30 6l12 12-14 14-12-12z" fill="#1d7bf2" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/><path d="M16 20l12 12-4 4-12-12z" fill="#aab4c3" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/><path d="M12 24c-6 2-6 8-8 14 6-2 12-2 14-8" fill="#ef3e36" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/>`,
   box: `<rect x="8" y="8" width="32" height="32" rx="6" fill="#ffffff55" stroke="#ffffffaa" stroke-width="3"/>`,
 };
 function ic(name, size = 28, extra = '') { return `<svg class="ic" width="${size}" height="${size}" viewBox="0 0 48 48" aria-hidden="true" ${extra}>${ICON[name] || ''}</svg>`; }
@@ -421,6 +433,8 @@ function dayRec(k = today()) { return S.days[k] || (S.days[k] = { done: {}, coin
    and the other phones' uploads sit in S.others. Everything the child sees is this phone + the others added up,
    so no phone ever overwrites another. */
 const others = () => Object.values(S.others || {});
+function allSpent() { return (S.spent || 0) + others().reduce((t, o) => t + (o.spent || 0), 0); }
+function wallet() { return Math.max(0, allCoins() - allSpent()); }   // coins he can spend; cars unlock by coins EARNED, so spending never locks a car
 function allCoins() { return (S.coins || 0) + others().reduce((t, o) => t + (o.coins || 0), 0); }
 function view(k = today()) {   // read-only merged day
   const mine = S.days[k] || { done: {}, coins: 0, goal: false };
@@ -808,7 +822,8 @@ const EMBLEMS = {
   crown: '<path d="M-8 6 L-8 -5 L-4 -1 L0 -8 L4 -1 L8 -5 L8 6 Z" fill="#ffd23f" stroke="#1b1b3a" stroke-width="1.5" stroke-linejoin="round"/>',
 };
 const K = '#1b1b3a';
-const wheelSVG = (x, y, r) => `<g class="wheel"><circle cx="${x}" cy="${y}" r="${r}" fill="#2b2d3a" stroke="${K}" stroke-width="3"/><circle cx="${x}" cy="${y}" r="${r * .42}" fill="#d6d9e6"/><path d="M${x} ${y - r + 3} L${x} ${y + r - 3} M${x - r + 3} ${y} L${x + r - 3} ${y}" stroke="#55586b" stroke-width="3"/></g>`;
+let WHEEL = '#d6d9e6';   // hub colour of the car being drawn (paint shop)
+const wheelSVG = (x, y, r) => `<g class="wheel"><circle cx="${x}" cy="${y}" r="${r}" fill="#2b2d3a" stroke="${K}" stroke-width="3"/><circle cx="${x}" cy="${y}" r="${r * .42}" fill="${WHEEL}"/><path d="M${x} ${y - r + 3} L${x} ${y + r - 3} M${x - r + 3} ${y} L${x + r - 3} ${y}" stroke="#55586b" stroke-width="3"/></g>`;
 const faceSVG = (x, y) => `<ellipse cx="${x}" cy="${y}" rx="5.5" ry="6.5" fill="#fff"/><circle cx="${x + 2}" cy="${y + 1}" r="3.2" fill="${K}"/><ellipse cx="${x + 22}" cy="${y + 1}" rx="5.5" ry="6.5" fill="#fff"/><circle cx="${x + 24}" cy="${y + 2}" r="3.2" fill="${K}"/>`;
 const smileSVG = (x, y) => `<path d="M${x} ${y} Q${x + 14} ${y + 6} ${x + 30} ${y}" fill="none" stroke="${K}" stroke-width="3" stroke-linecap="round"/>`;
 const emblemSVG = (c, x, y) => `<g transform="translate(${x} ${y})"><circle r="12" fill="#fff" stroke="${K}" stroke-width="3"/>${EMBLEMS[c.emblem]}</g>`;
@@ -861,8 +876,9 @@ const SHAPES = {
     <path d="M32 72 L176 72" stroke="${c.accent}" stroke-width="6" stroke-linecap="round"/>${emblemSVG(c, 66, 64)}
     ${wheelSVG(60, 86, 16)}${wheelSVG(160, 86, 16)}`,
 };
-function carSVG(i, w = 160) {
-  const c = CARS[i] || CARS[0];
+function carSVG(i, w = 160, mine = true, preview = null) {   // mine: show this child's paint-shop changes
+  const c = { ...(CARS[i] || CARS[0]), ...(mine ? ((S.mods || {})[i] || {}) : {}), ...(preview || {}) };
+  WHEEL = c.wheel || '#d6d9e6';
   if (c.shape && SHAPES[c.shape]) return `<svg viewBox="0 0 200 112" width="${w}" height="${w * 112 / 200}" aria-label="${esc(c.name)}">${SHAPES[c.shape](c)}</svg>`;
   return `<svg viewBox="0 0 200 112" width="${w}" height="${w * 112 / 200}" aria-label="${esc(c.name)}">
   <ellipse cx="102" cy="104" rx="84" ry="6" fill="#0000003a"/>
@@ -876,8 +892,8 @@ function carSVG(i, w = 160) {
   <path d="M28 70 L180 70" stroke="${c.accent}" stroke-width="6" stroke-linecap="round"/>
   <circle cx="186" cy="66" r="4" fill="#fff6a8" stroke="#1b1b3a" stroke-width="2"/>
   <g transform="translate(64 66)"><circle r="12" fill="#fff" stroke="#1b1b3a" stroke-width="3"/>${EMBLEMS[c.emblem]}</g>
-  <g class="wheel"><circle cx="58" cy="84" r="17" fill="#2b2d3a" stroke="#1b1b3a" stroke-width="3"/><circle cx="58" cy="84" r="7" fill="#d6d9e6"/><path d="M58 70 L58 98 M44 84 L72 84" stroke="#55586b" stroke-width="3"/></g>
-  <g class="wheel"><circle cx="156" cy="84" r="17" fill="#2b2d3a" stroke="#1b1b3a" stroke-width="3"/><circle cx="156" cy="84" r="7" fill="#d6d9e6"/><path d="M156 70 L156 98 M142 84 L170 84" stroke="#55586b" stroke-width="3"/></g>
+  <g class="wheel"><circle cx="58" cy="84" r="17" fill="#2b2d3a" stroke="#1b1b3a" stroke-width="3"/><circle cx="58" cy="84" r="7" fill="${WHEEL}"/><path d="M58 70 L58 98 M44 84 L72 84" stroke="#55586b" stroke-width="3"/></g>
+  <g class="wheel"><circle cx="156" cy="84" r="17" fill="#2b2d3a" stroke="#1b1b3a" stroke-width="3"/><circle cx="156" cy="84" r="7" fill="${WHEEL}"/><path d="M156 70 L156 98 M142 84 L170 84" stroke="#55586b" stroke-width="3"/></g>
 </svg>`;
 }
 function truckSVG(w = 64) {
@@ -938,7 +954,7 @@ function coin(size = 24) {
 function renderHome() {
   const st = currentStreak();
   $('#streakChip').innerHTML = ic('flame', 32) + ' ' + st;
-  $('#coinChip').innerHTML = coin(26) + ' ' + allCoins();
+  $('#coinChip').innerHTML = coin(26) + ' ' + wallet();
   checkBadges();
   const nc = $('#nameChip'); nc.style.display = S.name ? '' : 'none'; nc.textContent = S.name;
   if (!S.setupDone) setTimeout(setupWizard, 50);
@@ -1099,12 +1115,50 @@ function carWash() {
     say('wash');
   });
 }
+/* ---- paint shop: spend coins on looks for a car. Each thing is bought once per car and kept. ---- */
+const SHOP = [
+  { id: 'body', label: 'Paint', icon: 'brush', price: 150, opts: ['#ef3e36', '#ff8c1a', '#ffd23f', '#2bb673', '#14c1b5', '#1d7bf2', '#3a3f8f', '#8e44ad', '#ff7ab6', '#2b2d3a', '#ffffff', '#aab4c3'] },
+  { id: 'accent', label: 'Stripes', icon: 'flag', price: 100, opts: ['#ffffff', '#ffd23f', '#ef3e36', '#2bb673', '#1d7bf2', '#5ef2d6', '#ff7ab6', '#2b2d3a'] },
+  { id: 'emblem', label: 'Sticker', icon: 'star', price: 100, opts: Object.keys(EMBLEMS) },
+  { id: 'wheel', label: 'Wheels', icon: 'refresh', price: 300, opts: ['#d6d9e6', '#ffd23f', '#ef3e36', '#1d7bf2', '#2bb673', '#ff7ab6'] },
+];
+const ownedKey = (car, part, val) => `${car}|${part}|${val}`;
+function owns(car, part, val) { return (CARS[car] || {})[part] === val || !!(S.owned || {})[ownedKey(car, part, val)]; }
+function paintShop(car = S.car, tab = 'body', pick = null) {
+  const t = SHOP.find(x => x.id === tab), cur = { ...CARS[car], ...((S.mods || {})[car] || {}) };
+  const val = pick ?? cur[tab], has = owns(car, tab, val), can = wallet() >= t.price, changed = val !== cur[tab];
+  const sw = v => tab === 'emblem'
+    ? `<button class="sw" data-v="${v}" style="background:#fff" aria-label="${v}"><svg width="34" height="34" viewBox="-12 -12 24 24">${EMBLEMS[v]}</svg>${owns(car, tab, v) ? '' : `<i>${ic('lock', 14)}</i>`}</button>`
+    : `<button class="sw ${tab === 'wheel' ? 'wh' : ''}" data-v="${v}" style="background:${v}" aria-label="colour">${owns(car, tab, v) ? '' : `<i>${ic('lock', 14)}</i>`}</button>`;
+  modal(`<div style="display:flex;justify-content:space-between;align-items:center"><h2 style="display:flex;align-items:center;gap:8px">${coin(28)} ${wallet()}</h2><button class="iconbtn" style="background:#eee;color:#333" id="shopX" aria-label="Close">${ic('close', 22)}</button></div>
+    <div class="shopcar">${carSVG(car, 260, true, { [tab]: val })}</div>
+    <div class="shoptabs">${SHOP.map(x => `<button data-t="${x.id}" class="${x.id === tab ? 'on' : ''}">${ic(x.icon, 26)}<b>${x.label}</b></button>`).join('')}</div>
+    <div class="swatches">${t.opts.map(v => sw(v).replace('class="sw', `class="sw ${v === val ? 'sel' : ''}`)).join('')}</div>
+    <div class="shopact">${!changed ? `<div class="hint" style="text-align:center">Tap a ${t.label.toLowerCase()} to try it</div>`
+      : has ? `<button class="btn g" id="shopUse">${ic('check', 26)} Use it</button>`
+      : can ? `<button class="btn g" id="shopBuy">${ic('check', 26)} Buy ${coin(26)} ${t.price}</button>`
+      : `<button class="btn w" disabled style="opacity:.7">${ic('lock', 24)} ${coin(24)} ${t.price}</button>`}</div>`);
+  $('#shopX').onclick = () => { closeModal(); garage(); };
+  document.querySelectorAll('.shoptabs button').forEach(b => b.onclick = () => paintShop(car, b.dataset.t));
+  document.querySelectorAll('.swatches .sw').forEach(b => b.onclick = () => {
+    const v = b.dataset.v; paintShop(car, tab, v);
+    if (v === cur[tab]) return;
+    stopAudio(); say(owns(car, tab, v) ? 'shop_yay' : wallet() >= t.price ? 'shop_buy' : 'shop_more');
+  });
+  const apply = () => { S.mods = S.mods || {}; S.mods[car] = { ...(S.mods[car] || {}), [tab]: val }; save(); sfxWin(); confetti(30); stopAudio(); say('shop_yay'); renderHome(); paintShop(car, tab); };
+  const use = $('#shopUse'); if (use) use.onclick = apply;
+  const buy = $('#shopBuy'); if (buy) buy.onclick = () => {
+    if (wallet() < t.price) return;
+    S.spent = (S.spent || 0) + t.price; S.owned = S.owned || {}; S.owned[ownedKey(car, tab, val)] = 1; sfxCoin(); apply(); sync();
+  };
+}
 function garage() {
-  modal(`<div style="display:flex;justify-content:space-between;align-items:center"><h2 style="display:flex;align-items:center;gap:8px">${coin(28)} ${allCoins()}</h2><button class="iconbtn" style="background:#eee;color:#333" onclick="closeModal()" aria-label="Close">${ic('close', 22)}</button></div><div class="garage">${CARS.map((c, i) => {
+  modal(`<div style="display:flex;justify-content:space-between;align-items:center"><h2 style="display:flex;align-items:center;gap:8px">${coin(28)} ${allCoins()}</h2><button class="iconbtn" style="background:#eee;color:#333" onclick="closeModal()" aria-label="Close">${ic('close', 22)}</button></div><button class="btn g shopbtn" id="toShop">${ic('brush', 28)} Paint shop</button><div class="garage">${CARS.map((c, i) => {
     const locked = allCoins() < c.at;
     return `<button class="gcar ${i === S.car ? 'sel' : ''} ${locked ? 'locked' : ''}" data-i="${i}" ${locked ? 'disabled' : ''}>${carSVG(i, 130)}<div class="gst">${locked ? ic('lock', 22) + ' ' + coin(20) + ' ' + c.at : i === S.car ? ic('check', 28) : ic('play', 26)}</div></button>`;
   }).join('')}</div>`);
   say('help_garage');
+  $('#toShop').onclick = () => { stopAudio(); paintShop(S.car); say('shop_hi'); };
   document.querySelectorAll('.gcar:not(.locked)').forEach(b => b.onclick = () => { S.car = +b.dataset.i; save(); sfxVroom(); closeModal(); renderHome(); });
 }
 
@@ -1645,7 +1699,7 @@ async function openBoard() {
   dupNote(list);
   const meDone = !!d.goal;
   const mine = meDone ? '' : `<div class="lbrow me">${carSVG(S.car, 70)}<div class="nm">${esc(S.name || '')}</div><div style="display:flex;gap:2px">${Array.from({ length: need }, (_, i) => i < done ? ic('flag', 26) : ic('box', 26)).join('')}</div></div>`;
-  $('#boardBody').innerHTML = `<div class="lblist">${mine}${list.map(x => `<div class="lbrow ${x.player === S.lb.player ? 'me' : ''}"><div class="rk">${ic('trophy', 36)}</div>${carSVG(x.car, 70)}<div class="nm">${esc(x.name)}</div></div>`).join('')}</div>`;
+  $('#boardBody').innerHTML = `<div class="lblist">${mine}${list.map(x => `<div class="lbrow ${x.player === S.lb.player ? 'me' : ''}"><div class="rk">${ic('trophy', 36)}</div>${carSVG(x.car, 70, false)}<div class="nm">${esc(x.name)}</div></div>`).join('')}</div>`;
   if (meDone) await say('cup_done');
   else { await say(list.length ? 'cups_look' : 'cup_none'); await say('cup_todo'); }
 }
@@ -1668,7 +1722,7 @@ async function checkDupName() {
 function ledger() {
   const days = {}; Object.keys(S.days).sort().slice(-120).forEach(k => { const d = S.days[k]; days[k] = { done: d.done || {}, coins: d.coins || 0, goal: !!d.goal, words: d.words || 0, help: d.help || {} }; });
   const stats = {}; Object.entries(S.stats || {}).sort((a, b) => b[1].seen - a[1].seen).slice(0, 400).forEach(([w, x]) => stats[w] = x);
-  return { coins: S.coins || 0, raceCount: S.raceCount || 0, turbos: S.turbos || 0, best: S.best || 0, days, stats };
+  return { coins: S.coins || 0, spent: S.spent || 0, raceCount: S.raceCount || 0, turbos: S.turbos || 0, best: S.best || 0, days, stats };
 }
 let syncing = null;
 async function syncPush() {
