@@ -686,6 +686,16 @@ function stopAudio() { try { curSrc && curSrc.stop(); } catch (e) {} curSrc = nu
 // and keeps working after the microphone has been used. Web Audio is only a backup.
 function setSession(type) { try { if (navigator.audioSession) navigator.audioSession.type = type; } catch (e) {} }
 setSession('playback');
+// iPhone "electric" voice fix: before the game talks, wait for the mic to fully close (max 1.5 s),
+// then switch back to loudspeaker and give the phone a moment to change over.
+async function micSettled() {
+  let w; try { w = recEnded; } catch (e) { return; }
+  let open = true; w.then(() => { open = false; });
+  await sleep(0); if (!open) return;
+  await Promise.race([w, sleep(1500)]);
+  try { if (recEnded === w) recEnded = Promise.resolve(); } catch (e) {}
+  setSession('playback'); await sleep(150);
+}
 const player = new Audio(); player.preload = 'auto'; player.setAttribute('playsinline', '');
 const urlCache = {};
 function clipUrl(key) {
@@ -701,6 +711,7 @@ async function playKey(key) {
   if (!AUDIO[key]) await allAudio;
   await loadWordVoice(key);
   const url = clipUrl(key); if (!url) return false;
+  await micSettled();
   setSession('playback');
   if (curDone) curDone();
   try { curSrc && curSrc.stop(); } catch (e) {}
@@ -726,7 +737,8 @@ async function playKeyWA(key) {
   await new Promise(r => { src.onended = r; src.start(); setTimeout(r, buf.duration * 1000 + 300); });
   if (curSrc === src) curSrc = null; return true;
 }
-function deviceSpeak(text, rate = .85) {
+async function deviceSpeak(text, rate = .85) {
+  await micSettled(); setSession('playback');
   return new Promise(res => {
     if (!('speechSynthesis' in window)) return res();
     let done = false; const fin = () => { if (!done) { done = true; res(); } };
