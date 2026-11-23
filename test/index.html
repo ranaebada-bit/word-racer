@@ -1628,7 +1628,7 @@ function pSettings() {
       <p class="hint">Relaxed: small mishearings like “hell” for <i>hill</i> still count.</p>
       ${micTestBlock()}
       ${SR ? '' : '<div class="note"><b>This browser can’t listen.</b> On iPhone, open the game in Safari.</div>'}${micBlocked ? '<div class="note">The microphone was blocked on this page.</div>' : ''}`)}
-    ${sec('reset', ic('trash', 26), 'Start over', '', `<p class="hint">Clears coins, streak, cars and stats on this phone. The homework and name stay.</p><button class="btn r" id="resetAll">Reset coins, streak and stats</button>`)}
+    ${sec('reset', ic('trash', 26), 'Start over', '', `<p class="hint">Clears coins, streak, cars and stats on this phone. The homework and name stay.</p><button class="btn r" id="resetAll">Reset coins, streak and stats</button>${IS_TEST ? '<button class="btn w" id="testFresh" style="margin-top:8px">Test copy: start fresh (setup again)</button><button class="btn w" id="testLoad" style="margin-top:8px">Test copy: load test data</button>' : ''}`)}
   </div>`;
   trackSecs();
   const bind = (id, fn) => $(id).onchange = e => { fn(e.target.value); save(); toast('Saved ✓'); };
@@ -1636,6 +1636,8 @@ function pSettings() {
   bind('#sCome', v => S.settings.comebacks = +v); bind('#sGoal', v => S.settings.goal = v === 'all' ? 'all' : +v);
   bindName(pSettings); bindClass(); bindLink(); checkDupName();
   bind('#sDots', v => S.settings.dots = v === '1'); bind('#sStrict', v => S.settings.strict = v === '1'); bindMicTest();
+  const tf = $('#testFresh'); if (tf) tf.onclick = () => { S = fresh(); save(); renderHome(); show('home'); };
+  const tl = $('#testLoad'); if (tl) tl.onclick = loadTestData;
   $('#resetAll').onclick = () => {
     modal(`<h2>Reset coins, streak, cars and stats?</h2><p class="hint">The homework stays.</p><div style="display:flex;gap:10px"><button class="btn w" style="flex:1" onclick="closeModal()">Cancel</button><button class="btn r" style="flex:1" id="rsYes">Reset</button></div>`);
     $('#rsYes').onclick = () => { const keep = { homework: S.homework, review: S.review, settings: S.settings, name: S.name, nameRec: S.nameRec, lb: S.lb, setupDone: true }; S = { ...fresh(), ...keep }; save(); closeModal(); toast('Reset'); pSettings(); };
@@ -1751,13 +1753,24 @@ function pHelp() {
   </div>`;
   bindMicTest(); bindFeedback();
 }
+/* test copy only: fill the game with sample data so every screen can be checked straight away */
+function loadTestData() {
+  const d = n => addDays(today(), -n), days = {};
+  [1, 3, 4, 5, 6, 8, 9].forEach((n, j) => days[d(n)] = { done: { 0: 3, 1: j % 3 ? 3 : 2, 2: 3, 3: 1 }, goal: true, words: 26, coins: 90, help: j % 2 ? { egg: 1, hill: 1 } : { yell: 1 } });
+  days[d(7)] = { done: { 0: 2 }, goal: false, words: 8, coins: 20 };
+  S = { ...fresh(), name: 'Tester', homework: DEFAULT_HW, setupDone: true, firstMicDone: true, coins: 1400, car: 3, raceCount: 30, turbos: 4, best: 6, days,
+    stats: { egg: { seen: 5, first: 2, miss: 3 }, hill: { seen: 4, first: 2, miss: 2 }, yell: { seen: 3, first: 2, miss: 1 }, red: { seen: 6, first: 6, miss: 0 } },
+    heard: [{ t: 'hill', h: 'till', ok: false, at: '17:02' }, { t: 'egg', h: 'leg', ok: false, at: '17:01' }, { t: 'red', h: 'red', ok: true, at: '17:00' }],
+    lb: { cls: '', on: true, player: 'test' + Math.random().toString(36).slice(2, 8), phone: 'ptest' } };
+  refreshRed(); checkBadges(); save(); closeModal(); renderHome(); show('home'); toast('Test data loaded ✓');
+}
 function setupWizard(step = 0) {
   if (S.setupDone || (step === 0 && $('#modalBg').classList.contains('on'))) return;
   const N = 4, dots = `<div class="steps">${Array.from({ length: N }, (_, i) => `<i class="${i <= step ? 'on' : ''}"></i>`).join('')}</div>`;
   const nav = (next, label = 'Next →') => `<div style="display:flex;gap:10px;margin-top:6px">${step ? '<button class="btn w" style="flex:1" id="suBack">← Back</button>' : ''}<button class="btn g" style="flex:2" id="suNext">${label}</button></div>`;
   const body = [
     () => `<h2 style="display:flex;align-items:center;gap:8px">${carSVG(0, 56)} Welcome to Word Racer</h2><p class="hint">A 1-minute setup for grown-ups. You can change everything later with ${ic('gear', 18)}.</p>
-      <div class="panel" style="padding:0">${nameBlock()}</div>${nav()}`,
+      <div class="panel" style="padding:0">${nameBlock()}</div>${nav()}${IS_TEST ? '<button class="btn w" id="suTest" style="width:100%;margin-top:10px;border-color:#ef3e36;color:#ef3e36">Skip setup: load test data</button>' : ''}`,
     () => `<h2 style="display:flex;align-items:center;gap:8px">${ic('books', 34)} This week's homework</h2><p class="hint">Paste the words with commas between them, and each sentence on its own line. You can add or change it any time.</p>
       <textarea class="hw" id="suHw" style="min-height:150px" spellcheck="false" autocapitalize="off" placeholder="Words: cat, hen, zip, fox
 Sentences:
@@ -1768,7 +1781,7 @@ get a pen">${esc(S.homework)}</textarea>${nav()}`,
     () => `<h2 style="display:flex;align-items:center;gap:8px">${ic('mic', 34)} Last step</h2>${micTestBlock()}<div style="height:8px"></div>${homeTip()}${nav(0, `Let's race! ${ic('flag', 22)}`)}`,
   ];
   modal(dots + body[step]());
-  if (step === 0) bindName();
+  if (step === 0) { bindName(); const st = $('#suTest'); if (st) st.onclick = loadTestData; }
   if (step === 2) bindClass();
   if (step === 3) bindMicTest();
   const keepHw = () => { const t = $('#suHw'); if (t) { S.homework = t.value; refreshRed(); save(); } };
