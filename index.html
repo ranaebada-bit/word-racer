@@ -209,6 +209,7 @@ details.sec .sb{padding:0 2px 14px;display:flex;flex-direction:column;gap:8px}
 .ghint{display:flex;align-items:center;gap:6px;margin:12px 0 4px;font-weight:800;color:#555;font-size:15px}
 .gcar.spc{background:linear-gradient(135deg,#fff6d6,#ffe1f2)}
 .gcar.spc.locked{opacity:1}
+.nleft{font-weight:800;font-size:14px;white-space:nowrap}
 .shopcars{display:flex;gap:6px;overflow-x:auto;padding:6px 2px;margin-top:4px}.shopcars button{flex:none;border-radius:12px;background:#f1f3ff;padding:2px;border:3px solid transparent}.shopcars button.on{border-color:var(--blue);background:#e1efff}
 .shopbtn{width:100%;margin:8px 0;display:flex;align-items:center;justify-content:center;gap:8px}
 .shopcar{display:flex;justify-content:center;background:radial-gradient(circle at 50% 80%,#ffd23f44,transparent 60%),#eef1ff;border-radius:20px;padding:10px 0;margin:8px 0}
@@ -428,7 +429,20 @@ const CARS = [
   { name: 'Dragon Rocket', shape: 'rocket', body: '#2bb673', accent: '#ef3e36', emblem: 'flame', at: Infinity, price: 2500, special: true },
   { name: 'Rainbow Monster', shape: 'monster', body: '#ff7ab6', accent: '#5ef2d6', emblem: 'star', at: Infinity, price: 3500, special: true },
 ];
-const hasCar = i => CARS[i] && (CARS[i].special ? !!(S.owned || {})['car|' + i] : allCoins() >= CARS[i].at);
+// Switches for features that are built but not turned on yet
+const FEATURES = { shop: false, carsByRaces: false };
+const RACES_PER_CAR = 10;
+function carBase() {   // when "cars by races" starts: cars already unlocked by coins stay unlocked
+  if (!S.carBase) { const first = CARS.findIndex(c => !c.special && allCoins() < c.at); S.carBase = { races: totals().races, first: first < 0 ? CARS.length : first }; save(); }
+  return S.carBase;
+}
+const racesNeeded = i => { const b = carBase(); return b.races + RACES_PER_CAR * (i - b.first + 1); };
+function readingCarUnlocked(i) {
+  if (!FEATURES.carsByRaces) return allCoins() >= CARS[i].at;
+  const b = carBase(); return i < b.first || totals().races >= racesNeeded(i);
+}
+const hasCar = i => CARS[i] && (CARS[i].special ? !!(S.owned || {})['car|' + i] : readingCarUnlocked(i));
+const nextReadingCar = () => CARS.findIndex((c, i) => !c.special && !hasCar(i));
 function fresh() {
   return { homework: '', name: '', nameRec: null, setupDone: false, review: [], lb: { cls: '', on: true, player: Math.random().toString(36).slice(2, 12) },
     settings: { tries: { read: 1, fred: 1, sounds: 1, sound: 2 }, comebacks: 2, goal: 'all', useMic: true, dots: true },
@@ -450,7 +464,7 @@ function dayRec(k = today()) { return S.days[k] || (S.days[k] = { done: {}, coin
    so no phone ever overwrites another. */
 const others = () => Object.values(S.others || {});
 function allSpent() { return (S.spent || 0) + others().reduce((t, o) => t + (o.spent || 0), 0); }
-function wallet() { return Math.max(0, allCoins() - allSpent()); }   // coins he can spend; cars unlock by coins EARNED, so spending never locks a car
+function wallet() { return FEATURES.shop ? Math.max(0, allCoins() - allSpent()) : allCoins(); }   // coins he can spend; cars unlock by coins EARNED, so spending never locks a car
 function allCoins() { return (S.coins || 0) + others().reduce((t, o) => t + (o.coins || 0), 0); }
 function view(k = today()) {   // read-only merged day
   const mine = S.days[k] || { done: {}, coins: 0, goal: false };
@@ -975,10 +989,13 @@ function renderHome() {
   const nc = $('#nameChip'); nc.style.display = S.name ? '' : 'none'; nc.textContent = S.name;
   if (!S.setupDone) setTimeout(setupWizard, 50);
   $('#heroCar').innerHTML = carSVG(S.car, 170);
-  const pb = $('#paintBtn'); pb.innerHTML = ic('brush', 30) + (canBuySomething() ? '<i class="dot"></i>' : ''); pb.classList.toggle('glow', canBuySomething()); pb.onclick = () => { stopAudio(); paintShop(S.car); say('shop_hi'); };
-  const coinsNow = allCoins(), ni = CARS.findIndex(c => !c.special && c.at > coinsNow);
-  if (ni >= 0) {
-    const prev = ni > 0 ? CARS[ni - 1].at : 0, pct = Math.max(4, Math.min(100, (coinsNow - prev) / (CARS[ni].at - prev) * 100));
+  const pb = $('#paintBtn'); pb.style.display = FEATURES.shop ? '' : 'none'; pb.innerHTML = ic('brush', 30) + (canBuySomething() ? '<i class="dot"></i>' : ''); pb.classList.toggle('glow', canBuySomething()); pb.onclick = () => { stopAudio(); paintShop(S.car); say('shop_hi'); };
+  const ni = nextReadingCar();
+  if (ni >= 0 && FEATURES.carsByRaces) {
+    const need = racesNeeded(ni), left = Math.max(0, need - totals().races), pct = Math.max(4, Math.min(100, (RACES_PER_CAR - left) / RACES_PER_CAR * 100));
+    $('#nextCar').innerHTML = `${ic('flag', 24)}<div class="bar"><i style="width:${pct}%"></i></div><span class="nc">${carSVG(ni, 64)}</span><span class="nleft">${left} ${left === 1 ? 'race' : 'races'}</span>`;
+  } else if (ni >= 0) {
+    const coinsNow = allCoins(), prev = ni > 0 ? CARS[ni - 1].at : 0, pct = Math.max(4, Math.min(100, (coinsNow - prev) / (CARS[ni].at - prev) * 100));
     $('#nextCar').innerHTML = `${coin(22)}<div class="bar"><i style="width:${pct}%"></i></div><span class="nc">${carSVG(ni, 64)}</span>${ic('lock', 22)}`;
   } else $('#nextCar').innerHTML = '';
   const wk = [];
@@ -1145,7 +1162,7 @@ function owns(car, part, val) {
   return (CARS[car] || {})[part] === val || !!(S.owned || {})[ownedKey(part, val)];
 }
 const unlockedCars = () => CARS.map((c, i) => i).filter(hasCar);
-function canBuySomething() { return SHOP.some(t => wallet() >= t.price && t.opts.some(v => !owns(S.car, t.id, v))); }
+function canBuySomething() { if (!FEATURES.shop) return false; return SHOP.some(t => wallet() >= t.price && t.opts.some(v => !owns(S.car, t.id, v))); }
 function paintShop(car = S.car, tab = 'body', pick = null) {
   const t = SHOP.find(x => x.id === tab), cur = { ...CARS[car], ...((S.mods || {})[car] || {}) };
   const val = pick ?? cur[tab], has = owns(car, tab, val), can = wallet() >= t.price, changed = val !== cur[tab];
@@ -1179,6 +1196,7 @@ function paintShop(car = S.car, tab = 'body', pick = null) {
   };
 }
 function garageTabs(on) {
+  if (!FEATURES.shop) return '';
   return `<div class="gtabs"><button data-g="cars" class="${on === 'cars' ? 'on' : ''}">${carSVG(S.car, 44)}<b>Cars</b></button><button data-g="shop" class="${on === 'shop' ? 'on' : ''}">${ic('brush', 28)}<b>Paint shop</b></button></div>`;
 }
 function bindGarageTabs() {
@@ -1187,15 +1205,15 @@ function bindGarageTabs() {
 function garage() {
   const card = i => {
     const c = CARS[i], has = hasCar(i);
-    const st = has ? (i === S.car ? ic('check', 28) : ic('play', 26)) : c.special ? `${coin(20)} ${c.price}` : `${ic('lock', 22)} ${coin(20)} ${c.at}`;
+    const st = has ? (i === S.car ? ic('check', 28) : ic('play', 26)) : c.special ? `${coin(20)} ${c.price}` : FEATURES.carsByRaces ? `${ic('lock', 22)} ${ic('flag', 20)} ${Math.max(0, racesNeeded(i) - totals().races)}` : `${ic('lock', 22)} ${coin(20)} ${c.at}`;
     return `<button class="gcar ${i === S.car ? 'sel' : ''} ${has ? '' : 'locked'} ${c.special ? 'spc' : ''}" data-i="${i}">${carSVG(i, 130)}<div class="gst">${st}</div></button>`;
   };
-  const all = CARS.map((c, i) => i), mine = all.filter(hasCar), toBuy = all.filter(i => CARS[i].special && !hasCar(i)), toRead = all.filter(i => !CARS[i].special && !hasCar(i));
+  const all = CARS.map((c, i) => i), mine = all.filter(hasCar), toBuy = FEATURES.shop ? all.filter(i => CARS[i].special && !hasCar(i)) : [], toRead = all.filter(i => !CARS[i].special && !hasCar(i));
   modal(`<div style="display:flex;justify-content:space-between;align-items:center"><h2 style="display:flex;align-items:center;gap:8px">${coin(28)} ${wallet()}</h2><button class="iconbtn" style="background:#eee;color:#333" onclick="closeModal()" aria-label="Close">${ic('close', 22)}</button></div>
     ${garageTabs('cars')}
     <p class="ghint">${ic('check', 20)} My cars</p><div class="garage">${mine.map(card).join('')}</div>
     ${toBuy.length ? `<p class="ghint">${ic('shine', 20)} Buy with coins</p><div class="garage">${toBuy.map(card).join('')}</div>` : ''}
-    ${toRead.length ? `<p class="ghint">${ic('book', 20)} Read to unlock</p><div class="garage">${toRead.map(card).join('')}</div>` : ''}`);
+    ${toRead.length ? `<p class="ghint">${ic(FEATURES.carsByRaces ? 'flag' : 'book', 20)} ${FEATURES.carsByRaces ? 'Finish races to unlock' : 'Read to unlock'}</p><div class="garage">${toRead.map(card).join('')}</div>` : ''}`);
   say('help_garage'); bindGarageTabs();
   document.querySelectorAll('.gcar').forEach(b => b.onclick = () => {
     const i = +b.dataset.i, c = CARS[i];
@@ -1396,7 +1414,7 @@ function pitStop() { const it = R.cur.it; if (it.comeback >= S.settings.comeback
 function award(n) {
   if (!n) return; const before = allCoins();
   S.coins += n; R.coins += n; dayRec().coins += n;
-  const after = allCoins(), unl = CARS.findIndex(c => before < c.at && after >= c.at); if (unl >= 0) R.unlocked = unl;
+  const after = allCoins(), unl = CARS.findIndex(c => before < c.at && after >= c.at); if (unl >= 0 && !FEATURES.carsByRaces) R.unlocked = unl;
   const el = $('#raceCoins'); el.innerHTML = coin(22) + ' ' + R.coins; el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop'); sfxCoin(); save();
 }
 function stat(it, firstTry, missed) { const k = norm(plain(it.text)); const s = S.stats[k] || (S.stats[k] = { seen: 0, first: 0, miss: 0 }); s.seen++; if (firstTry) s.first++; if (missed) { s.miss++; const d = dayRec(); d.help = d.help || {}; d.help[k] = (d.help[k] || 0) + 1; } }
@@ -1423,7 +1441,7 @@ function advance() { if (!R || R.dead) return; const r = R; setBusy(true); R.idx
 async function finishRace() {
   if (!R || R.dead) return;
   R.dead = true; // finished: nothing from this race may run again
-  const m = R.meta; let bonus = 0, goalNow = false;
+  const m = R.meta; let bonus = 0, goalNow = false; const carBefore = FEATURES.carsByRaces ? nextReadingCar() : -1;
   const ratio = R.scored ? R.firstTry / R.scored : 1;
   const won = R.rival < R.queue.length;
   const medal = won ? (ratio >= .8 ? 3 : ratio >= .5 ? 2 : 1) : 1;
@@ -1437,6 +1455,7 @@ async function finishRace() {
     }
   } else bonus = 3;
   S.raceCount = (S.raceCount || 0) + 1;
+  if (carBefore >= 0 && hasCar(carBefore)) R.unlocked = carBefore;
   award(bonus); save(); if (goalNow) lbSubmit();
   sync();
   const newBadges = checkBadges();
@@ -1456,7 +1475,7 @@ async function finishRace() {
       <button class="bigbtn" id="resHelp" aria-label="What do I do?" style="flex:.6">${ic('speaker', 48)}</button>
       ${next >= 0 ? `<button class="bigbtn g" id="resNext" aria-label="Next race">${ic('play', 60)}</button>` : `<button class="bigbtn y" id="resBonus" aria-label="Bonus">${ic('star', 60)}</button>`}
     </div>`;
-  if (m.race != null) await carWash();
+  if (m.race != null && view().goal && !dayRec().washed) { dayRec().washed = 1; save(); await carWash(); }   // once a day, after the last race
   show('results');
   document.querySelectorAll('[data-say]').forEach(s => s.onclick = () => { const t = s.dataset.say; t.includes(' ') ? saySentence(t) : sayWord(t); });
   $('#resHome').onclick = () => { stopAudio(); renderHome(); show('home'); };
