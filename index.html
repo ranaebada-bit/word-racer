@@ -236,6 +236,7 @@ table{width:100%;border-collapse:collapse;font-size:15px}td,th{padding:6px 4px;b
 <script>
 const AUDIO = {};
 const AUDIO_PACKS = ["core", "w1", "w2", "w3", "w4"];
+const EXTRA_PACKS = [["x1", "a", "c"], ["x2", "d", "k"], ["x3", "l", "r"], ["x4", "s", "z"]];
 const PHRASES = {"read_word": "Read the word!", "read_sentence": "Read the sentence!", "what_sound": "What sound is this?", "pit": "Pit stop! This one came back. Can you read it?", "pit_sound": "Pit stop! What sound is this?", "fred_word": "Not quite. Fred Talk it! Say the sounds, then blend them.", "fred_sentence": "Not quite. Fred Talk the orange words, then read it again.", "again": "Nearly! Have another go.", "fred_again": "Fred Talk it again, then blend!", "sound_again": "Nearly! Say the sound again.", "sounds_intro": "Let's go sound by sound. Say each sound when it lights up.", "blend_now": "Now blend them! Tap and say the word.", "listen": "Listen to me.", "your_turn_word": "Your turn! Say the word.", "your_turn_sentence": "Your turn! Read it to me.", "your_turn_sound": "Now you say it!", "didnt_hear": "I didn't hear you. Tap and try again!", "didnt_hear2": "Say it nice and loud, close to the phone!", "good_try": "Good try! We'll come back to it.", "great_job": "Great job!", "pr1": "Brilliant!", "pr2": "Super reader!", "pr3": "Zoom zoom! Yes!", "pr4": "Fantastic!", "pr5": "You did it!", "pr6": "Amazing!", "pr7": "Turbo reading!", "pr8": "Wow, great blending!", "spr1": "Yes! That's the sound!", "spr2": "Great sound!", "spr3": "Perfect!", "turbo": "Turbo boost! Three in a row!", "race_done": "Race complete! You beat the truck!", "race_lost": "Race complete! Great driving!", "goal_done": "Amazing! You finished all your races today! Your streak is growing!", "new_car": "Wow! You unlocked a new car!", "start_home": "Tap a race to start!", "leave_q": "Do you want to stop racing?", "no_mic": "I can't use the microphone. Ask a grown-up for help.", "tap_mic": "Tap the microphone, then read!", "garage": "Pick your car!", "all_done": "All races done! Try a bonus lap for extra points!", "lets_race": "Ready, steady, go!", "finish_line": "Last one! Read it to cross the finish line!", "welcome": "Hello racer! Tap a race to start!", "hello": "Hello", "well_done": "Well done", "setup_hi": "Hello racer!", "red_word": "This is a red word. We can't Fred Talk it. Listen!", "cups_look": "Look who finished their reading today!", "cup_done": "Well done! You finished today's reading. Here's your cup!", "cup_todo": "Finish all your races today to get your cup!", "cup_none": "Nobody has finished yet. Be the first to get a cup!", "race0": "Rocket Race!", "race1": "Lightning Lap!", "race2": "Superhero Sprint!", "race3": "Police Chase!", "race4": "Dino Dash!", "race5": "Space Speedway!", "race6": "Fire Truck Rescue!", "race7": "Grand Prix!", "race8": "Moto Madness!", "race9": "Sky Rally!", "bonus_lap": "Bonus lap! Extra coins!", "fred_word_s": "Fred Talk it!", "fred_sentence_s": "Fred Talk the orange words!", "sounds_intro_s": "Sound by sound!", "blend_now_s": "Now blend!", "your_turn_s": "Your turn!", "didnt_hear_s": "Try again!", "good_try_s": "Good try!", "again_s": "Have another go!", "red_word_s": "Red word! Listen!", "pit_s": "Pit stop!", "fred_again_s": "Again! Fred Talk it!", "listen_s": "Listen!"};
 </script>
 <script>
@@ -379,9 +380,9 @@ function buildPlan() {
 function todayPlan() {
   const d = dayRec(); const key = hashStr(S.homework);
   if (!d.plan || d.planKey !== key) {
-    // homework changed: build new races but keep the medals already won today
-    const won = Object.values(d.done || {}); d.plan = buildPlan(); d.planKey = key; d.done = {};
-    won.slice(0, d.plan.length).forEach((m, i) => d.done[i] = m); save();
+    // homework changed: build new races. Old medals are not copied onto the new races (that hid new words);
+    // if today's goal was already reached it stays reached, so the streak is safe.
+    d.plan = buildPlan(); d.planKey = key; d.done = {}; save();
   }
   return d.plan;
 }
@@ -403,9 +404,18 @@ function loadPack(name) {
   return packP[name] || (packP[name] = fetch('audio/' + name + '.json').then(r => r.ok ? r.json() : {}).then(o => { Object.assign(AUDIO, o); }).catch(() => { delete packP[name]; }));
 }
 const allAudio = (async () => { for (const p of AUDIO_PACKS) await loadPack(p); })();
+// extra word voices (about 2,800 more words): split by first letter, loaded only when a word needs them
+const extraPack = w => { const c = (w || '')[0] || 'a'; const p = EXTRA_PACKS.find(p => c >= p[1] && c <= p[2]); return p ? p[0] : null; };
+async function loadWordVoice(key) { if (!AUDIO[key] && key.startsWith('w_')) { const p = extraPack(key.slice(2)); if (p) await loadPack(p); } }
+async function ensureWords(list) {
+  await allAudio;
+  const need = new Set(); (list || []).forEach(t => norm(plain(t)).split(' ').forEach(w => { const p = extraPack(w); if (w && p && !AUDIO['w_' + w]) need.add(p); }));
+  await Promise.all([...need].map(loadPack));
+}
 const bufCache = {};
 async function getBuf(key) {
   if (!AUDIO[key]) await allAudio;
+  await loadWordVoice(key);
   if (bufCache[key]) return bufCache[key];
   const b64 = AUDIO[key], c = ac(); if (!b64 || !c) return null;
   const bin = atob(b64), u = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i);
@@ -430,6 +440,7 @@ function clipUrl(key) {
 let curDone = null;   // finishes the clip that is playing now (used when something new starts or stopAudio)
 async function playKey(key) {
   if (!AUDIO[key]) await allAudio;
+  await loadWordVoice(key);
   const url = clipUrl(key); if (!url) return false;
   setSession('playback');
   if (curDone) curDone();
@@ -505,45 +516,84 @@ let currentRec = null;
 let recEnded = Promise.resolve();
 // IMPORTANT: must run straight from the tap, with no waiting before rec.start(), or iPhone Safari refuses the mic.
 function listen(maxMs, isDone, onReady) {
+  // Noise-proof listening: a wrong guess from background noise no longer ends the turn. We keep every guess,
+  // restart the recogniser if it stops early (common in noise), and judge when the word is heard, when the
+  // child goes quiet for a moment, or when time runs out. The first start stays straight from the tap (iPhone rule).
   setSession('play-and-record');   // let the mic in; switched back to loudspeaker 'playback' before the next clip
-  let rec; try { rec = new SR(); } catch (e) { return Promise.resolve({ error: 'unsupported', texts: [] }); }
-  currentRec = rec; rec.lang = 'en-GB'; rec.interimResults = true; rec.continuous = false; rec.maxAlternatives = 5;
-  let endDone; recEnded = new Promise(r => endDone = r);
+  if (!SR) return Promise.resolve({ error: 'unsupported', texts: [] });
   return new Promise(resolve => {
-    let texts = [], finished = false, ready = false, timer, safety;
-    const finish = r => { if (finished) return; finished = true; clearTimeout(timer); clearTimeout(safety); try { rec.stop(); } catch (e) {} resolve(r); };
+    const all = []; let finished = false, ready = false, timer, safety, quiet, rec = null, restarts = 0, t0 = Date.now(), firstErr = null;
+    const handle = { abort: () => finish({ error: 'aborted', texts: [] }, true) };
+    const finish = (r, hard) => {
+      if (finished) return; finished = true; clearTimeout(timer); clearTimeout(safety); clearTimeout(quiet); currentRec = null;
+      try { hard ? rec && rec.abort() : rec && rec.stop(); } catch (e) {}
+      resolve(r);
+    };
+    const done = () => finish(all.length ? { texts: all.slice() } : { error: firstErr || (ready ? 'no-speech' : 'no-audio'), texts: [] });
     const goReady = () => {
-      if (ready) return; ready = true; onReady && onReady();
-      timer = setTimeout(() => { try { rec.stop(); } catch (e) {} setTimeout(() => finish(texts.length ? { texts } : { error: 'no-speech', texts }), 1200); }, maxMs);
+      if (ready) return; ready = true; t0 = Date.now(); onReady && onReady();
+      timer = setTimeout(() => { try { rec.stop(); } catch (e) {} setTimeout(done, 1200); }, maxMs);
     };
-    rec.onstart = () => setTimeout(goReady, 350);
-    rec.onaudiostart = goReady;
-    rec.onresult = e => {
-      texts = []; const first = [];
-      for (let i = 0; i < e.results.length; i++) { first.push(e.results[i][0].transcript); for (let j = 0; j < e.results[i].length; j++) texts.push(e.results[i][j].transcript); }
-      texts.unshift(first.join(' '));
-      if (isDone(texts) || e.results[e.results.length - 1].isFinal) finish({ texts });
+    const start = first => {
+      let r; try { r = new SR(); } catch (e) { return first ? finish({ error: 'unsupported', texts: [] }) : done(); }
+      rec = r; currentRec = handle; r.lang = 'en-GB'; r.interimResults = true; r.continuous = false; r.maxAlternatives = 5;
+      let endDone; recEnded = new Promise(x => endDone = x);
+      r.onstart = () => setTimeout(goReady, 350);
+      r.onaudiostart = goReady;
+      r.onresult = e => {
+        if (finished || rec !== r) return;
+        const firstAlt = [], texts = [];
+        for (let i = 0; i < e.results.length; i++) { firstAlt.push(e.results[i][0].transcript); for (let j = 0; j < e.results[i].length; j++) texts.push(e.results[i][j].transcript); }
+        texts.unshift(firstAlt.join(' '));
+        texts.forEach(t => { if (t && !all.includes(t)) all.push(t); });
+        if (isDone(all)) return finish({ texts: all.slice() });
+        clearTimeout(quiet);
+        if (e.results[e.results.length - 1].isFinal) quiet = setTimeout(done, 1600);   // a moment to try again before judging
+      };
+      r.onerror = e => {
+        if (rec !== r || finished) return;
+        if (!first) return;   // errors from a restart never block the mic; we just judge what we heard
+        firstErr = e.error;
+        if (['not-allowed', 'service-not-allowed'].includes(e.error)) finish({ error: e.error, texts: all.slice() });
+      };
+      r.onend = () => {
+        endDone();
+        if (finished || rec !== r) return;
+        if (ready && Date.now() - t0 < maxMs - 700 && restarts < 4) { restarts++; start(false); return; }   // stopped early: listen again
+        done();
+      };
+      try { r.start(); } catch (e) { endDone(); if (first) finish({ error: 'start-failed', texts: [] }); else done(); }
     };
-    rec.onerror = e => finish({ error: e.error, texts });
-    rec.onend = () => { currentRec = null; endDone(); finish(texts.length ? { texts } : { error: ready ? 'no-speech' : 'no-audio', texts }); };
-    safety = setTimeout(() => { try { rec.abort(); } catch (e) {} endDone(); finish(texts.length ? { texts } : { error: 'no-audio', texts }); }, maxMs + 5000);
-    try { rec.start(); } catch (e) { endDone(); finish({ error: 'start-failed', texts: [] }); }
+    safety = setTimeout(() => { try { rec && rec.abort(); } catch (e) {} done(); }, maxMs + 5000);
+    start(true);
   });
 }
 const norm = s => String(s).toLowerCase().replace(/[^a-z' ]+/g, ' ').replace(/'/g, '').replace(/\s+/g, ' ').trim();
 const squash = w => w.replace(/(.)\1+/g, '$1');
 // spelling-blind compare: "kat" = "cat", "hil" = "hill", "phox" = "fox"
 const sp = w => squash(w.replace(/ph/g, 'f').replace(/ck/g, 'k').replace(/c(?=[aou]|$)/g, 'k').replace(/q/g, 'k').replace(/x/g, 'ks').replace(/wh/g, 'w').replace(/([^aeiou])e$/, '$1'));
-const ALIAS = { red: ['read'], web: ['webb'], bell: ['belle'], jet: ['jett'], pen: ['penn'], yap: ['yapp'], jam: ['jamb'], win: ['wynn', 'wyn'], vet: ['vette'], doll: ['dahl'], box: ['bocks'], cat: ['kat'], mix: ['micks'], fix: ['ficks'], hen: ['hens'], son: ['sun'], sun: ['son'], to: ['two', 'too'], no: ['know'], be: ['bee'], see: ['sea'], i: ['eye'] };
+const ALIAS = { zag: ['zack', 'zac', 'zak'], six: ['sicks', 'sics'], fox: ['fawks'], chin: ['chinn'], red: ['read'], web: ['webb'], bell: ['belle'], jet: ['jett'], pen: ['penn'], yap: ['yapp'], jam: ['jamb'], win: ['wynn', 'wyn'], vet: ['vette'], doll: ['dahl'], box: ['bocks'], cat: ['kat'], mix: ['micks'], fix: ['ficks'], hen: ['hens'], son: ['sun'], sun: ['son'], to: ['two', 'too'], no: ['know'], be: ['bee'], see: ['sea'], i: ['eye'] };
 // Consonant outline of a word: hill / hell / heal / he'll -> "hl", yap / yup / yep -> "yp", egg -> "eg".
 // Phones often swap a child's vowel for a more common word, so the relaxed check compares outlines.
 const skel = w => { const s = sp(w); return s[0] + s.slice(1).replace(/[aeiouy]/g, '').replace(/(.)\1+/g, '$1'); };
 let hwWords = new Set();   // today's homework words: hearing one of THESE instead is a real mistake
+// "th" is the sound speech recognisers get wrong most (and young children often say it as f/v/d).
+// So for words with "th" we also accept the usual mishearings: thin -> fin/tin/thing, this -> dis/vis/these, with -> wif/wiv.
+const TH_ALIAS = { thin: ['fin', 'finn', 'fen', 'tin', 'thing', 'think', 'thins', 'sin', 'thinn'], this: ['dis', 'diss', 'these', 'vis', 'fis', 'fiss', 'thiss', 'tis', 'thus', 'thes'],
+  that: ['dat', 'vat', 'fat', 'thats'], then: ['den', 'ven', 'than', 'them'], them: ['dem', 'vem', 'then'], the: ['da', 'de', 'duh'], with: ['wif', 'wiv', 'wid', 'wit', 'width'],
+  thick: ['fick', 'tick', 'sick'], thing: ['fing', 'ting', 'think', 'thin'], think: ['fink', 'tink', 'thing', 'sink'], moth: ['mof', 'moff', 'mouth', 'mott'], bath: ['baf', 'barf', 'bat'],
+  path: ['paf', 'pat'], three: ['free', 'tree', 'fee'], thank: ['fank', 'tank'], cloth: ['clof', 'clot'], teeth: ['teef'], tooth: ['toof'], they: ['day', 'dey'], there: ['dare', 'their'] };
+function thOk(t, h) {
+  if (!t.includes('th') || hwWords.has(h)) return false;   // hearing another homework word is a real mistake
+  if ((TH_ALIAS[t] || []).includes(h)) return true;
+  if (['f', 'v', 'd', 't', 's'].some(x => t.replace(/th/g, x) === h)) return true;   // any other th-word
+  return /n$/.test(t) && (h === t + 'g' || h === t + 'k');                          // "thing" for thin
+}
 function exactOk(t, h) { return h === t || squash(h) === squash(t) || sp(h) === sp(t) || (ALIAS[t] || []).includes(h); }
 function wordOk(target, heard) {
   const t = norm(plain(target)), h = norm(heard);
   if (!h) return false;
-  if (exactOk(t, h)) return true;
+  if (exactOk(t, h) || thOk(t, h)) return true;
   if (S.settings.strict || h.length < 2 || hwWords.has(h) || t.length < 2) return false;
   if (h === t + 's') return true;                                              // "hills" for hill
   if (h.length <= t.length + 2 && skel(h) === skel(t)) return true;            // "hell", "heal" for hill; "yup" for yap
@@ -556,6 +606,7 @@ function check(it, texts) {
   hwWords = new Set(parseHomework(S.homework).words);
   texts = (texts || []).filter(Boolean);
   if (it.type === 'sentence') {
+    if (texts.length > 1) texts = [...texts, texts.join(' ')];
     const tw = norm(plain(it.text)).split(' '); let best = null;
     for (const tx of texts) { const hw = norm(tx).split(' '); const miss = tw.filter(w => !LENIENT.includes(w) && !hw.some(h => wordOk(w, h))); if (!best || miss.length < best.length) best = miss; }
     best = best || tw.filter(w => !LENIENT.includes(w));
@@ -685,6 +736,7 @@ function renderHome() {
   document.querySelectorAll('[data-r]').forEach(b => b.onclick = () => { const i = +b.dataset.r; startRace(todayPlan()[i], { race: i, intro: 'race' + (i % RACES.length) }); });
   $('#bonusTile').onclick = bonusLap; $('#garageTile').onclick = garage;
   const bt = $('#boardTile'); if (bt) bt.onclick = openBoard;
+  ensureWords([...plan.flat().map(it => it.text), ...S.review]); // fetch any extra voices this homework needs, in the background
 }
 document.getElementById('home').addEventListener('click', e => { if (!welcomed && !e.target.closest('button')) { welcomed = true; welcome(); } });
 async function welcome() { await loadPack('core'); if (S.name && hasNameVoice()) { await playKey('p_hello'); await sayName(); await playKey('p_start_home'); } else await playKey('p_welcome'); }
@@ -770,7 +822,7 @@ function renderControls() {
 }
 $('#race').addEventListener('click', e => {
   const b = e.target.closest('[data-a]'); if (!b) return; const a = b.dataset.a;
-  if (a === 'hear') return hearModel();
+  if (a === 'hear') { if (currentRec) return; return hearModel(); }
   if (busy) return;
   if (a === 'mic') return onMic();
   if (a === 'yes') return handleResult(true, {});
@@ -786,6 +838,7 @@ function setBusy(v) {
 }
 
 async function nextItem() {
+  if (!R || R.dead) return;
   if (R.idx >= R.queue.length) return finishRace();
   const it = R.queue[R.idx];
   R.cur = { it, stage: 0, tries: 0, missing: [], modeled: false };
@@ -796,6 +849,7 @@ async function nextItem() {
   else if (last && R.queue.length > 1) id = 'finish_line';
   else if (!prev || prev.type !== it.type) id = it.type === 'sentence' ? 'read_sentence' : 'read_word';
   if (id) await say(id); else $('#bubble').textContent = '';
+  if (R.dead) return;
   if (!S.firstMicDone && micOn()) { S.firstMicDone = true; save(); await say('tap_mic'); }
   setBusy(false);
 }
@@ -808,7 +862,8 @@ function onMic() {   // stays synchronous until the mic has started (iPhone rule
   if (btn) { btn.classList.remove('talking'); btn.textContent = '⏳'; btn.disabled = false; btn.classList.remove('ready'); }
   const p = listen(it.type === 'sentence' ? 9000 : 6000, texts => check(it, texts).ok,
     () => { if (btn) { btn.classList.add('listening'); btn.textContent = '🗣️'; } });   // green: "speak now"   // turns green only when the mic is really on
-  p.then(r => afterListen(it, btn, r));
+  const race = R;
+  p.then(r => { if (R === race && !race.dead) afterListen(it, btn, r); });
 }
 async function afterListen(it, btn, r) {
   if (btn) btn.classList.remove('listening');
@@ -821,7 +876,7 @@ async function afterListen(it, btn, r) {
   }
   noHear = 0;
   const res = check(it, r.texts);
-  logHeard(it.text, r.texts[0] || '', res.ok);
+  logHeard(it.text, r.texts.filter((t, i, x) => t && x.indexOf(t) === i).slice(0, 3).join(' · '), res.ok);   // everything it heard, not only the first guess
   setBusy(false);
   handleResult(res.ok, res);
 }
@@ -832,7 +887,7 @@ async function handleResult(ok, res) {
   setBusy(true);
   if (c.modeled) {
     stat(c.it, false, true); addMissed(c.it); countRead(c.it); if (!c.it.comeback) R.scored++; save();
-    await say('good_try'); return advance();
+    await say('good_try'); if (R.dead) return; return advance();
   }
   sfxOops(); bump('bad'); R.combo = 0; $('#runner').classList.remove('turbo');
   if (c.it.type === 'sentence') c.missing = (res.missing && res.missing.length) ? res.missing : norm(plain(c.it.text)).split(' ').filter(w => !LENIENT.includes(w));
@@ -846,6 +901,7 @@ async function handleResult(ok, res) {
     else if (st === 'sounds') await lightSounds(true);
     setBusy(false); return;
   }
+  if (R.dead) return;
   c.stage++; c.tries = 0; R.rival += .5; moveCars();
   await enterStage(); setBusy(false);
 }
@@ -864,7 +920,8 @@ async function enterStage() {
 async function lightSounds(auto) {
   if (!auto) setBusy(true);
   const all = [...document.querySelectorAll('#card .g')], n = all.length ? Math.max(...all.map(x => +x.dataset.u)) + 1 : 0;
-  for (let k = 0; k < n; k++) { all.forEach(x => x.classList.toggle('lit', +x.dataset.u === k)); tone(660, .08, 'sine', 0, .05); await sleep(1300); }
+  const r0 = R;
+  for (let k = 0; k < n && !r0.dead; k++) { all.forEach(x => x.classList.toggle('lit', +x.dataset.u === k)); tone(660, .08, 'sine', 0, .05); await sleep(1300); }
   all.forEach(x => x.classList.remove('lit')); await sleep(200);
   await say('blend_now');
   if (!auto) setBusy(false);
@@ -913,10 +970,13 @@ async function correct() {
   if (c.modeled) await say('great_job');
   else if (turbo) { $('#runner').classList.add('turbo'); flash('TURBO!'); award(3); await say('turbo'); }
   else { await say(pick(['pr1', 'pr2', 'pr3', 'pr4', 'pr5', 'pr6', 'pr7', 'pr8'])); if (Math.random() < .35) await sayName(); }
+  if (R.dead) return;
   advance();
 }
-function advance() { setBusy(true); R.idx++; R.rival += .6; moveCars(); setTimeout(nextItem, 350); }
+function advance() { if (!R || R.dead) return; const r = R; setBusy(true); R.idx++; R.rival += .6; moveCars(); setTimeout(() => { if (R === r && !r.dead) nextItem(); }, 350); }
 async function finishRace() {
+  if (!R || R.dead) return;
+  R.dead = true; // finished: nothing from this race may run again
   const m = R.meta; let bonus = 0, goalNow = false;
   const ratio = R.scored ? R.firstTry / R.scored : 1;
   const won = R.rival < R.queue.length;
@@ -961,7 +1021,7 @@ $('#exitRace').onclick = () => {
   modal(`<div class="bigrow" style="padding:10px 0"><button class="bigbtn r" id="mLeave" aria-label="Stop">🏠</button><button class="bigbtn g" id="mStay" aria-label="Keep racing">▶️</button></div>`);
   say('leave_q');
   $('#mStay').onclick = () => { closeModal(); };
-  $('#mLeave').onclick = () => { closeModal(); try { currentRec && currentRec.abort(); } catch (e) {} stopAudio(); busy = false; renderHome(); show('home'); };
+  $('#mLeave').onclick = () => { closeModal(); if (R) R.dead = true; try { currentRec && currentRec.abort(); } catch (e) {} stopAudio(); busy = false; renderHome(); show('home'); };
 };
 
 /* ============ PARENT ============ */
@@ -990,8 +1050,9 @@ function pHomework() {
     <div id="hwPv">${preview(S.homework)}</div>
     <button class="btn g" id="hwSave">💾 Save homework</button>
   </div>`;
-  $('#hwTx').oninput = e => { $('#hwPv').innerHTML = preview(e.target.value); };
-  allAudio.then(() => { const t = $('#hwTx'); if (t) $('#hwPv').innerHTML = preview(t.value); });
+  const refreshPv = () => { const t = $('#hwTx'); if (!t) return; const hw = parseHomework(t.value); ensureWords([...hw.words, ...hw.sents]).then(() => { const t2 = $('#hwTx'); if (t2) $('#hwPv').innerHTML = preview(t2.value); }); };
+  $('#hwTx').oninput = e => { $('#hwPv').innerHTML = preview(e.target.value); clearTimeout(refreshPv._t); refreshPv._t = setTimeout(refreshPv, 600); };
+  refreshPv();
   $('#hwSave').onclick = () => {
     const oldHw = parseHomework(S.homework), nu = parseHomework($('#hwTx').value);
     [...oldHw.words, ...oldHw.sents].forEach(t => { if (!nu.words.includes(t) && !nu.sents.includes(t) && !S.review.includes(t)) S.review.push(t); });
@@ -1019,6 +1080,7 @@ function pSettings() {
   $('#pbody').innerHTML = `<div class="panel">
     ${nameBlock()}
     ${classBlock()}
+    ${linkBlock()}
     <h3 style="margin:0">Help steps (tries at each step)</h3>
     <div class="set"><label>Words 1: read it alone</label><select id="tRead">${[1, 2, 3].map(v => opt(v, t.read)).join('')}</select></div>
     <div class="set"><label>Words 2: "Fred Talk it" (no hints)</label><select id="tFred">${[1, 2, 3].map(v => opt(v, t.fred)).join('')}</select></div>
@@ -1035,7 +1097,7 @@ function pSettings() {
   const bind = (id, fn) => $(id).onchange = e => { fn(e.target.value); save(); toast('Saved ✓'); };
   bind('#tRead', v => t.read = +v); bind('#tFred', v => t.fred = +v); bind('#tSounds', v => t.sounds = +v);
   bind('#sCome', v => S.settings.comebacks = +v); bind('#sGoal', v => S.settings.goal = v === 'all' ? 'all' : +v);
-  bindName(pSettings); bindClass();
+  bindName(pSettings); bindClass(); bindLink(); checkDupName();
   bind('#sDots', v => S.settings.dots = v === '1'); bind('#sStrict', v => S.settings.strict = v === '1');
   $('#resetAll').onclick = () => {
     modal(`<h2>Reset coins, streak, cars and stats?</h2><p class="hint">The homework stays.</p><div style="display:flex;gap:10px"><button class="btn w" style="flex:1" onclick="closeModal()">Cancel</button><button class="btn r" style="flex:1" id="rsYes">Reset</button></div>`);
@@ -1122,6 +1184,7 @@ async function openBoard() {
   const res = (await lbSubmit()) || await lbCall({ action: 'list' });
   if (!res || !res.ok) { $('#boardBody').innerHTML = '<div style="text-align:center;font-size:70px;padding:40px">📶❌</div>'; return; }
   const list = res.list || [], d = dayRec(), plan = todayPlan(), done = doneToday(), need = goalNeeded();
+  dupNote(list);
   const meDone = !!d.goal;
   const mine = meDone ? '' : `<div class="lbrow me">${carSVG(S.car, 70)}<div class="nm">${esc(S.name || '')}</div><div style="font-size:24px">${Array.from({ length: need }, (_, i) => i < done ? '🏁' : '⬜').join('')}</div></div>`;
   $('#boardBody').innerHTML = `<div class="lblist">${mine}${list.map(x => `<div class="lbrow ${x.player === S.lb.player ? 'me' : ''}"><div class="rk">🏆</div>${carSVG(x.car, 70)}<div class="nm">${esc(x.name)}</div></div>`).join('')}</div>`;
@@ -1130,12 +1193,44 @@ async function openBoard() {
 }
 $('#boardBack').onclick = () => { stopAudio(); renderHome(); show('home'); };
 $('#boardRefresh').onclick = openBoard;
+/* same name as another child on today's list: suggest a last initial (never blocks) */
+const sameName = (a, b) => String(a || '').trim().toLowerCase() === String(b || '').trim().toLowerCase();
+function dupNote(list) {
+  const el = $('#lbDup'); if (!el) return;
+  const nm = (S.name || '').trim();
+  const dup = nm && (list || []).some(x => x.player !== S.lb.player && sameName(x.name, nm));
+  el.innerHTML = dup ? `<div class="note">Another child on today's list is also called <b>${esc(nm)}</b>. Add a last initial to the name (for example <b>${esc(nm.split(' ')[0])} A.</b>) so the children can tell who is who.</div>` : '';
+}
+async function checkDupName() {
+  if (!lbActive() || !S.lb.on || !S.name) return dupNote([]);
+  const res = await lbCall({ action: 'list' });
+  if (res && res.ok) dupNote(res.list);
+}
+/* same child on two phones: share one player code so they count as one */
+function linkBlock() {
+  return `<div class="set" style="flex-wrap:wrap;border-bottom:0"><label>Same child on another phone?</label></div>
+    <div class="hint">This phone's code: <b style="font-size:20px;letter-spacing:2px;color:var(--ink)">${esc(S.lb.player)}</b><br>On the other phone, open ⚙️ Settings and type this code below, so your child shows up once on the list. Coins, cars and streaks stay separate on each phone.</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 12px"><input type="text" id="lnkIn" placeholder="Other phone’s code" autocapitalize="off" autocomplete="off" spellcheck="false" style="flex:1;min-width:160px;border:2px solid #dfe3f2;border-radius:10px;padding:8px;font-size:18px"><button class="btn w" id="lnkGo" style="padding:8px 14px">🔗 Link</button></div>`;
+}
+function bindLink() {
+  const go = $('#lnkGo'); if (!go) return;
+  go.onclick = () => {
+    const code = $('#lnkIn').value.trim().toLowerCase().replace(/\s+/g, '');
+    if (!/^[a-z0-9]{4,20}$/.test(code)) return toast('Check the code: letters and numbers only');
+    if (code === S.lb.player) return toast('That is this phone’s own code');
+    S.lb.player = code; save(); toast('Linked ✓');
+    if (dayRec().goal) lbSubmit(); // already finished today: show up under the shared code
+    pSettings();
+  };
+}
 function classBlock() {
   return `<div class="set" style="flex-wrap:wrap"><label>Class code (for the "done today" list)</label><input type="text" id="clsIn" value="${esc(S.lb.cls)}" placeholder="optional" autocapitalize="characters" style="width:150px;border:2px solid #dfe3f2;border-radius:10px;padding:8px;font-size:18px"></div>
     <div class="set"><label>Show my child on the list</label><select id="clsOn"><option value="1" ${S.lb.on ? 'selected' : ''}>Yes</option><option value="0" ${S.lb.on ? '' : 'selected'}>No</option></select></div>
-    <div class="hint">When your child finishes all of today's races, their first name and car appear on the class list with a 🏆. No scores and no ranking. Choose "No" to stay off the list. Children who are off the list don't see it either.</div>`;
+    <div class="hint">When your child finishes all of today's races, their first name and car appear on the class list with a 🏆. No scores and no ranking. Choose "No" to stay off the list. Children who are off the list don't see it either.</div>
+    <div id="lbDup"></div>`;
 }
 function bindClass() {
+  const ni = $('#nmIn'); if (ni) ni.addEventListener('change', () => checkDupName());
   $('#clsIn').onchange = e => { S.lb.cls = e.target.value.trim().toUpperCase(); save(); };
   $('#clsOn').onchange = e => {
     const on = e.target.value === '1';
