@@ -215,6 +215,7 @@ details.sec .sb{padding:0 2px 14px;display:flex;flex-direction:column;gap:8px}
 .slot.on{background:#ffd23f;border-color:#fff}
 .slot.pop{animation:pop .8s 2}
 .res .slots .slot{background:#e4e7f2;border-color:#cfd5ea}.res .slots .slot.on{background:#ffd23f;border-color:#1b1b3a44}
+.bring{position:relative;width:48px;height:48px;display:grid;place-items:center}.bring>svg:first-child{position:absolute;inset:0}.bring .dot{position:absolute;top:0;right:0;width:12px;height:12px;border-radius:50%;background:#ef3e36;border:2px solid #fff}
 .nleft{font-weight:800;font-size:14px;white-space:nowrap}
 .shopcars{display:flex;gap:6px;overflow-x:auto;padding:6px 2px;margin-top:4px}.shopcars button{flex:none;border-radius:12px;background:#f1f3ff;padding:2px;border:3px solid transparent}.shopcars button.on{border-color:var(--blue);background:#e1efff}
 .shopbtn{width:100%;margin:8px 0;display:flex;align-items:center;justify-content:center;gap:8px}
@@ -1040,9 +1041,10 @@ function renderHome() {
   $('#bonusTile').onclick = bonusLap; $('#garageTile').onclick = garage;
   const bt = $('#boardTile'); if (bt) bt.onclick = openBoard;
   $('#badgeTile').onclick = badgesModal; $('#badgeCount').textContent = 'Badges';
-  const nb = nextBadge(), nbEl = $('#nextBadge');
-  if (nb) { nbEl.style.display = ''; nbEl.innerHTML = `${medallion(nb.b, Math.min(4, nb.lvl + 1), 40)}<div class="bar"><i style="width:${Math.max(4, Math.round(nb.pct * 100))}%"></i></div><span class="nbt">${nb.v}/${nb.next}</span>${ic('speaker', 22)}`; nbEl.onclick = () => sayBadge(nb.b); }
-  else nbEl.style.display = 'none';
+  // the next badge lives on the Badges button (a ring that fills up), not under the car
+  $('#nextBadge').style.display = 'none';
+  const nb = nextBadge(), pct = nb ? nb.pct : 1, R0 = 21, C0 = 2 * Math.PI * R0;
+  $('#badgeTile').innerHTML = `<span class="bring"><svg width="48" height="48" viewBox="0 0 48 48"><circle cx="24" cy="24" r="${R0}" fill="none" stroke="#ffffff33" stroke-width="4"/><circle cx="24" cy="24" r="${R0}" fill="none" stroke="#2bb673" stroke-width="4" stroke-linecap="round" stroke-dasharray="${C0}" stroke-dashoffset="${C0 * (1 - pct)}" transform="rotate(-90 24 24)"/></svg>${nb ? medallion(nb.b, Math.min(4, nb.lvl + 1), 34) : ic('ribbon', 30)}${nb && nb.pct >= .75 ? '<i class="dot"></i>' : ''}</span><b>Badges</b>`;
   ensureWords([...plan.flat().map(it => it.text), ...S.review]); // fetch any extra voices this homework needs, in the background
   if (S.name && !S.nameRec) loadClip('n_' + nameKey(S.name));
 }
