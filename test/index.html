@@ -1539,6 +1539,7 @@ $('#exitRace').onclick = () => {
 
 /* ============ PARENT ============ */
 $('#parentBtn').onclick = () => {
+  if (IS_TEST) { ptab = 'homework'; show('parent'); renderParent(); return; }   // test copy: no sum
   const a = rand(12, 39), b = rand(11, 28);
   modal(`<h2>Grown-ups only</h2><p>What is ${a} + ${b}?</p><input id="gateIn" type="number" inputmode="numeric" style="width:100%;font-size:24px;padding:10px;border:2px solid #ddd;border-radius:12px"><div style="display:flex;gap:10px;margin-top:12px"><button class="btn w" style="flex:1" onclick="closeModal()">Cancel</button><button class="btn" style="flex:1" id="gateGo">Enter</button></div>`);
   const go = () => { if (+$('#gateIn').value === a + b) { closeModal(); ptab = 'homework'; show('parent'); renderParent(); } else { toast('Not quite'); $('#gateIn').value = ''; } };
