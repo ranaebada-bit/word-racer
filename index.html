@@ -7,6 +7,13 @@
 <meta name="apple-mobile-web-app-title" content="Word Racer">
 <meta name="theme-color" content="#14205c">
 <title>Word Racer</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Word Racer">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="icon" href="data:,">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -50,7 +57,7 @@ input,select,textarea{font-family:var(--ui);font-size:16px;-webkit-user-select:t
 .rcard.done .go{font-size:42px}
 .rcard.next{animation:glow2 1.4s infinite}
 @keyframes glow2{50%{box-shadow:0 6px 0 #0004,0 0 0 7px #ffd23faa}}
-.mini{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.mini{display:grid;grid-template-columns:repeat(auto-fit,minmax(70px,1fr));gap:10px}
 .mtile{border-radius:20px;background:var(--card);box-shadow:0 5px 0 #0003;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px 4px;font-size:38px;line-height:1.1;color:var(--ink)}
 .mtile b{font-size:15px;margin-top:4px}
 .mtile:active{transform:translateY(3px)}
@@ -86,9 +93,9 @@ input,select,textarea{font-family:var(--ui);font-size:16px;-webkit-user-select:t
 .mascot{width:90px;flex:none}
 .bubble{flex:1;background:#fff;border-radius:20px 20px 20px 4px;padding:10px 14px;font-size:19px;font-weight:700;line-height:1.2;min-height:52px;display:flex;align-items:center}
 .card{background:var(--card);border-radius:28px;min-height:220px;display:flex;align-items:center;justify-content:center;flex-direction:column;padding:22px 12px;box-shadow:0 8px 0 #0003;position:relative}
-.card.good{animation:goodflash .7s}.card.bad{animation:shake .45s}
+.card.good{animation:goodflash .7s}.card.bad{animation:shake .5s ease-in-out}
 @keyframes goodflash{30%{background:#d7f8e5;transform:scale(1.03)}}
-@keyframes shake{20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
+@keyframes shake{25%{transform:translateX(-4px) rotate(-1deg)}75%{transform:translateX(4px) rotate(1deg)}}
 .tag{position:absolute;top:10px;left:14px;font-size:22px}
 .card.final{padding-top:40px}
 .card.final::before{content:'';position:absolute;left:0;right:0;top:0;height:26px;border-radius:28px 28px 0 0;background:repeating-conic-gradient(#1b1b3a 0 25%,#fff 0 50%) 0 0/26px 26px}
@@ -148,6 +155,18 @@ input,select,textarea{font-family:var(--ui);font-size:16px;-webkit-user-select:t
 .nextcar .bar i{display:block;height:100%;background:linear-gradient(90deg,#ffd23f,#ff8c1a);border-radius:999px}
 .nextcar .nc{opacity:.75}
 /* parent */
+.faq details{border-bottom:1px solid #eee;padding:10px 0}.faq summary{font-weight:800;cursor:pointer;font-size:16px}.faq p{margin:8px 0 0;color:#444;font-size:15px;line-height:1.4}
+.wk{display:grid;grid-template-columns:1fr 1fr;gap:8px}.wk div{background:#f3f5ff;border-radius:14px;padding:10px;text-align:center;font-size:14px;color:#555}.wk b{display:block;font-size:24px;color:var(--ink)}
+.steps{display:flex;gap:6px;justify-content:center;margin:2px 0 8px}.steps i{width:28px;height:6px;border-radius:3px;background:#dfe3f2}.steps i.on{background:var(--blue)}
+.mictest{background:#f3f5ff;border-radius:14px;padding:10px;font-size:15px;line-height:1.4}
+.newbadges{display:flex;gap:10px;justify-content:center;margin-top:8px}.newbadges .bdg{width:110px}.bdg.pop{animation:pop .6s}
+.badges{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:8px}.bdg{background:#fff4cc;border-radius:16px;padding:10px 4px;text-align:center}.bdg span{font-size:38px;display:block}.bdg small{font-size:12px;font-weight:700;color:#555}.bdg.locked{background:#eee}.bdg.locked span{filter:grayscale(1);opacity:.35}
+.wash{position:fixed;inset:0;z-index:60;background:linear-gradient(#5ec8ff,#bfe9ff 60%,#7ad36b 60%);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;touch-action:none}
+.wash .stage{position:relative;width:320px;height:180px}
+.wash .stage svg{position:absolute;left:0;top:0}
+.wash canvas{position:absolute;left:0;top:0;width:320px;height:180px;touch-action:none}
+.wash .skip{position:absolute;top:calc(14px + env(safe-area-inset-top));right:14px;background:#ffffffcc;border-radius:999px;padding:8px 16px;font-weight:800;font-size:16px;color:var(--ink)}
+.wash .hand{font-size:46px;animation:bob 1s ease-in-out infinite}
 .panel{background:#fff;border-radius:22px;padding:14px;display:flex;flex-direction:column;gap:10px}
 .tabs{display:flex;gap:6px}
 .tabs button{flex:1;padding:10px 6px;border-radius:14px;background:#ffffff22;color:#fff;font-weight:800;font-size:16px}
@@ -188,6 +207,12 @@ table{width:100%;border-collapse:collapse;font-size:15px}td,th{padding:6px 4px;b
 </style>
 </head>
 <body>
+<div id="splash" style="position:fixed;inset:0;z-index:99;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;background:linear-gradient(160deg,#2d4bd8,#141f5c);transition:opacity .4s">
+  <img src="icon-512.png" alt="" style="width:150px;height:150px;border-radius:34px;box-shadow:0 10px 30px #0006">
+  <div style="font:800 38px 'Baloo 2',system-ui;color:#fff">Word Racer</div>
+  <div style="width:160px;height:8px;border-radius:4px;background:#ffffff33;overflow:hidden"><i style="display:block;height:100%;width:40%;background:#ffd23f;border-radius:4px;animation:load 1s ease-in-out infinite alternate"></i></div>
+</div>
+<style>@keyframes load{from{margin-left:0}to{margin-left:60%}}</style>
 <div class="bg"></div>
 
 <section id="home" class="screen">
@@ -198,7 +223,8 @@ table{width:100%;border-collapse:collapse;font-size:15px}td,th{padding:6px 4px;b
     <div class="spacer"></div>
     <button class="gear" id="parentBtn" aria-label="Grown-ups">⚙️</button>
   </div>
-  <div class="hero">
+  <div class="hero" style="position:relative">
+    <button id="helpBtn" aria-label="What do I do?" style="position:absolute;top:8px;right:8px;width:44px;height:44px;border-radius:50%;background:#ffffff26;font-size:22px">🔊</button>
     <div class="bounce" id="heroCar" style="display:flex;justify-content:center"></div>
     <div class="nextcar" id="nextCar"></div>
     <div class="week" id="week"></div>
@@ -226,7 +252,7 @@ table{width:100%;border-collapse:collapse;font-size:15px}td,th{padding:6px 4px;b
 
 <section id="parent" class="screen">
   <div class="top"><button class="iconbtn" id="parentBack">←</button><div style="font-size:26px;font-weight:800">Grown-ups</div></div>
-  <div class="tabs" id="ptabs"><button data-t="homework" class="on">Homework</button><button data-t="progress">Progress</button><button data-t="settings">Settings</button></div>
+  <div class="tabs" id="ptabs"><button data-t="homework" class="on">Homework</button><button data-t="progress">Progress</button><button data-t="settings">Settings</button><button data-t="help">Help</button></div>
   <div id="pbody"></div>
 </section>
 
@@ -235,9 +261,8 @@ table{width:100%;border-collapse:collapse;font-size:15px}td,th{padding:6px 4px;b
 
 <script>
 const AUDIO = {};
-const AUDIO_PACKS = ["core", "w1", "w2", "w3", "w4"];
-const EXTRA_PACKS = [["x1", "a", "c"], ["x2", "d", "k"], ["x3", "l", "r"], ["x4", "s", "z"]];
-const PHRASES = {"read_word": "Read the word!", "read_sentence": "Read the sentence!", "what_sound": "What sound is this?", "pit": "Pit stop! This one came back. Can you read it?", "pit_sound": "Pit stop! What sound is this?", "fred_word": "Not quite. Fred Talk it! Say the sounds, then blend them.", "fred_sentence": "Not quite. Fred Talk the orange words, then read it again.", "again": "Nearly! Have another go.", "fred_again": "Fred Talk it again, then blend!", "sound_again": "Nearly! Say the sound again.", "sounds_intro": "Let's go sound by sound. Say each sound when it lights up.", "blend_now": "Now blend them! Tap and say the word.", "listen": "Listen to me.", "your_turn_word": "Your turn! Say the word.", "your_turn_sentence": "Your turn! Read it to me.", "your_turn_sound": "Now you say it!", "didnt_hear": "I didn't hear you. Tap and try again!", "didnt_hear2": "Say it nice and loud, close to the phone!", "good_try": "Good try! We'll come back to it.", "great_job": "Great job!", "pr1": "Brilliant!", "pr2": "Super reader!", "pr3": "Zoom zoom! Yes!", "pr4": "Fantastic!", "pr5": "You did it!", "pr6": "Amazing!", "pr7": "Turbo reading!", "pr8": "Wow, great blending!", "spr1": "Yes! That's the sound!", "spr2": "Great sound!", "spr3": "Perfect!", "turbo": "Turbo boost! Three in a row!", "race_done": "Race complete! You beat the truck!", "race_lost": "Race complete! Great driving!", "goal_done": "Amazing! You finished all your races today! Your streak is growing!", "new_car": "Wow! You unlocked a new car!", "start_home": "Tap a race to start!", "leave_q": "Do you want to stop racing?", "no_mic": "I can't use the microphone. Ask a grown-up for help.", "tap_mic": "Tap the microphone, then read!", "garage": "Pick your car!", "all_done": "All races done! Try a bonus lap for extra points!", "lets_race": "Ready, steady, go!", "finish_line": "Last one! Read it to cross the finish line!", "welcome": "Hello racer! Tap a race to start!", "hello": "Hello", "well_done": "Well done", "setup_hi": "Hello racer!", "red_word": "This is a red word. We can't Fred Talk it. Listen!", "cups_look": "Look who finished their reading today!", "cup_done": "Well done! You finished today's reading. Here's your cup!", "cup_todo": "Finish all your races today to get your cup!", "cup_none": "Nobody has finished yet. Be the first to get a cup!", "race0": "Rocket Race!", "race1": "Lightning Lap!", "race2": "Superhero Sprint!", "race3": "Police Chase!", "race4": "Dino Dash!", "race5": "Space Speedway!", "race6": "Fire Truck Rescue!", "race7": "Grand Prix!", "race8": "Moto Madness!", "race9": "Sky Rally!", "bonus_lap": "Bonus lap! Extra coins!", "fred_word_s": "Fred Talk it!", "fred_sentence_s": "Fred Talk the orange words!", "sounds_intro_s": "Sound by sound!", "blend_now_s": "Now blend!", "your_turn_s": "Your turn!", "didnt_hear_s": "Try again!", "good_try_s": "Good try!", "again_s": "Have another go!", "red_word_s": "Red word! Listen!", "pit_s": "Pit stop!", "fred_again_s": "Again! Fred Talk it!", "listen_s": "Listen!"};
+const AUDIO_PACKS = ["core2"];   // game phrases + letter sounds; each word and name is its own small file, fetched only when needed
+const PHRASES = {"read_word": "Read the word!", "read_sentence": "Read the sentence!", "what_sound": "What sound is this?", "pit": "Pit stop! This one came back. Can you read it?", "pit_sound": "Pit stop! What sound is this?", "fred_word": "Almost! Let's Fred Talk it. Say the sounds, then blend them.", "fred_sentence": "Almost! Let's Fred Talk the orange words, then read it again.", "again": "Nearly! Have another go.", "fred_again": "Fred Talk it again, then blend!", "sound_again": "Nearly! Say the sound again.", "sounds_intro": "Let's go sound by sound. Say each sound when it lights up.", "blend_now": "Now blend them! Tap and say the word.", "listen": "Listen to me.", "your_turn_word": "Your turn! Say the word.", "your_turn_sentence": "Your turn! Read it to me.", "your_turn_sound": "Now you say it!", "didnt_hear": "I didn't hear you. Tap and try again!", "didnt_hear2": "Say it nice and loud, close to the phone!", "good_try": "Good try! We'll come back to it.", "great_job": "Great job!", "pr1": "Brilliant!", "pr2": "Super reader!", "pr3": "Zoom zoom! Yes!", "pr4": "Fantastic!", "pr5": "You did it!", "pr6": "Amazing!", "pr7": "Turbo reading!", "pr8": "Wow, great blending!", "spr1": "Yes! That's the sound!", "spr2": "Great sound!", "spr3": "Perfect!", "turbo": "Turbo boost! Three in a row!", "race_done": "Race complete! You beat the truck!", "race_lost": "Race complete! Great driving!", "goal_done": "Amazing! You finished all your races today! Your streak is growing!", "new_car": "Wow! You unlocked a new car!", "start_home": "Tap a race to start!", "leave_q": "Do you want to stop racing?", "no_mic": "I can't use the microphone. Ask a grown-up for help.", "tap_mic": "Tap the microphone, then read!", "garage": "Pick your car!", "all_done": "All races done! Try a bonus lap for extra points!", "lets_race": "Ready, steady, go!", "finish_line": "Last one! Read it to cross the finish line!", "welcome": "Hello racer! Tap a race to start!", "hello": "Hello", "well_done": "Well done", "setup_hi": "Hello racer!", "red_word": "This is a red word. We can't Fred Talk it. Listen!", "cups_look": "Look who finished their reading today!", "cup_done": "Well done! You finished today's reading. Here's your cup!", "cup_todo": "Finish all your races today to get your cup!", "cup_none": "Nobody has finished yet. Be the first to get a cup!", "race0": "Rocket Race!", "race1": "Lightning Lap!", "race2": "Superhero Sprint!", "race3": "Police Chase!", "race4": "Dino Dash!", "race5": "Space Speedway!", "race6": "Fire Truck Rescue!", "race7": "Grand Prix!", "race8": "Moto Madness!", "race9": "Sky Rally!", "bonus_lap": "Bonus lap! Extra coins!", "fred_word_s": "Fred Talk it!", "fred_sentence_s": "Fred Talk the orange words!", "sounds_intro_s": "Sound by sound!", "blend_now_s": "Now blend!", "your_turn_s": "Your turn!", "didnt_hear_s": "Try again!", "good_try_s": "Good try!", "again_s": "Have another go!", "red_word_s": "Red word! Listen!", "pit_s": "Pit stop!", "fred_again_s": "Again! Fred Talk it!", "listen_s": "Listen!", "pr9": "Super speedy!", "pr10": "You're a reading star!", "pr11": "Vroom vroom! Brilliant!", "pr12": "Wow, you read it!", "pr13": "High five!", "pr14": "Awesome reading!", "pr15": "Yes! You nailed it!", "pr16": "Champion reader!", "badge_new": "Wow! You earned a new badge!", "badges": "These are your badges! Keep reading to earn more.", "help_home": "Tap the race with the arrow to start. The star is a bonus lap, and the car is your garage.", "help_results": "Tap the green arrow for the next race, or the house to go home.", "help_garage": "Pick your car! The locked cars need more coins.", "wash": "Your car is muddy! Rub it to wash it!", "wash_done": "Sparkly clean! Great job!"};
 </script>
 <script>
 "use strict";
@@ -285,11 +310,40 @@ function load() {
 }
 let S = load();
 if (!S.lb || !S.lb.player) S.lb = { cls: '', on: true, player: Math.random().toString(36).slice(2, 12), ...(S.lb || {}) };
+if (!S.lb.phone) S.lb.phone = 'p' + Math.random().toString(36).slice(2, 11);   // this phone (one child can have several)
 function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
 try { navigator.storage && navigator.storage.persist && navigator.storage.persist(); } catch (e) {}
 const today = () => dayKey();
 function dayRec(k = today()) { return S.days[k] || (S.days[k] = { done: {}, coins: 0, goal: false }); }
-function currentStreak() { const t = today(); return (S.lastGoalDay === t || S.lastGoalDay === addDays(t, -1)) ? S.streak : 0; }
+/* Progress shared between linked phones: each phone keeps and uploads only its OWN progress (S),
+   and the other phones' uploads sit in S.others. Everything the child sees is this phone + the others added up,
+   so no phone ever overwrites another. */
+const others = () => Object.values(S.others || {});
+function allCoins() { return (S.coins || 0) + others().reduce((t, o) => t + (o.coins || 0), 0); }
+function view(k = today()) {   // read-only merged day
+  const mine = S.days[k] || { done: {}, coins: 0, goal: false };
+  const v = { ...mine, done: { ...(mine.done || {}) }, help: { ...(mine.help || {}) }, words: mine.words || 0, coins: mine.coins || 0, goal: !!mine.goal };
+  others().forEach(o => { const d = o.days && o.days[k]; if (!d) return;
+    Object.entries(d.done || {}).forEach(([i, m]) => v.done[i] = Math.max(v.done[i] || 0, m));
+    Object.entries(d.help || {}).forEach(([w, n]) => v.help[w] = (v.help[w] || 0) + n);
+    v.words += d.words || 0; v.coins += d.coins || 0; v.goal = v.goal || !!d.goal; });
+  return v;
+}
+function allDayKeys() { const ks = new Set(Object.keys(S.days)); others().forEach(o => Object.keys(o.days || {}).forEach(k => ks.add(k))); return [...ks]; }
+function mergedStats() {
+  const out = {}; const add = st => Object.entries(st || {}).forEach(([w, x]) => { const o = out[w] || (out[w] = { seen: 0, first: 0, miss: 0 }); o.seen += x.seen || 0; o.first += x.first || 0; o.miss += x.miss || 0; });
+  add(S.stats); others().forEach(o => add(o.stats)); return out;
+}
+function currentStreak() {   // days in a row with all races done, on any linked phone
+  let k = today(), n = 0; if (!view(k).goal) k = addDays(k, -1);
+  while (view(k).goal && n < 3650) { n++; k = addDays(k, -1); }
+  return n;
+}
+function bestStreak() {
+  const ks = allDayKeys().filter(k => view(k).goal).sort(); let best = 0, run = 0, prev = null;
+  ks.forEach(k => { run = prev && addDays(prev, 1) === k ? run + 1 : 1; best = Math.max(best, run); prev = k; });
+  return Math.max(best, S.best || 0, ...others().map(o => o.best || 0));
+}
 
 /* ============ sounds & parsing ============ */
 const MULTI = ['tion','igh','air','ear','ure','ire','are','sh','ch','th','ng','nk','qu','ck','wh','ph','ay','ee','ow','oo','ar','or','ir','ur','er','ou','oy','ea','oi','aw','ai','oa','ew'];
@@ -387,14 +441,14 @@ function todayPlan() {
   return d.plan;
 }
 function goalNeeded() { const n = todayPlan().length; return S.settings.goal === 'all' ? n : Math.min(n, +S.settings.goal); }
-function doneToday() { return Object.keys(dayRec().done).length; }
+function doneToday() { return Object.keys(view().done).length; }
 
 /* ============ audio ============ */
 let actx = null;
 function ac() { if (!actx) { try { actx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) {} } if (actx && actx.state !== 'running') { try { actx.resume(); } catch (e) {} } return actx; }
 function tone(f, d, type = 'sine', when = 0, vol = .1) { const c = ac(); if (!c) return; const o = c.createOscillator(), g = c.createGain(); o.type = type; o.frequency.value = f; const t = c.currentTime + when; g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(vol, t + .02); g.gain.exponentialRampToValueAtTime(.001, t + d); o.connect(g); g.connect(c.destination); o.start(t); o.stop(t + d + .05); }
 function sfxWin() { [523, 659, 784, 1047].forEach((f, i) => tone(f, .18, 'triangle', i * .08)); }
-function sfxOops() { tone(330, .15); tone(247, .25, 'sine', .14); }
+function sfxOops() { tone(523, .12, 'sine', 0, .05); tone(440, .18, 'sine', .1, .05); }   // soft 'hmm', not a buzzer
 function sfxVroom() { const c = ac(); if (!c) return; const o = c.createOscillator(), g = c.createGain(); o.type = 'sawtooth'; const t = c.currentTime; o.frequency.setValueAtTime(70, t); o.frequency.exponentialRampToValueAtTime(260, t + .5); g.gain.setValueAtTime(.05, t); g.gain.exponentialRampToValueAtTime(.001, t + .6); o.connect(g); g.connect(c.destination); o.start(t); o.stop(t + .65); }
 function sfxCoin() { tone(988, .08, 'square', 0, .05); tone(1319, .2, 'square', .07, .05); }
 
@@ -403,14 +457,26 @@ const packP = {};
 function loadPack(name) {
   return packP[name] || (packP[name] = fetch('audio/' + name + '.json').then(r => r.ok ? r.json() : {}).then(o => { Object.assign(AUDIO, o); }).catch(() => { delete packP[name]; }));
 }
+// Which words and names have a natural voice (small list; the clips themselves load one by one, when needed)
+let VOICE = { w: new Set(), n: new Set() };
+const voiceIndex = fetch('audio/index.json').then(r => r.ok ? r.json() : { w: [], n: [] }).then(o => { VOICE = { w: new Set(o.w), n: new Set(o.n) }; }).catch(() => {});
 const allAudio = (async () => { for (const p of AUDIO_PACKS) await loadPack(p); })();
-// extra word voices (about 2,800 more words): split by first letter, loaded only when a word needs them
-const extraPack = w => { const c = (w || '')[0] || 'a'; const p = EXTRA_PACKS.find(p => c >= p[1] && c <= p[2]); return p ? p[0] : null; };
-async function loadWordVoice(key) { if (!AUDIO[key] && key.startsWith('w_')) { const p = extraPack(key.slice(2)); if (p) await loadPack(p); } }
+const clipP = {};
+function b64(buf) { const u = new Uint8Array(buf); let s = ''; for (let i = 0; i < u.length; i += 0x8000) s += String.fromCharCode.apply(null, u.subarray(i, i + 0x8000)); return btoa(s); }
+function loadClip(key) {   // key: w_<word> or n_<name>
+  if (AUDIO[key]) return Promise.resolve();
+  const kind = key[0], name = key.slice(2);
+  if (!/^[wn]_[a-z]+$/.test(key)) return Promise.resolve();
+  return clipP[key] || (clipP[key] = voiceIndex.then(() => {
+    if (!VOICE[kind].has(name)) return;
+    return fetch(`audio/${kind}/${name}.mp3`).then(r => r.ok ? r.arrayBuffer() : null).then(buf => { if (buf) AUDIO[key] = b64(buf); });
+  }).catch(() => { delete clipP[key]; }));
+}
+async function loadWordVoice(key) { if (!AUDIO[key]) await loadClip(key); }
 async function ensureWords(list) {
-  await allAudio;
-  const need = new Set(); (list || []).forEach(t => norm(plain(t)).split(' ').forEach(w => { const p = extraPack(w); if (w && p && !AUDIO['w_' + w]) need.add(p); }));
-  await Promise.all([...need].map(loadPack));
+  await voiceIndex;
+  const keys = new Set(); (list || []).forEach(t => norm(plain(t)).split(' ').forEach(w => { if (w) keys.add('w_' + w); }));
+  const all = [...keys]; for (let i = 0; i < all.length; i += 8) await Promise.all(all.slice(i, i + 8).map(loadClip));   // 8 at a time
 }
 const bufCache = {};
 async function getBuf(key) {
@@ -479,7 +545,7 @@ function deviceSpeak(text, rate = .85) {
     } catch (e) { fin(); }
   });
 }
-const hasWord = w => !!AUDIO['w_' + norm(w)];
+const hasWord = w => { const k = norm(w); return !!AUDIO['w_' + k] || VOICE.w.has(k); };
 async function sayWord(w) { w = norm(plain(w)); if (!(await playKey('w_' + w))) await deviceSpeak(w); }
 async function saySound(g) { if (!(await playKey('s_' + g))) await deviceSpeak(g); }
 async function saySentence(t) {
@@ -500,7 +566,7 @@ async function say(id) {
   try { await playKey('p_' + id); } finally { m && m.classList.remove('talking'); }
 }
 const nameKey = n => norm(n || '').split(' ')[0] || '';
-function hasNameVoice() { return !!(S.nameRec || AUDIO['n_' + nameKey(S.name)]); }
+function hasNameVoice() { return !!(S.nameRec || VOICE.n.has(nameKey(S.name))); }
 async function sayName() {
   if (!S.name) return;
   if (S.nameRec) { if (!AUDIO.__name || AUDIO.__nameSrc !== S.nameRec.b64) { AUDIO.__name = S.nameRec.b64; AUDIO.__nameSrc = S.nameRec.b64; delete bufCache.__name; } if (await playKey('__name')) return; }
@@ -700,23 +766,24 @@ function coin(size = 24) {
 function renderHome() {
   const st = currentStreak();
   $('#streakChip').textContent = '🔥 ' + st;
-  $('#coinChip').innerHTML = coin(26) + ' ' + S.coins;
+  $('#coinChip').innerHTML = coin(26) + ' ' + allCoins();
+  checkBadges();
   const nc = $('#nameChip'); nc.style.display = S.name ? '' : 'none'; nc.textContent = S.name;
   if (!S.setupDone) setTimeout(setupWizard, 50);
   $('#heroCar').innerHTML = carSVG(S.car, 200);
-  const ni = CARS.findIndex(c => c.at > S.coins);
+  const coinsNow = allCoins(), ni = CARS.findIndex(c => c.at > coinsNow);
   if (ni >= 0) {
-    const prev = ni > 0 ? CARS[ni - 1].at : 0, pct = Math.max(4, Math.min(100, (S.coins - prev) / (CARS[ni].at - prev) * 100));
+    const prev = ni > 0 ? CARS[ni - 1].at : 0, pct = Math.max(4, Math.min(100, (coinsNow - prev) / (CARS[ni].at - prev) * 100));
     $('#nextCar').innerHTML = `${coin(22)}<div class="bar"><i style="width:${pct}%"></i></div><span class="nc">${carSVG(ni, 64)}</span>🔒`;
   } else $('#nextCar').innerHTML = '';
   const wk = [];
   const L = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
   for (let i = 6; i >= 0; i--) {
-    const k = addDays(today(), -i), ok = S.days[k] && S.days[k].goal, [y, m, dd] = k.split('-').map(Number);
+    const k = addDays(today(), -i), ok = view(k).goal, [y, m, dd] = k.split('-').map(Number);
     wk.push(`<div class="wd"><b class="${ok ? 'ok' : ''} ${i === 0 ? 'today' : ''}">${ok ? '🔥' : ''}</b>${i === 0 ? 'Today' : L[new Date(y, m - 1, dd).getDay()]}</div>`);
   }
   $('#week').innerHTML = wk.join('');
-  const plan = todayPlan(), d = dayRec();
+  const plan = todayPlan(), d = view();
   const nextIdx = plan.findIndex((_, i) => !d.done[i]);
   const cards = plan.map((r, i) => {
     const m = d.done[i], th = RACES[i % RACES.length];
@@ -731,22 +798,25 @@ function renderHome() {
     <div class="mini">
       <button class="mtile" id="bonusTile" style="background:#efe2ff">⭐<b>Bonus</b></button>
       <button class="mtile" id="garageTile" style="background:#e1efff">🚗<b>Garage</b></button>
+      <button class="mtile" id="badgeTile" style="background:#e6ffe9">🏅<b id="badgeCount">Badges</b></button>
       ${lbActive() ? '<button class="mtile" id="boardTile" style="background:#fff1c2">🏆<b>Done today</b></button>' : ''}
     </div>`;
   document.querySelectorAll('[data-r]').forEach(b => b.onclick = () => { const i = +b.dataset.r; startRace(todayPlan()[i], { race: i, intro: 'race' + (i % RACES.length) }); });
   $('#bonusTile').onclick = bonusLap; $('#garageTile').onclick = garage;
   const bt = $('#boardTile'); if (bt) bt.onclick = openBoard;
+  $('#badgeTile').onclick = badgesModal; $('#badgeCount').textContent = badgeCount() + ' badge' + (badgeCount() === 1 ? '' : 's');
   ensureWords([...plan.flat().map(it => it.text), ...S.review]); // fetch any extra voices this homework needs, in the background
+  if (S.name && !S.nameRec) loadClip('n_' + nameKey(S.name));
 }
 document.getElementById('home').addEventListener('click', e => { if (!welcomed && !e.target.closest('button')) { welcomed = true; welcome(); } });
-async function welcome() { await loadPack('core'); if (S.name && hasNameVoice()) { await playKey('p_hello'); await sayName(); await playKey('p_start_home'); } else await playKey('p_welcome'); }
+async function welcome() { await allAudio; await voiceIndex; if (S.name && hasNameVoice()) { await playKey('p_hello'); await sayName(); await playKey('p_start_home'); } else await playKey('p_welcome'); }
 function bonusLap() {
   const hw = parseHomework(S.homework); const pool = [];
   hw.words.forEach(t => pool.push({ text: t, type: 'word', red: isRed(norm(plain(t))) }));
   hw.sents.forEach(t => pool.push({ text: t, type: 'sentence' }));
   S.review.forEach(t => { if (!isSoundOnly(t)) pool.push({ text: t, type: t.includes(' ') ? 'sentence' : 'word', red: isRed(t) }); });
   if (!pool.length) return;
-  const weight = it => { const s = S.stats[norm(plain(it.text))]; return 1 + (s ? s.miss * 3 : 2); };
+  const ms = mergedStats(); const weight = it => { const s = ms[norm(plain(it.text))]; return 1 + (s ? s.miss * 3 : 2); };
   const chosen = [], used = new Set();
   while (chosen.length < Math.min(8, pool.length)) {
     let tot = 0; pool.forEach((p, i) => { if (!used.has(i)) tot += weight(p); }); let r = Math.random() * tot;
@@ -755,12 +825,84 @@ function bonusLap() {
   chosen.sort((a, b) => (a.type === 'sentence') - (b.type === 'sentence'));
   startRace(chosen, { bonus: true, intro: 'bonus_lap' });
 }
+$('#helpBtn').onclick = () => { stopAudio(); say('help_home'); };
+/* ---- badges ---- */
+const BADGES = [
+  { id: 'first', em: '🏁', name: 'First race', ok: t => t.races >= 1 },
+  { id: 'r10', em: '🚦', name: '10 races', ok: t => t.races >= 10 },
+  { id: 'r25', em: '🏎️', name: '25 races', ok: t => t.races >= 25 },
+  { id: 'r50', em: '🚀', name: '50 races', ok: t => t.races >= 50 },
+  { id: 'w50', em: '📖', name: '50 words', ok: t => t.words >= 50 },
+  { id: 'w100', em: '📚', name: '100 words', ok: t => t.words >= 100 },
+  { id: 'w250', em: '🧠', name: '250 words', ok: t => t.words >= 250 },
+  { id: 'w500', em: '🌟', name: '500 words', ok: t => t.words >= 500 },
+  { id: 's3', em: '🔥', name: '3 days in a row', ok: t => t.streak >= 3 },
+  { id: 's7', em: '🌈', name: '7 days in a row', ok: t => t.streak >= 7 },
+  { id: 's14', em: '👑', name: '14 days in a row', ok: t => t.streak >= 14 },
+  { id: 'turbo', em: '⚡', name: 'Turbo boost', ok: t => t.turbos >= 1 },
+  { id: 'gold5', em: '🥇', name: '5 gold medals', ok: t => t.gold >= 5 },
+  { id: 'gold20', em: '🏆', name: '20 gold medals', ok: t => t.gold >= 20 },
+];
+function totals() {
+  let words = 0, gold = 0, races = 0;
+  allDayKeys().forEach(k => { const d = view(k); words += d.words || 0; Object.values(d.done || {}).forEach(m => { races++; if (m === 3) gold++; }); });
+  const sum = f => (S[f] || 0) + others().reduce((t, o) => t + (o[f] || 0), 0);
+  return { words, gold, races: Math.max(races, sum('raceCount')), streak: Math.max(bestStreak(), currentStreak()), turbos: sum('turbos') };
+}
+function checkBadges() {   // returns badges earned just now
+  S.badges = S.badges || {}; const t = totals(), fresh = [];
+  BADGES.forEach(b => { if (!S.badges[b.id] && b.ok(t)) { S.badges[b.id] = today(); fresh.push(b); } });
+  if (fresh.length) save(); return fresh;
+}
+function badgeCount() { return Object.keys(S.badges || {}).length; }
+function badgesModal() {
+  checkBadges();
+  modal(`<div style="display:flex;justify-content:space-between;align-items:center"><h2>🏅 ${badgeCount()} / ${BADGES.length}</h2><button class="iconbtn" style="background:#eee;color:#333" onclick="closeModal()">✕</button></div>
+    <div class="badges">${BADGES.map(b => { const has = S.badges && S.badges[b.id]; return `<div class="bdg ${has ? '' : 'locked'}"><span>${b.em}</span><small>${esc(b.name)}</small></div>`; }).join('')}</div>`);
+  say('badges');
+}
+/* ---- car wash: a short reward after each race. The child rubs the mud off the car. ---- */
+function carWash() {
+  return new Promise(res => {
+    const W = 320, H = 180, el = document.createElement('div'); el.className = 'wash';
+    el.innerHTML = `<button class="skip" aria-label="Skip">Skip ➜</button><div class="stage">${carSVG(S.car, W)}<canvas width="${W * 2}" height="${H * 2}"></canvas></div><div class="hand">👆🧽</div>`;
+    document.body.appendChild(el);
+    const cv = el.querySelector('canvas'), g = cv.getContext('2d'); g.scale(2, 2);
+    // mud: brown blobs over the car shape only
+    g.fillStyle = '#8a5a2b';
+    for (let i = 0; i < 70; i++) { g.beginPath(); g.arc(30 + Math.random() * 270, 40 + Math.random() * 120, 14 + Math.random() * 22, 0, 7); g.fill(); }
+    g.fillStyle = '#6b4220'; for (let i = 0; i < 40; i++) { g.beginPath(); g.arc(30 + Math.random() * 270, 40 + Math.random() * 120, 4 + Math.random() * 7, 0, 7); g.fill(); }
+    const start = g.getImageData(0, 0, W * 2, H * 2).data; let mud = 0; for (let i = 3; i < start.length; i += 64) if (start[i]) mud++;
+    let done = false, moves = 0, last = null;
+    const finish = async win => {
+      if (done) return; done = true; clearTimeout(tmo);
+      if (win) { g.clearRect(0, 0, W, H); confetti(24); sfxWin(); await say('wash_done'); }
+      el.remove(); res();
+    };
+    const rub = e => {
+      const r = cv.getBoundingClientRect(), x = (e.clientX - r.left) * W / r.width, y = (e.clientY - r.top) * H / r.height;
+      g.globalCompositeOperation = 'destination-out'; g.lineCap = 'round'; g.lineWidth = 46;
+      g.beginPath(); g.moveTo(last ? last.x : x, last ? last.y : y); g.lineTo(x, y); g.stroke(); last = { x, y };
+      if (++moves % 12 === 0) {   // how much mud is left?
+        const d = g.getImageData(0, 0, W * 2, H * 2).data; let left = 0; for (let i = 3; i < d.length; i += 64) if (d[i]) left++;
+        if (left < mud * .25) finish(true);
+        else if (moves % 36 === 0) tone(880 + Math.random() * 300, .06, 'sine', 0, .03);   // little squeaky bubbles
+      }
+    };
+    cv.addEventListener('pointerdown', e => { last = null; el.querySelector('.hand').style.visibility = 'hidden'; rub(e); });
+    cv.addEventListener('pointermove', e => { if (e.buttons || e.pointerType === 'touch') rub(e); });
+    cv.addEventListener('pointerup', () => last = null);
+    el.querySelector('.skip').onclick = () => { stopAudio(); finish(false); };
+    const tmo = setTimeout(() => finish(true), 20000);   // never keeps a child stuck
+    say('wash');
+  });
+}
 function garage() {
-  modal(`<div style="display:flex;justify-content:space-between;align-items:center"><h2>🚗 ${coin(28)} ${S.coins}</h2><button class="iconbtn" style="background:#eee;color:#333" onclick="closeModal()">✕</button></div><div class="garage">${CARS.map((c, i) => {
-    const locked = S.coins < c.at;
+  modal(`<div style="display:flex;justify-content:space-between;align-items:center"><h2>🚗 ${coin(28)} ${allCoins()}</h2><button class="iconbtn" style="background:#eee;color:#333" onclick="closeModal()">✕</button></div><div class="garage">${CARS.map((c, i) => {
+    const locked = allCoins() < c.at;
     return `<button class="gcar ${i === S.car ? 'sel' : ''} ${locked ? 'locked' : ''}" data-i="${i}" ${locked ? 'disabled' : ''}>${carSVG(i, 130)}<div>${locked ? '🔒 ' + coin(20) + ' ' + c.at : i === S.car ? '✅' : '▶️'}</div></button>`;
   }).join('')}</div>`);
-  say('garage');
+  say('help_garage');
   document.querySelectorAll('.gcar:not(.locked)').forEach(b => b.onclick = () => { S.car = +b.dataset.i; save(); sfxVroom(); closeModal(); renderHome(); });
 }
 
@@ -948,12 +1090,12 @@ async function hearModel() {
 }
 function pitStop() { const it = R.cur.it; if (it.comeback >= S.settings.comebacks) return; R.queue.splice(Math.min(R.idx + 3, R.queue.length), 0, { ...it, comeback: it.comeback + 1 }); }
 function award(n) {
-  if (!n) return; const before = S.coins;
+  if (!n) return; const before = allCoins();
   S.coins += n; R.coins += n; dayRec().coins += n;
-  const unl = CARS.findIndex(c => before < c.at && S.coins >= c.at); if (unl >= 0) R.unlocked = unl;
+  const after = allCoins(), unl = CARS.findIndex(c => before < c.at && after >= c.at); if (unl >= 0) R.unlocked = unl;
   const el = $('#raceCoins'); el.innerHTML = coin(22) + ' ' + R.coins; el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop'); sfxCoin(); save();
 }
-function stat(it, firstTry, missed) { const k = norm(plain(it.text)); const s = S.stats[k] || (S.stats[k] = { seen: 0, first: 0, miss: 0 }); s.seen++; if (firstTry) s.first++; if (missed) s.miss++; }
+function stat(it, firstTry, missed) { const k = norm(plain(it.text)); const s = S.stats[k] || (S.stats[k] = { seen: 0, first: 0, miss: 0 }); s.seen++; if (firstTry) s.first++; if (missed) { s.miss++; const d = dayRec(); d.help = d.help || {}; d.help[k] = (d.help[k] || 0) + 1; } }
 function addMissed(it) { const d = plain(it.text); if (!R.missed.includes(d)) R.missed.push(d); }
 function bump(cls) { const card = $('#card'); card.classList.remove('good', 'bad'); void card.offsetWidth; card.classList.add(cls); }
 async function correct() {
@@ -968,8 +1110,8 @@ async function correct() {
   if (c.stage === 0) { R.combo++; if (R.combo % 3 === 0) turbo = true; } else R.combo = 0;
   if (it.type === 'word') await sayWord(it.text);
   if (c.modeled) await say('great_job');
-  else if (turbo) { $('#runner').classList.add('turbo'); flash('TURBO!'); award(3); await say('turbo'); }
-  else { await say(pick(['pr1', 'pr2', 'pr3', 'pr4', 'pr5', 'pr6', 'pr7', 'pr8'])); if (Math.random() < .35) await sayName(); }
+  else if (turbo) { S.turbos = (S.turbos || 0) + 1; $('#runner').classList.add('turbo'); flash('TURBO!'); award(3); await say('turbo'); }
+  else { await say(pick(['pr1', 'pr2', 'pr3', 'pr4', 'pr5', 'pr6', 'pr7', 'pr8', 'pr9', 'pr10', 'pr11', 'pr12', 'pr13', 'pr14', 'pr15', 'pr16'])); if (Math.random() < .35) await sayName(); }
   if (R.dead) return;
   advance();
 }
@@ -985,35 +1127,42 @@ async function finishRace() {
     const d = dayRec();
     if (!d.done[m.race]) bonus = 5;
     d.done[m.race] = Math.max(d.done[m.race] || 0, medal);
-    if (!d.goal && doneToday() >= goalNeeded()) {
-      d.goal = true; goalNow = true; bonus += 10; const t = today();
-      S.streak = S.lastGoalDay === addDays(t, -1) ? S.streak + 1 : (S.lastGoalDay === t ? S.streak : 1);
-      S.lastGoalDay = t; S.best = Math.max(S.best, S.streak);
+    if (!view().goal && doneToday() >= goalNeeded()) {
+      d.goal = true; goalNow = true; bonus += 10;
+      S.streak = currentStreak(); S.lastGoalDay = today(); S.best = Math.max(S.best || 0, bestStreak());
     }
   } else bonus = 3;
+  S.raceCount = (S.raceCount || 0) + 1;
   award(bonus); save(); if (goalNow) lbSubmit();
+  sync();
+  const newBadges = checkBadges();
   sfxWin(); confetti(60);
-  const plan = todayPlan(), d = dayRec();
+  const plan = todayPlan(), d = view();
   const next = plan.findIndex((_, i) => !d.done[i]);
   $('#resBody').innerHTML = `<div class="res">
       <div class="medal">${goalNow ? '🏆' : MEDAL[medal]}</div>
       <div style="display:flex;justify-content:center;align-items:flex-end;gap:6px">${carSVG(S.car, won ? 170 : 130)}${truckSVG(won ? 90 : 120)}</div>
       ${S.name ? `<div style="font-size:30px;font-weight:800">${esc(S.name)}</div>` : ''}<div class="plus">+${R.coins} ${coin(34)}</div>
-      ${goalNow ? `<div style="font-size:40px;font-weight:800">🔥 ${S.streak}</div>` : ''}
+      ${goalNow ? `<div style="font-size:40px;font-weight:800">🔥 ${currentStreak()}</div>` : ''}
+      ${newBadges.length ? `<div class="newbadges">${newBadges.map(b => `<div class="bdg pop"><span>${b.em}</span><small>${esc(b.name)}</small></div>`).join('')}</div>` : ''}
       ${R.missed.length ? `<div class="practice">${R.missed.map(w => `<span data-say="${esc(w)}">${esc(w)} 🔊</span>`).join('')}</div>` : ''}
     </div>
     ${R.unlocked != null ? `<button class="unlock" id="driveNew" style="width:100%;margin-top:12px">🎉 ${carSVG(R.unlocked, 160)}</button>` : ''}
     <div class="bigrow" style="margin-top:16px">
       <button class="bigbtn" id="resHome" aria-label="Home">🏠</button>
+      <button class="bigbtn" id="resHelp" aria-label="What do I do?" style="flex:.6">🔊</button>
       ${next >= 0 ? `<button class="bigbtn g" id="resNext" aria-label="Next race">▶️</button>` : `<button class="bigbtn y" id="resBonus" aria-label="Bonus">⭐</button>`}
     </div>`;
+  if (m.race != null) await carWash();
   show('results');
   document.querySelectorAll('[data-say]').forEach(s => s.onclick = () => { const t = s.dataset.say; t.includes(' ') ? saySentence(t) : sayWord(t); });
   $('#resHome').onclick = () => { stopAudio(); renderHome(); show('home'); };
+  $('#resHelp').onclick = () => { stopAudio(); say('help_results'); };
   const nb = $('#resNext'); if (nb) nb.onclick = () => startRace(todayPlan()[next], { race: next, intro: 'race' + (next % RACES.length) });
   const bb = $('#resBonus'); if (bb) bb.onclick = bonusLap;
   const dn = $('#driveNew'); if (dn) dn.onclick = () => { S.car = R.unlocked; save(); sfxVroom(); dn.style.opacity = .6; };
   await sayName(); await say(goalNow ? 'goal_done' : won ? 'race_done' : 'race_lost');
+  if (newBadges.length) await say('badge_new');
   if (R.unlocked != null) await say('new_car');
   else if (next < 0 && !goalNow && m.race != null) await say('all_done');
 }
@@ -1035,7 +1184,7 @@ $('#parentBtn').onclick = () => {
 $('#parentBack').onclick = () => { renderHome(); show('home'); };
 let ptab = 'homework';
 $('#ptabs').onclick = e => { const b = e.target.closest('button'); if (!b) return; ptab = b.dataset.t; renderParent(); };
-function renderParent() { document.querySelectorAll('#ptabs button').forEach(b => b.classList.toggle('on', b.dataset.t === ptab)); ({ homework: pHomework, progress: pProgress, settings: pSettings })[ptab](); }
+function renderParent() { document.querySelectorAll('#ptabs button').forEach(b => b.classList.toggle('on', b.dataset.t === ptab)); ({ homework: pHomework, progress: pProgress, settings: pSettings, help: pHelp })[ptab](); }
 function preview(txt) {
   const hw = parseHomework(txt);
   const miss = [...hw.words, ...hw.sents.flatMap(s => norm(plain(s)).split(' '))].filter((w, i, a) => a.indexOf(w) === i && !hasWord(w));
@@ -1060,11 +1209,24 @@ function pHomework() {
     S.homework = $('#hwTx').value; refreshRed(); save(); toast('Saved ✓ New races are ready');
   };
 }
+function weekSummary() {
+  let goal = 0, races = 0, words = 0, coins = 0; const help = {};
+  for (let i = 0; i < 7; i++) {
+    const d = view(addDays(today(), -i));
+    if (d.goal) goal++; races += Object.keys(d.done || {}).length; words += d.words || 0; coins += d.coins || 0;
+    Object.entries(d.help || {}).forEach(([w, n]) => help[w] = (help[w] || 0) + n);
+  }
+  const top = Object.entries(help).sort((a, b) => b[1] - a[1]).slice(0, 6).map(([w]) => w);
+  return `<h3 style="margin:0">This week (last 7 days)</h3>
+    <div class="wk"><div><b>${goal}/7</b>days all races done</div><div><b>${races}</b>races finished</div><div><b>${words}</b>words read</div><div><b>${coins}</b>coins earned</div></div>
+    <p class="hint" style="margin:0">${top.length ? `Needed help with: <b style="font-family:var(--read);color:var(--ink)">${top.map(esc).join(', ')}</b>` : 'No words needed help this week.'}</p>`;
+}
 function pProgress() {
-  const rows = []; for (let i = 0; i < 14; i++) { const k = addDays(today(), -i); const d = S.days[k]; if (d && (d.coins || Object.keys(d.done).length)) rows.push(`<tr><td>${k}</td><td>${Object.keys(d.done).length}${d.plan ? '/' + d.plan.length : ''}</td><td>${d.coins}</td><td>${d.goal ? '🔥' : ''}</td></tr>`); }
-  const tricky = Object.entries(S.stats).filter(([, s]) => s.miss > 0).map(([w, s]) => ({ w, ...s, rate: s.first / s.seen })).sort((a, b) => a.rate - b.rate || b.miss - a.miss).slice(0, 15);
+  const rows = []; for (let i = 0; i < 14; i++) { const k = addDays(today(), -i); const d = view(k); if (d && (d.coins || Object.keys(d.done).length)) rows.push(`<tr><td>${k}</td><td>${Object.keys(d.done).length}${d.plan ? '/' + d.plan.length : ''}</td><td>${d.coins}</td><td>${d.goal ? '🔥' : ''}</td></tr>`); }
+  const tricky = Object.entries(mergedStats()).filter(([, s]) => s.miss > 0).map(([w, s]) => ({ w, ...s, rate: s.first / s.seen })).sort((a, b) => a.rate - b.rate || b.miss - a.miss).slice(0, 15);
   $('#pbody').innerHTML = `<div class="panel">
-    <div style="display:flex;gap:8px;flex-wrap:wrap"><div class="chip" style="color:var(--ink);background:#fff4cc;font-size:17px">🔥 Streak ${currentStreak()}</div><div class="chip" style="color:var(--ink);background:#e1efff;font-size:17px">Best ${S.best}</div><div class="chip" style="color:var(--ink);background:#eafbf1;font-size:17px">🪙 ${S.coins}</div></div>
+    ${weekSummary()}
+    <div style="display:flex;gap:8px;flex-wrap:wrap"><div class="chip" style="color:var(--ink);background:#fff4cc;font-size:17px">🔥 Streak ${currentStreak()}</div><div class="chip" style="color:var(--ink);background:#e1efff;font-size:17px">Best ${bestStreak()}</div><div class="chip" style="color:var(--ink);background:#eafbf1;font-size:17px">🪙 ${allCoins()}</div></div>
     <h3 style="margin:6px 0 0">Tricky ones</h3>
     ${tricky.length ? `<table><tr><th>Item</th><th>Read alone</th><th>Needed help</th></tr>${tricky.map(t => `<tr><td style="font-family:var(--read);font-size:18px">${esc(t.w)}</td><td>${t.first}/${t.seen}</td><td>${t.miss}</td></tr>`).join('')}</table>` : '<p class="hint">Nothing tricky yet.</p>'}
     <h3 style="margin:6px 0 0">What the microphone heard</h3>
@@ -1091,6 +1253,7 @@ function pSettings() {
     <div class="set"><label>Microphone checking</label><select id="sStrict"><option value="0" ${S.settings.strict ? '' : 'selected'}>Relaxed (recommended)</option><option value="1" ${S.settings.strict ? 'selected' : ''}>Strict</option></select></div>
     <p class="hint">Relaxed: if the phone mishears a vowel (e.g. writes “hell” or “heal” for <i>hill</i>), it still counts, unless the word it heard is also on the homework list.</p>
     <div class="set"><label>Sound dots under words</label><select id="sDots">${opt('1', S.settings.dots ? 1 : 0, 'Always')}${opt('0', S.settings.dots ? 1 : 0, 'Only when helping')}</select></div>
+    ${micTestBlock()}
     <div class="note">${SR ? 'This browser can listen to your child.' : '<b>This browser can’t listen.</b> On iPhone, open the game in Safari.'}${micBlocked ? ' The microphone was blocked on this page.' : ''}</div>
     <button class="btn r" id="resetAll" style="margin-top:6px">Reset coins, streak and stats</button>
   </div>`;
@@ -1098,7 +1261,7 @@ function pSettings() {
   bind('#tRead', v => t.read = +v); bind('#tFred', v => t.fred = +v); bind('#tSounds', v => t.sounds = +v);
   bind('#sCome', v => S.settings.comebacks = +v); bind('#sGoal', v => S.settings.goal = v === 'all' ? 'all' : +v);
   bindName(pSettings); bindClass(); bindLink(); checkDupName();
-  bind('#sDots', v => S.settings.dots = v === '1'); bind('#sStrict', v => S.settings.strict = v === '1');
+  bind('#sDots', v => S.settings.dots = v === '1'); bind('#sStrict', v => S.settings.strict = v === '1'); bindMicTest();
   $('#resetAll').onclick = () => {
     modal(`<h2>Reset coins, streak, cars and stats?</h2><p class="hint">The homework stays.</p><div style="display:flex;gap:10px"><button class="btn w" style="flex:1" onclick="closeModal()">Cancel</button><button class="btn r" style="flex:1" id="rsYes">Reset</button></div>`);
     $('#rsYes').onclick = () => { const keep = { homework: S.homework, review: S.review, settings: S.settings, name: S.name, nameRec: S.nameRec, lb: S.lb, setupDone: true }; S = { ...fresh(), ...keep }; save(); closeModal(); toast('Reset'); pSettings(); };
@@ -1107,13 +1270,13 @@ function pSettings() {
 
 /* ---- child's name + first-run setup ---- */
 function nameBlock() {
-  const known = !!AUDIO['n_' + nameKey(S.name)];
+  const known = VOICE.n.has(nameKey(S.name));
   return `<div class="set" style="flex-wrap:wrap"><label>Child's name</label><input type="text" id="nmIn" value="${esc(S.name)}" placeholder="e.g. Omar" style="width:150px;border:2px solid #dfe3f2;border-radius:10px;padding:8px;font-size:18px"></div>
     <div id="nmVoice" class="hint">${nameVoiceHint()}</div>`;
 }
 function nameVoiceHint() {
   if (!S.name) return 'The game shows the name and says it out loud.';
-  const known = !!AUDIO['n_' + nameKey(S.name)];
+  const known = VOICE.n.has(nameKey(S.name));
   return `${S.nameRec ? 'The game uses your recording of the name.' : known ? 'The game knows how to say this name.' : '<b>The game’s voice doesn’t know this name</b>, so it will only show it. You can record it (3 seconds).'}
     <div style="display:flex;gap:8px;margin-top:6px">${hasNameVoice() ? '<button class="btn w" id="nmPlay" style="padding:8px 12px">🔊 Hear it</button>' : ''}<button class="btn w" id="nmRec" style="padding:8px 12px">🎙️ ${S.nameRec ? 'Record again' : 'Record the name'}</button>${S.nameRec ? '<button class="btn w" id="nmDel" style="padding:8px 12px">🗑</button>' : ''}</div>`;
 }
@@ -1141,22 +1304,83 @@ async function recordName(btn, done) {
   };
   btn.textContent = '⏺ Say the name now…'; mr.start(); setTimeout(() => { if (mr.state === 'recording') mr.stop(); }, 2500);
 }
-function setupWizard() {
-  if (S.setupDone || $('#modalBg').classList.contains('on')) return;
-  modal(`<h2>🏎️ Welcome to Word Racer</h2>
-    <p class="hint">A quick setup for grown-ups. You can change this later with ⚙️.</p>
-    <div class="panel" style="padding:0">${nameBlock()}
-    ${classBlock()}
-    <label style="font-weight:700">This week's homework words and sentences</label>
-    <textarea class="hw" id="suHw" style="min-height:150px" spellcheck="false" autocapitalize="off" placeholder="Words: cat, hen, zip, fox
+/* ---- microphone test (setup, settings and help) ---- */
+const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+const MIC_FIX = isIOS
+  ? 'On iPhone: Settings → Apps → Safari → Microphone → <b>Allow</b>, and Settings → General → Keyboard → <b>Enable Dictation</b>. Then reload the game.'
+  : 'Tap the 🔒 or ⓘ next to the web address, set Microphone to <b>Allow</b>, then reload the game.';
+function micTestBlock() {
+  return `<div class="mictest" id="micTest"><b>Microphone test</b><br>Tap the button, then your child says <b>"cat"</b>.<div style="margin-top:8px"><button class="btn w" id="micTestGo" style="padding:8px 14px">🎤 Test the microphone</button></div><div id="micTestRes" style="margin-top:6px"></div></div>`;
+}
+function bindMicTest() {
+  const b = $('#micTestGo'); if (!b) return;
+  b.onclick = () => {   // listen() must start straight from the tap (iPhone rule)
+    const out = $('#micTestRes');
+    if (!SR) { out.innerHTML = '❌ This browser can’t listen. ' + (isIOS ? 'Open the game in <b>Safari</b>.' : 'Open the game in <b>Chrome</b>.'); return; }
+    b.disabled = true; out.textContent = 'Getting ready…';
+    listen(5000, t => t.some(x => /\b(cat|kat|cats)\b/.test(norm(x))), () => { out.innerHTML = '🗣️ Say <b>"cat"</b> now!'; }).then(r => {
+      b.disabled = false; setSession('playback');
+      if (r.texts && r.texts.length) {
+        const ok = r.texts.some(x => /\b(cat|kat|cats)\b/.test(norm(x)));
+        out.innerHTML = ok ? `✅ The microphone works. It heard: "${esc(r.texts[0])}"` : `⚠️ It heard "${esc(r.texts[0])}". The microphone works, but try again a bit closer and slower.`;
+        if (micBlocked) { micBlocked = false; }
+      } else if (['not-allowed', 'service-not-allowed'].includes(r.error)) out.innerHTML = '❌ The microphone is blocked. ' + MIC_FIX;
+      else out.innerHTML = '⚠️ Nothing heard. Hold the phone closer and try again. If it keeps happening: ' + MIC_FIX;
+    });
+  };
+}
+const isStandalone = () => (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true;
+function homeTip() {
+  if (isStandalone()) return '';
+  return `<div class="note">📲 <b>Put the game on the home screen</b> so it opens like an app: ${isIOS
+    ? 'in Safari tap <b>Share</b> (the square with an arrow ⬆️), then <b>Add to Home Screen</b>.'
+    : 'in Chrome tap <b>⋮</b> (top right), then <b>Add to Home screen</b> or <b>Install app</b>.'}</div>`;
+}
+function pHelp() {
+  const qa = [
+    ['The microphone doesn’t work, or it keeps saying “I didn’t hear you”', `Use the test below. Speak close to the phone in a quiet room. ${MIC_FIX}`],
+    ['My child read it right but the game said no', 'Phones sometimes mishear young children. Open <b>Progress → What the microphone heard</b> to see what the phone wrote. In <b>Settings</b>, keep <b>Microphone checking</b> on <b>Relaxed</b>.'],
+    ['How do I add this week’s homework?', 'Open <b>Homework</b>, paste the words (commas between them) and each sentence on its own line, then tap <b>Save homework</b>. The game builds the races by itself.'],
+    ['A word has a robot voice', 'The game has a natural voice for about 4,600 words. For others it uses the phone’s own voice. The Homework tab lists those words so you can tell us.'],
+    ['What are the daily goal and the 🔥 streak?', 'The goal is finishing today’s races (change it in <b>Settings</b>). Each day the goal is met adds 1 to the streak. Missing a day starts it again.'],
+    ['What is “Done today”?', 'If you entered a class code, children who finished all of today’s races appear with their first name and car. No scores or ranking. Choose <b>No</b> for “Show my child on the list” to stay off it; your child then doesn’t see the list either.'],
+    ['My child plays on two phones', 'Open <b>Settings</b> on the first phone and copy the code under “Same child on another phone?”. Type it on the second phone and tap <b>🔗 Link</b>. After that, coins, medals, streaks and badges are added up across both phones, and they show once on the class list. Both phones need internet now and then to share.'],
+    ['Will we lose progress?', 'Progress is saved on the phone and, when online, a copy is kept in the class sheet. If you clear Safari/Chrome website data, use <b>Same child on another phone</b> with the code you wrote down to get it back, so it’s worth noting the code in Settings.'],
+    ['Does it work without internet?', 'Yes, after the first visit. Only the “Done today” list needs internet.'],
+  ];
+  $('#pbody').innerHTML = `<div class="panel">
+    ${homeTip()}
+    ${micTestBlock()}
+    <div class="faq">${qa.map(([q, a]) => `<details><summary>${q}</summary><p>${a}</p></details>`).join('')}</div>
+  </div>`;
+  bindMicTest();
+}
+function setupWizard(step = 0) {
+  if (S.setupDone || (step === 0 && $('#modalBg').classList.contains('on'))) return;
+  const N = 4, dots = `<div class="steps">${Array.from({ length: N }, (_, i) => `<i class="${i <= step ? 'on' : ''}"></i>`).join('')}</div>`;
+  const nav = (next, label = 'Next →') => `<div style="display:flex;gap:10px;margin-top:6px">${step ? '<button class="btn w" style="flex:1" id="suBack">← Back</button>' : ''}<button class="btn g" style="flex:2" id="suNext">${label}</button></div>`;
+  const body = [
+    () => `<h2>🏎️ Welcome to Word Racer</h2><p class="hint">A 1-minute setup for grown-ups. You can change everything later with ⚙️.</p>
+      <div class="panel" style="padding:0">${nameBlock()}</div>${nav()}`,
+    () => `<h2>📚 This week's homework</h2><p class="hint">Paste the words with commas between them, and each sentence on its own line. You can add or change it any time.</p>
+      <textarea class="hw" id="suHw" style="min-height:150px" spellcheck="false" autocapitalize="off" placeholder="Words: cat, hen, zip, fox
 Sentences:
 get a hat
-get a pen">${esc(S.homework)}</textarea>
-    <div class="hint">Commas between words. Each sentence on its own line. Extra red words: start a line with "Red words:".</div>
-    <button class="btn g" id="suGo">Let's race! 🏁</button></div>`);
-  bindName(); bindClass();
-  $('#suGo').onclick = () => {
-    S.homework = $('#suHw').value; S.setupDone = true; refreshRed(); save(); closeModal(); renderHome();
+get a pen">${esc(S.homework)}</textarea>${nav()}`,
+    () => `<h2>🏆 Class list (optional)</h2><p class="hint">If your teacher gave you a class code, enter it to see who finished today. No code? Just tap Next.</p>
+      <div class="panel" style="padding:0">${classBlock()}</div>${nav()}`,
+    () => `<h2>🎤 Last step</h2>${micTestBlock()}<div style="height:8px"></div>${homeTip()}${nav(0, "Let's race! 🏁")}`,
+  ];
+  modal(dots + body[step]());
+  if (step === 0) bindName();
+  if (step === 2) bindClass();
+  if (step === 3) bindMicTest();
+  const keepHw = () => { const t = $('#suHw'); if (t) { S.homework = t.value; refreshRed(); save(); } };
+  const back = $('#suBack'); if (back) back.onclick = () => { keepHw(); setupWizard(step - 1); };
+  $('#suNext').onclick = () => {
+    keepHw();
+    if (step < N - 1) return setupWizard(step + 1);
+    S.setupDone = true; save(); closeModal(); renderHome();
   };
 }
 
@@ -1171,7 +1395,7 @@ async function lbCall(params) {
 }
 // Sends "finished today" only when the daily goal is done and the parent allows it.
 function lbSubmit() {
-  if (!lbActive() || !S.lb.on || !dayRec().goal) return Promise.resolve(null);
+  if (!lbActive() || !S.lb.on || !view().goal) return Promise.resolve(null);
   return lbCall({ action: 'done', name: S.name || 'Racer', car: S.car });
 }
 async function openBoard() {
@@ -1183,7 +1407,7 @@ async function openBoard() {
   $('#boardBody').innerHTML = '<div style="text-align:center;font-size:60px;padding:40px" class="bounce">🏎️</div>';
   const res = (await lbSubmit()) || await lbCall({ action: 'list' });
   if (!res || !res.ok) { $('#boardBody').innerHTML = '<div style="text-align:center;font-size:70px;padding:40px">📶❌</div>'; return; }
-  const list = res.list || [], d = dayRec(), plan = todayPlan(), done = doneToday(), need = goalNeeded();
+  const list = res.list || [], d = view(), plan = todayPlan(), done = doneToday(), need = goalNeeded();
   dupNote(list);
   const meDone = !!d.goal;
   const mine = meDone ? '' : `<div class="lbrow me">${carSVG(S.car, 70)}<div class="nm">${esc(S.name || '')}</div><div style="font-size:24px">${Array.from({ length: need }, (_, i) => i < done ? '🏁' : '⬜').join('')}</div></div>`;
@@ -1206,10 +1430,38 @@ async function checkDupName() {
   const res = await lbCall({ action: 'list' });
   if (res && res.ok) dupNote(res.list);
 }
+/* ---- progress sharing: upload this phone's own progress, download the child's other phones ---- */
+function ledger() {
+  const days = {}; Object.keys(S.days).sort().slice(-120).forEach(k => { const d = S.days[k]; days[k] = { done: d.done || {}, coins: d.coins || 0, goal: !!d.goal, words: d.words || 0, help: d.help || {} }; });
+  const stats = {}; Object.entries(S.stats || {}).sort((a, b) => b[1].seen - a[1].seen).slice(0, 400).forEach(([w, x]) => stats[w] = x);
+  return { coins: S.coins || 0, raceCount: S.raceCount || 0, turbos: S.turbos || 0, best: S.best || 0, days, stats };
+}
+let syncing = null;
+async function syncPush() {
+  if (!LB_URL.startsWith('https://') || !navigator.onLine) return;
+  try { await fetch(LB_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'push', player: S.lb.player, phone: S.lb.phone, data: ledger() }) }); } catch (e) {}
+}
+async function syncPull() {
+  if (!LB_URL.startsWith('https://') || !navigator.onLine) return false;
+  const q = new URLSearchParams({ action: 'pull', player: S.lb.player });
+  const ctl = new AbortController(); const t = setTimeout(() => ctl.abort(), 15000);
+  try {
+    const r = await (await fetch(LB_URL + '?' + q, { signal: ctl.signal })).json();
+    if (!r || !r.ok || !Array.isArray(r.phones)) return false;   // older sheet script: nothing to share yet
+    const o = {}; r.phones.forEach(x => { if (x.phone && x.phone !== S.lb.phone && x.data) o[x.phone] = x.data; });
+    const before = JSON.stringify(S.others || {}); S.others = o; save();
+    return JSON.stringify(o) !== before;
+  } catch (e) { return false; } finally { clearTimeout(t); }
+}
+function sync() {   // push this phone, then pull the others; refresh the home screen if something changed
+  if (syncing) return syncing;
+  syncing = (async () => { await syncPush(); const changed = await syncPull(); if (changed && $('#home').classList.contains('on')) renderHome(); })().finally(() => { syncing = null; });
+  return syncing;
+}
 /* same child on two phones: share one player code so they count as one */
 function linkBlock() {
   return `<div class="set" style="flex-wrap:wrap;border-bottom:0"><label>Same child on another phone?</label></div>
-    <div class="hint">This phone's code: <b style="font-size:20px;letter-spacing:2px;color:var(--ink)">${esc(S.lb.player)}</b><br>On the other phone, open ⚙️ Settings and type this code below, so your child shows up once on the list. Coins, cars and streaks stay separate on each phone.</div>
+    <div class="hint">This phone's code: <b style="font-size:20px;letter-spacing:2px;color:var(--ink)">${esc(S.lb.player)}</b><br>On the other phone, open ⚙️ Settings and type this code below, so your child shows up once on the list. After linking, coins, medals, streaks and badges are added up across both phones.</div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 12px"><input type="text" id="lnkIn" placeholder="Other phone’s code" autocapitalize="off" autocomplete="off" spellcheck="false" style="flex:1;min-width:160px;border:2px solid #dfe3f2;border-radius:10px;padding:8px;font-size:18px"><button class="btn w" id="lnkGo" style="padding:8px 14px">🔗 Link</button></div>`;
 }
 function bindLink() {
@@ -1218,8 +1470,8 @@ function bindLink() {
     const code = $('#lnkIn').value.trim().toLowerCase().replace(/\s+/g, '');
     if (!/^[a-z0-9]{4,20}$/.test(code)) return toast('Check the code: letters and numbers only');
     if (code === S.lb.player) return toast('That is this phone’s own code');
-    S.lb.player = code; save(); toast('Linked ✓');
-    if (dayRec().goal) lbSubmit(); // already finished today: show up under the shared code
+    S.lb.player = code; save(); toast('Linked ✓'); sync();
+    if (view().goal) lbSubmit(); // already finished today: show up under the shared code
     pSettings();
   };
 }
@@ -1240,6 +1492,12 @@ function bindClass() {
 }
 
 renderHome(); show('home');
+// splash screen: until the game's voices are ready (at most 3 seconds)
+Promise.race([allAudio, sleep(3000)]).then(() => { const sp = $('#splash'); if (sp) { sp.style.opacity = 0; setTimeout(() => sp.remove(), 450); } });
+sync();
+document.addEventListener('visibilitychange', () => { if (!document.hidden) sync(); });
+// keep the game and voices on the phone: faster opening, less data, works offline
+if ('serviceWorker' in navigator) window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(() => {}); });
 </script>
 </body>
 </html>
