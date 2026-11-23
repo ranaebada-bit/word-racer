@@ -239,10 +239,10 @@ details.sec .sb{padding:0 2px 14px;display:flex;flex-direction:column;gap:8px}
 .shoptabs button{display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 2px;border-radius:14px;background:#f1f3ff;font-size:13px;color:var(--ink)}
 .shoptabs button.on{background:#e1efff;box-shadow:inset 0 0 0 3px var(--blue)}
 .swatches{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin:12px 0}
-.sw{width:46px;height:46px;border-radius:50%;border:3px solid #1b1b3a33;position:relative;display:grid;place-items:center;box-shadow:0 3px 0 #0002}
-.sw.wh{border:8px solid #2b2d3a}
-.sw.sel{outline:4px solid var(--blue);outline-offset:2px}
-.sw i{position:absolute;right:-6px;bottom:-6px;background:#fff;border-radius:50%;width:22px;height:22px;display:grid;place-items:center;box-shadow:0 1px 3px #0003}
+.swatches .sw{width:46px;height:46px;border-radius:50%;border:3px solid #1b1b3a33;position:relative;display:grid;place-items:center;box-shadow:0 3px 0 #0002}
+.swatches .sw.wh{border:8px solid #2b2d3a}
+.swatches .sw.sel{outline:4px solid var(--blue);outline-offset:2px}
+.swatches .sw i{position:absolute;right:-6px;bottom:-6px;background:#fff;border-radius:50%;width:22px;height:22px;display:grid;place-items:center;box-shadow:0 1px 3px #0003}
 .shopact .btn{width:100%;display:flex;align-items:center;justify-content:center;gap:8px;font-size:20px}
 .panel{background:#fff;border-radius:22px;padding:14px;display:flex;flex-direction:column;gap:10px}
 .tabs{display:flex;gap:6px}
@@ -686,16 +686,6 @@ function stopAudio() { try { curSrc && curSrc.stop(); } catch (e) {} curSrc = nu
 // and keeps working after the microphone has been used. Web Audio is only a backup.
 function setSession(type) { try { if (navigator.audioSession) navigator.audioSession.type = type; } catch (e) {} }
 setSession('playback');
-// iPhone "electric" voice fix: before the game talks, wait for the mic to fully close (max 1.5 s),
-// then switch back to loudspeaker and give the phone a moment to change over.
-async function micSettled() {
-  let w; try { w = recEnded; } catch (e) { return; }
-  let open = true; w.then(() => { open = false; });
-  await sleep(0); if (!open) return;
-  await Promise.race([w, sleep(1500)]);
-  try { if (recEnded === w) recEnded = Promise.resolve(); } catch (e) {}
-  setSession('playback'); await sleep(150);
-}
 const player = new Audio(); player.preload = 'auto'; player.setAttribute('playsinline', '');
 const urlCache = {};
 function clipUrl(key) {
@@ -711,7 +701,6 @@ async function playKey(key) {
   if (!AUDIO[key]) await allAudio;
   await loadWordVoice(key);
   const url = clipUrl(key); if (!url) return false;
-  await micSettled();
   setSession('playback');
   if (curDone) curDone();
   try { curSrc && curSrc.stop(); } catch (e) {}
@@ -737,8 +726,7 @@ async function playKeyWA(key) {
   await new Promise(r => { src.onended = r; src.start(); setTimeout(r, buf.duration * 1000 + 300); });
   if (curSrc === src) curSrc = null; return true;
 }
-async function deviceSpeak(text, rate = .85) {
-  await micSettled(); setSession('playback');
+function deviceSpeak(text, rate = .85) {
   return new Promise(res => {
     if (!('speechSynthesis' in window)) return res();
     let done = false; const fin = () => { if (!done) { done = true; res(); } };
