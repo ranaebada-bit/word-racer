@@ -372,6 +372,16 @@ const CARS = [
   { name: 'Lava Racer', body: '#ff5a1f', accent: '#2b2d3a', emblem: 'flame', at: 1400 },
   { name: 'Silver Shield', body: '#aab4c3', accent: '#1d7bf2', emblem: 'shield', at: 1900 },
   { name: 'Gold Champion', body: '#f4c430', accent: '#8b5a00', emblem: 'crown', at: 2500 },
+  // second set: new shapes
+  { name: 'Mega Monster', shape: 'monster', body: '#2bb673', accent: '#ffd23f', emblem: 'bolt', at: 3000 },
+  { name: 'School Bus Buddy', shape: 'bus', body: '#ffc928', accent: '#1b1b3a', emblem: 'star', at: 3600 },
+  { name: 'Formula Flash', shape: 'f1', body: '#ef3e36', accent: '#ffffff', emblem: 'bolt', at: 4300 },
+  { name: 'Jungle Jeep', shape: 'jeep', body: '#6fa83a', accent: '#ffd23f', emblem: 'shield', at: 5100 },
+  { name: 'Ice Cream Dream', shape: 'van', body: '#ff9ecf', accent: '#5ec8ff', emblem: 'star', at: 6000 },
+  { name: 'Rocket Rider', shape: 'rocket', body: '#3a3f8f', accent: '#ff8c1a', emblem: 'moon', at: 7000 },
+  { name: 'Monster Blaze', shape: 'monster', body: '#ff5a1f', accent: '#2b2d3a', emblem: 'flame', at: 8200 },
+  { name: 'Turbo Formula', shape: 'f1', body: '#1d7bf2', accent: '#ffd23f', emblem: 'star', at: 9500 },
+  { name: 'Diamond Rocket', shape: 'rocket', body: '#5ef2d6', accent: '#8e44ad', emblem: 'crown', at: 11000 },
 ];
 function fresh() {
   return { homework: '', name: '', nameRec: null, setupDone: false, review: [], lb: { cls: '', on: true, player: Math.random().toString(36).slice(2, 12) },
@@ -765,8 +775,63 @@ const EMBLEMS = {
   shield: '<path d="M0 -9 L7 -6 L6 2 C5 6 2 8 0 9 C-2 8 -5 6 -6 2 L-7 -6 Z" fill="#1d7bf2" stroke="#1b1b3a" stroke-width="1.5"/>',
   crown: '<path d="M-8 6 L-8 -5 L-4 -1 L0 -8 L4 -1 L8 -5 L8 6 Z" fill="#ffd23f" stroke="#1b1b3a" stroke-width="1.5" stroke-linejoin="round"/>',
 };
+const K = '#1b1b3a';
+const wheelSVG = (x, y, r) => `<g class="wheel"><circle cx="${x}" cy="${y}" r="${r}" fill="#2b2d3a" stroke="${K}" stroke-width="3"/><circle cx="${x}" cy="${y}" r="${r * .42}" fill="#d6d9e6"/><path d="M${x} ${y - r + 3} L${x} ${y + r - 3} M${x - r + 3} ${y} L${x + r - 3} ${y}" stroke="#55586b" stroke-width="3"/></g>`;
+const faceSVG = (x, y) => `<ellipse cx="${x}" cy="${y}" rx="5.5" ry="6.5" fill="#fff"/><circle cx="${x + 2}" cy="${y + 1}" r="3.2" fill="${K}"/><ellipse cx="${x + 22}" cy="${y + 1}" rx="5.5" ry="6.5" fill="#fff"/><circle cx="${x + 24}" cy="${y + 2}" r="3.2" fill="${K}"/>`;
+const smileSVG = (x, y) => `<path d="M${x} ${y} Q${x + 14} ${y + 6} ${x + 30} ${y}" fill="none" stroke="${K}" stroke-width="3" stroke-linecap="round"/>`;
+const emblemSVG = (c, x, y) => `<g transform="translate(${x} ${y})"><circle r="12" fill="#fff" stroke="${K}" stroke-width="3"/>${EMBLEMS[c.emblem]}</g>`;
+const SHAPES = {
+  monster: c => `<ellipse cx="102" cy="106" rx="88" ry="5" fill="#0000003a"/>
+    <path d="M60 64 L62 80 M142 64 L140 80" stroke="#55586b" stroke-width="6" stroke-linecap="round"/>
+    <path d="M20 66 Q16 44 42 40 L70 36 Q82 12 112 12 L130 14 Q152 18 162 36 L180 40 Q192 44 190 66 Z" fill="${c.body}" stroke="${K}" stroke-width="4" stroke-linejoin="round"/>
+    <path d="M80 36 Q90 21 110 20 L128 22 Q142 25 148 36 Z" fill="#bfe9ff" stroke="${K}" stroke-width="3" stroke-linejoin="round"/>
+    ${faceSVG(110, 28)}${smileSVG(118, 46)}
+    <path d="M26 56 L184 56" stroke="${c.accent}" stroke-width="6" stroke-linecap="round"/>${emblemSVG(c, 54, 52)}
+    ${wheelSVG(54, 82, 24)}${wheelSVG(150, 82, 24)}`,
+  bus: c => `<ellipse cx="102" cy="104" rx="90" ry="6" fill="#0000003a"/>
+    <rect x="10" y="20" width="182" height="64" rx="14" fill="${c.body}" stroke="${K}" stroke-width="4"/>
+    ${[22, 52, 82, 112].map(x => `<rect x="${x}" y="30" width="24" height="20" rx="4" fill="#bfe9ff" stroke="${K}" stroke-width="3"/>`).join('')}
+    <rect x="144" y="30" width="40" height="24" rx="5" fill="#bfe9ff" stroke="${K}" stroke-width="3"/>
+    ${faceSVG(150, 40)}${smileSVG(150, 64)}
+    <path d="M14 62 L140 62" stroke="${c.accent}" stroke-width="5" stroke-linecap="round"/>
+    <circle cx="188" cy="74" r="4" fill="#fff6a8" stroke="${K}" stroke-width="2"/>
+    ${wheelSVG(48, 86, 15)}${wheelSVG(160, 86, 15)}`,
+  f1: c => `<ellipse cx="102" cy="104" rx="90" ry="5" fill="#0000003a"/>
+    <path d="M8 34 H40 V44 H8 Z" fill="${c.accent}" stroke="${K}" stroke-width="3.5" stroke-linejoin="round"/><path d="M26 44 V62" stroke="${K}" stroke-width="5"/>
+    <path d="M14 84 L16 62 L58 58 Q84 40 110 42 L124 58 L180 64 Q196 66 196 78 L196 84 Z" fill="${c.body}" stroke="${K}" stroke-width="4" stroke-linejoin="round"/>
+    <path d="M86 56 Q94 46 110 47 L118 58 Z" fill="#bfe9ff" stroke="${K}" stroke-width="3" stroke-linejoin="round"/>
+    ${faceSVG(136, 66)}<path d="M150 82 Q164 86 180 80" fill="none" stroke="${K}" stroke-width="3" stroke-linecap="round"/>
+    <path d="M176 86 H198" stroke="${c.accent}" stroke-width="6" stroke-linecap="round"/>${emblemSVG(c, 70, 72)}
+    ${wheelSVG(44, 84, 18)}${wheelSVG(158, 84, 18)}`,
+  jeep: c => `<ellipse cx="102" cy="104" rx="86" ry="6" fill="#0000003a"/>
+    <circle cx="14" cy="56" r="13" fill="#2b2d3a" stroke="${K}" stroke-width="3"/>
+    <path d="M20 84 V52 Q20 44 28 44 H62 L78 20 H138 Q144 20 146 26 L156 44 H182 Q192 44 192 54 V84 Z" fill="${c.body}" stroke="${K}" stroke-width="4" stroke-linejoin="round"/>
+    <path d="M84 26 H134 L142 42 H74 Z" fill="#bfe9ff" stroke="${K}" stroke-width="3" stroke-linejoin="round"/>
+    ${faceSVG(102, 32)}${smileSVG(150, 62)}
+    <path d="M24 66 L188 66" stroke="${c.accent}" stroke-width="6" stroke-linecap="round"/>${emblemSVG(c, 52, 58)}
+    <circle cx="186" cy="52" r="4" fill="#fff6a8" stroke="${K}" stroke-width="2"/>
+    ${wheelSVG(56, 86, 18)}${wheelSVG(156, 86, 18)}`,
+  van: c => `<ellipse cx="102" cy="104" rx="88" ry="6" fill="#0000003a"/>
+    <path d="M46 9 L66 9 L56 23 Z" fill="#f4c27a" stroke="${K}" stroke-width="3" stroke-linejoin="round"/><circle cx="56" cy="7" r="8" fill="#fff0f6" stroke="${K}" stroke-width="3"/><circle cx="53" cy="4" r="1.6" fill="#ef3e36"/><circle cx="59" cy="8" r="1.6" fill="#1d7bf2"/>
+    <path d="M14 84 V30 Q14 22 22 22 H136 Q146 22 152 32 L166 50 H184 Q194 50 194 60 V84 Z" fill="${c.body}" stroke="${K}" stroke-width="4" stroke-linejoin="round"/>
+    <rect x="28" y="34" width="70" height="24" rx="6" fill="#fff" stroke="${K}" stroke-width="3"/>
+    ${[36, 52, 68, 84].map((x, i) => `<circle cx="${x}" cy="46" r="5" fill="${['#ff8c1a', '#5ec8ff', '#2bb673', '#ef3e36'][i]}"/>`).join('')}
+    <path d="M112 32 H140 L156 50 H112 Z" fill="#bfe9ff" stroke="${K}" stroke-width="3" stroke-linejoin="round"/>
+    ${faceSVG(120, 40)}${smileSVG(150, 66)}
+    <path d="M18 72 L190 72" stroke="${c.accent}" stroke-width="6" stroke-linecap="round"/>
+    ${wheelSVG(52, 86, 16)}${wheelSVG(160, 86, 16)}`,
+  rocket: c => `<ellipse cx="104" cy="104" rx="84" ry="6" fill="#0000003a"/>
+    <path d="M4 56 Q18 48 30 58 Q18 64 4 72 Q14 64 4 56 Z" fill="#ff8c1a" stroke="${K}" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M28 42 L44 18 L56 46 Z" fill="${c.accent}" stroke="${K}" stroke-width="3.5" stroke-linejoin="round"/>
+    <path d="M26 82 Q22 50 52 46 L120 40 Q170 36 196 70 Q196 82 184 82 Z" fill="${c.body}" stroke="${K}" stroke-width="4" stroke-linejoin="round"/>
+    <path d="M104 44 Q130 32 154 44 L150 56 Q128 50 102 56 Z" fill="#bfe9ff" stroke="${K}" stroke-width="3" stroke-linejoin="round"/>
+    ${faceSVG(120, 50)}${smileSVG(146, 70)}
+    <path d="M32 72 L176 72" stroke="${c.accent}" stroke-width="6" stroke-linecap="round"/>${emblemSVG(c, 66, 64)}
+    ${wheelSVG(60, 86, 16)}${wheelSVG(160, 86, 16)}`,
+};
 function carSVG(i, w = 160) {
   const c = CARS[i] || CARS[0];
+  if (c.shape && SHAPES[c.shape]) return `<svg viewBox="0 0 200 112" width="${w}" height="${w * 112 / 200}" aria-label="${esc(c.name)}">${SHAPES[c.shape](c)}</svg>`;
   return `<svg viewBox="0 0 200 112" width="${w}" height="${w * 112 / 200}" aria-label="${esc(c.name)}">
   <ellipse cx="102" cy="104" rx="84" ry="6" fill="#0000003a"/>
   <path d="M10 48 L32 48 L36 60 L16 62 Z" fill="${c.accent}" stroke="#1b1b3a" stroke-width="4" stroke-linejoin="round"/>
