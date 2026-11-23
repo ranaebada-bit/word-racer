@@ -198,6 +198,8 @@ details.sec .sb{padding:0 2px 14px;display:flex;flex-direction:column;gap:8px}
 .bwin-in{display:flex;flex-direction:column;align-items:center;gap:10px;color:#fff;text-align:center;animation:zoomin .6s cubic-bezier(.3,1.6,.5,1)}
 .bwin-t{font-size:34px;font-weight:800}.bwin-s{font-size:18px;opacity:.85;margin-bottom:10px}
 @keyframes zoomin{from{transform:scale(.2) rotate(-20deg);opacity:0}to{transform:none;opacity:1}}
+.wd b.sh{background:#e1f4ff;border-color:#5ec8ff}
+.report{white-space:pre-wrap;font:600 15px/1.5 inherit;font-family:inherit;background:#f3f5ff;border-radius:14px;padding:12px;margin:0;color:var(--ink)}
 .panel{background:#fff;border-radius:22px;padding:14px;display:flex;flex-direction:column;gap:10px}
 .tabs{display:flex;gap:6px}
 .tabs button{flex:1;padding:10px 6px;border-radius:14px;background:#ffffff22;color:#fff;font-weight:800;font-size:16px}
@@ -352,6 +354,7 @@ const ICON = {
   link: `<path d="M20 28l8-8" stroke="${INK}" stroke-width="4" stroke-linecap="round"/><path d="M22 14l4-4a8 8 0 0 1 12 12l-4 4M26 34l-4 4a8 8 0 0 1-12-12l4-4" fill="none" stroke="#1d7bf2" stroke-width="5" stroke-linecap="round"/>`,
   record: `<rect x="17" y="4" width="14" height="24" rx="7" fill="#fff" stroke="${INK}" stroke-width="3"/><path d="M11 22a13 13 0 0 0 26 0M24 35v7M17 43h14" fill="none" stroke="${INK}" stroke-width="3.5" stroke-linecap="round"/><circle cx="38" cy="9" r="5" fill="#ef3e36" stroke="${INK}" stroke-width="2"/>`,
   info: `<circle cx="24" cy="24" r="19" fill="#1d7bf2" stroke="${INK}" stroke-width="3"/><circle cx="24" cy="15" r="2.8" fill="#fff"/><path d="M24 22v13" stroke="#fff" stroke-width="4.5" stroke-linecap="round"/>`,
+  shield: `<path d="M24 4l17 6v12c0 11-8 19-17 22C15 41 7 33 7 22V10z" fill="#5ec8ff" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/><path d="M16 23l6 6 11-12" fill="none" stroke="#fff" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>`,
   box: `<rect x="8" y="8" width="32" height="32" rx="6" fill="#ffffff55" stroke="#ffffffaa" stroke-width="3"/>`,
 };
 function ic(name, size = 28, extra = '') { return `<svg class="ic" width="${size}" height="${size}" viewBox="0 0 48 48" aria-hidden="true" ${extra}>${ICON[name] || ''}</svg>`; }
@@ -433,14 +436,28 @@ function mergedStats() {
   const out = {}; const add = st => Object.entries(st || {}).forEach(([w, x]) => { const o = out[w] || (out[w] = { seen: 0, first: 0, miss: 0 }); o.seen += x.seen || 0; o.first += x.first || 0; o.miss += x.miss || 0; });
   add(S.stats); others().forEach(o => add(o.stats)); return out;
 }
-function currentStreak() {   // days in a row with all races done, on any linked phone
-  let k = today(), n = 0; if (!view(k).goal) k = addDays(k, -1);
-  while (view(k).goal && n < 3650) { n++; k = addDays(k, -1); }
-  return n;
+/* Streak with a shield: one missed day a week doesn't break it (at most one shielded day in any 7 days,
+   and never two missed days in a row). A busy evening shouldn't wipe out weeks of reading. */
+function streakFrom(k) {   // count back from day k; returns { n, shields: [day keys saved by the shield] }
+  let n = 0, last = null; const shields = [];
+  for (let guard = 0; guard < 3650; guard++) {
+    if (view(k).goal) n++;
+    else {
+      const prevDay = addDays(k, -1);
+      const free = !last || (new Date(last) - new Date(k)) / 864e5 >= 7;
+      if (free && view(prevDay).goal && (n > 0 || k !== today())) { shields.push(k); last = k; }
+      else break;
+    }
+    k = addDays(k, -1);
+  }
+  // a shield only counts if days were actually saved behind it
+  while (shields.length && !view(addDays(shields[shields.length - 1], -1)).goal) shields.pop();
+  return { n, shields };
 }
+function streakInfo() { const t = today(); return streakFrom(view(t).goal ? t : addDays(t, -1)); }
+function currentStreak() { return streakInfo().n; }   // days in a row with all races done, on any linked phone
 function bestStreak() {
-  const ks = allDayKeys().filter(k => view(k).goal).sort(); let best = 0, run = 0, prev = null;
-  ks.forEach(k => { run = prev && addDays(prev, 1) === k ? run + 1 : 1; best = Math.max(best, run); prev = k; });
+  let best = 0; allDayKeys().filter(k => view(k).goal).forEach(k => { best = Math.max(best, streakFrom(k).n); });
   return Math.max(best, S.best || 0, ...others().map(o => o.best || 0));
 }
 
@@ -932,10 +949,10 @@ function renderHome() {
     $('#nextCar').innerHTML = `${coin(22)}<div class="bar"><i style="width:${pct}%"></i></div><span class="nc">${carSVG(ni, 64)}</span>${ic('lock', 22)}`;
   } else $('#nextCar').innerHTML = '';
   const wk = [];
-  const L = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+  const L = ['S', 'M', 'T', 'W', 'T', 'F', 'S'], shielded = new Set(streakInfo().shields);
   for (let i = 6; i >= 0; i--) {
     const k = addDays(today(), -i), ok = view(k).goal, [y, m, dd] = k.split('-').map(Number);
-    wk.push(`<div class="wd"><b class="${ok ? 'ok' : ''} ${i === 0 ? 'today' : ''}">${ok ? ic('flame', 22) : ''}</b>${i === 0 ? 'Today' : L[new Date(y, m - 1, dd).getDay()]}</div>`);
+    wk.push(`<div class="wd"><b class="${ok ? 'ok' : shielded.has(k) ? 'sh' : ''} ${i === 0 ? 'today' : ''}">${ok ? ic('flame', 22) : shielded.has(k) ? ic('shield', 24) : ''}</b>${i === 0 ? 'Today' : L[new Date(y, m - 1, dd).getDay()]}</div>`);
   }
   $('#week').innerHTML = wk.join('');
   const plan = todayPlan(), d = view();
@@ -1405,12 +1422,34 @@ function weekSummary() {
     <div class="wk"><div><b>${goal}/7</b>days all races done</div><div><b>${races}</b>races finished</div><div><b>${words}</b>words read</div><div><b>${coins}</b>coins earned</div></div>
     <p class="hint" style="margin:0">${top.length ? `Needed help with: <b style="font-family:var(--read);color:var(--ink)">${top.map(esc).join(', ')}</b>` : 'No words needed help this week.'}</p>`;
 }
+function weeklyReport() {   // short text a parent can send to family or the teacher
+  let goal = 0, races = 0, words = 0, coins = 0; const help = {};
+  for (let i = 0; i < 7; i++) {
+    const d = view(addDays(today(), -i));
+    if (d.goal) goal++; races += Object.keys(d.done || {}).length; words += d.words || 0; coins += d.coins || 0;
+    Object.entries(d.help || {}).forEach(([w, n]) => help[w] = (help[w] || 0) + n);
+  }
+  const fmt = k => { const [y, m, d] = k.split('-').map(Number); return new Date(y, m - 1, d).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }); };
+  const top = Object.entries(help).sort((a, b) => b[1] - a[1]).slice(0, 5).map(([w]) => w);
+  const won = BADGES.map(b => ({ b, l: (S.badgeLv || {})[b.id] || 0 })).filter(x => x.l).map(x => `${TIERS[x.l]} ${x.b.name}`);
+  return [`${S.name || 'Our racer'}'s reading week (${fmt(addDays(today(), -6))} to ${fmt(today())})`,
+    `✅ All races done on ${goal} of 7 days`, `🏁 ${races} races finished`, `📖 ${words} words read`, `🔥 Streak: ${currentStreak()} day${currentStreak() === 1 ? '' : 's'}`,
+    won.length ? `🏅 Badges: ${won.join(', ')}` : '', top.length ? `💪 Practising: ${top.join(', ')}` : '', '', 'From Word Racer'].filter((l, i, a) => l || (i === a.length - 2)).join('\n');
+}
+async function shareReport() {
+  const text = weeklyReport();
+  try { if (navigator.share) { await navigator.share({ text }); return; } } catch (e) { if (e && e.name === 'AbortError') return; }
+  try { await navigator.clipboard.writeText(text); toast('Copied ✓ Paste it in WhatsApp'); } catch (e) { window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank'); }
+}
 function pProgress() {
   const rows = []; for (let i = 0; i < 14; i++) { const k = addDays(today(), -i); const d = view(k); if (d && (d.coins || Object.keys(d.done).length)) rows.push(`<tr><td>${k}</td><td>${Object.keys(d.done).length}${d.plan ? '/' + d.plan.length : ''}</td><td>${d.coins}</td><td>${d.goal ? ic('flame', 20) : ''}</td></tr>`); }
   const tricky = Object.entries(mergedStats()).filter(([, s]) => s.miss > 0).map(([w, s]) => ({ w, ...s, rate: s.first / s.seen })).sort((a, b) => a.rate - b.rate || b.miss - a.miss).slice(0, 15);
   const heard = S.heard || [], missed = heard.filter(x => !x.ok).length;
   $('#pbody').innerHTML = `<div class="panel settings">
     ${secBlock('week', ic('flame', 26), 'This week', `Streak ${currentStreak()} · best ${bestStreak()}`, weekSummary().replace('<h3 style="margin:0">This week (last 7 days)</h3>', '') + `<p class="hint" style="margin:0">${coin(16)} ${allCoins()} coins in total</p>`)}
+    ${secBlock('report', ic('share', 26), 'Weekly report', 'Send to family',
+      `<pre class="report">${esc(weeklyReport())}</pre><button class="btn g" id="repShare">${ic('share', 22)} Share this week</button>
+       <a class="btn w" style="text-align:center;text-decoration:none" target="_blank" href="https://wa.me/?text=${encodeURIComponent(weeklyReport())}">Send on WhatsApp</a>`)}
     ${secBlock('tricky', ic('bulb', 26), 'Tricky words', tricky.length ? tricky.slice(0, 3).map(t => esc(t.w)).join(', ') : 'None yet',
       tricky.length ? `<table><tr><th>Word</th><th>Read alone</th><th>Needed help</th></tr>${tricky.map(t => `<tr><td style="font-family:var(--read);font-size:18px">${esc(t.w)}</td><td>${t.first}/${t.seen}</td><td>${t.miss}</td></tr>`).join('')}</table>` : '<p class="hint">Nothing tricky yet.</p>')}
     ${secBlock('heard', ic('mic', 26), 'What the mic heard', heard.length ? `${missed} not accepted` : 'Nothing yet',
@@ -1420,6 +1459,7 @@ function pProgress() {
       rows.length ? `<table><tr><th>Day</th><th>Races</th><th>Coins</th><th>Goal</th></tr>${rows.join('')}</table>` : '<p class="hint">No races yet.</p>')}
   </div>`;
   trackSecs();
+  $('#repShare').onclick = shareReport;
 }
 let secOpen = new Set(['child', 'week']);   // which Settings/Progress sections are open (kept while the page is open)
 const secBlock = (id, icon, title, sum, body) => `<details class="sec" data-sec="${id}" ${secOpen.has(id) ? 'open' : ''}><summary>${icon}<span class="st">${title}</span><span class="sv">${sum}</span></summary><div class="sb">${body}</div></details>`;
@@ -1535,7 +1575,7 @@ function pHelp() {
     ['My child read it right but the game said no', 'Phones sometimes mishear young children. Open <b>Progress → What the microphone heard</b> to see what the phone wrote. In <b>Settings</b>, keep <b>Microphone checking</b> on <b>Relaxed</b>.'],
     ['How do I add this week’s homework?', 'Open <b>Homework</b>, paste the words (commas between them) and each sentence on its own line, then tap <b>Save homework</b>. The game builds the races by itself.'],
     ['A word has a robot voice', 'The game has a natural voice for about 4,600 words. For others it uses the phone’s own voice. The Homework tab lists those words so you can tell us.'],
-    [`What are the daily goal and the ${ic('flame', 18)} streak?`, 'The goal is finishing today’s races (change it in <b>Settings</b>). Each day the goal is met adds 1 to the streak. Missing a day starts it again.'],
+    [`What are the daily goal and the ${ic('flame', 18)} streak?`, 'The goal is finishing today’s races (change it in <b>Settings</b>). Each day the goal is met adds 1 to the streak. One missed day a week is saved by a shield (shown on the home screen), so the streak carries on. Missing two days in a row, or two in one week, starts it again.'],
     ['What is “Done today”?', 'If you entered a class code, children who finished all of today’s races appear with their first name and car. No scores or ranking. Choose <b>No</b> for “Show my child on the list” to stay off it; your child then doesn’t see the list either.'],
     ['My child plays on two phones', `Open <b>Settings</b> on the first phone and copy the code under <b>Another phone</b>. Type it on the second phone and tap <b>${ic('link', 16)} Link</b>. After that, coins, medals, streaks and badges are added up across both phones, and they show once on the class list. Both phones need internet now and then to share.`],
     ['Will we lose progress?', 'Progress is saved on the phone and, when online, a copy is kept in the class sheet. If you clear Safari/Chrome website data, use <b>Another phone</b> in Settings with the code you wrote down to get it back, so it’s worth noting the code in Settings.'],
