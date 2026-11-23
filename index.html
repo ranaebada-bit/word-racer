@@ -43,23 +43,25 @@ input,select,textarea{font-family:var(--ui);font-size:16px;-webkit-user-select:t
 .week b.ok{background:var(--yellow);border-color:#fff}
 .week b.today{box-shadow:0 0 0 3px #ffffff99}
 .tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-.races{display:flex;flex-direction:column;gap:12px}
-.rcard{display:flex;align-items:center;gap:12px;border-radius:24px;padding:10px 14px 10px 10px;box-shadow:0 6px 0 #0004;color:#fff;text-align:left;position:relative;overflow:hidden;width:100%}
+.races{display:flex;flex-direction:column;gap:10px}
+.rcard{display:flex;align-items:center;gap:12px;border-radius:22px;padding:8px 12px 8px 10px;box-shadow:0 6px 0 #0004;color:#fff;text-align:left;position:relative;overflow:hidden;width:100%}
 .rcard::after{content:'';position:absolute;right:-10px;top:0;bottom:0;width:46px;opacity:.18;background:repeating-conic-gradient(#fff 0 25%,#000 0 50%) 0 0/16px 16px}
 .rcard:active{transform:translateY(4px);box-shadow:0 2px 0 #0004}
-.rcard .badge{width:74px;height:74px;flex:none;border-radius:50%;background:#00000022;border:3px solid #ffffff88;display:grid;place-items:center;font-size:42px;position:relative}
-.rcard .badge .n{position:absolute;top:-4px;left:-4px;width:28px;height:28px;border-radius:50%;background:#fff;color:var(--ink);font-size:16px;font-weight:800;display:grid;place-items:center;box-shadow:0 2px 0 #0003}
+.rcard .badge{width:58px;height:58px;flex:none;border-radius:50%;background:#00000022;border:3px solid #ffffff88;display:grid;place-items:center;font-size:32px;position:relative}
+.rcard .badge .n{position:absolute;top:-6px;left:-6px;width:24px;height:24px;border-radius:50%;background:#fff;color:var(--ink);font-size:16px;font-weight:800;display:grid;place-items:center;box-shadow:0 2px 0 #0003}
 .rcard .info{flex:1;min-width:0;z-index:1}
-.rcard .nm{font-size:23px;font-weight:800;line-height:1.05;text-shadow:0 2px 0 #0003}
-.rcard .sub{font-size:15px;font-weight:700;opacity:.92;margin-top:3px}
-.rcard .go{font-size:34px;z-index:1;width:54px;text-align:center}
+.rcard .nm{font-size:21px;font-weight:800;line-height:1.05;text-shadow:0 2px 0 #0003}
+.rcard .sub{font-size:14px;font-weight:700;opacity:.92;margin-top:3px}
+.rcard .go{font-size:30px;z-index:1;width:44px;text-align:center}
 .rcard.done .badge,.rcard.done .info{opacity:.6}
-.rcard.done .go{font-size:42px}
+.rcard.done .go{font-size:36px}
 .rcard.next{animation:glow2 1.4s infinite}
 @keyframes glow2{50%{box-shadow:0 6px 0 #0004,0 0 0 7px #ffd23faa}}
-.mini{display:grid;grid-template-columns:repeat(auto-fit,minmax(70px,1fr));gap:10px}
-.mtile{border-radius:20px;background:var(--card);box-shadow:0 5px 0 #0003;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px 4px;font-size:38px;line-height:1.1;color:var(--ink)}
-.mtile b{font-size:15px;margin-top:4px}
+.mini{position:fixed;left:0;right:0;bottom:0;z-index:20;display:grid;grid-template-columns:repeat(auto-fit,minmax(0,1fr));gap:4px;padding:8px 10px calc(8px + env(safe-area-inset-bottom));background:#0f1a4fee;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-top:1px solid #ffffff22}
+#home{padding-bottom:calc(96px + env(safe-area-inset-bottom))}
+.mtile{border-radius:16px;background:none!important;box-shadow:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:4px 2px;min-height:60px;font-size:28px;line-height:1;color:#fff;text-align:center}
+.mtile:active{background:#ffffff1f!important}
+.mtile b{font-size:12px;margin:0;line-height:1.1;font-weight:800;opacity:.9;white-space:nowrap}
 .mtile:active{transform:translateY(3px)}
 .week{align-items:flex-end}
 .wd{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:12px;font-weight:800;color:#fffc}
@@ -770,7 +772,7 @@ function renderHome() {
   checkBadges();
   const nc = $('#nameChip'); nc.style.display = S.name ? '' : 'none'; nc.textContent = S.name;
   if (!S.setupDone) setTimeout(setupWizard, 50);
-  $('#heroCar').innerHTML = carSVG(S.car, 200);
+  $('#heroCar').innerHTML = carSVG(S.car, 170);
   const coinsNow = allCoins(), ni = CARS.findIndex(c => c.at > coinsNow);
   if (ni >= 0) {
     const prev = ni > 0 ? CARS[ni - 1].at : 0, pct = Math.max(4, Math.min(100, (coinsNow - prev) / (CARS[ni].at - prev) * 100));
@@ -804,7 +806,7 @@ function renderHome() {
   document.querySelectorAll('[data-r]').forEach(b => b.onclick = () => { const i = +b.dataset.r; startRace(todayPlan()[i], { race: i, intro: 'race' + (i % RACES.length) }); });
   $('#bonusTile').onclick = bonusLap; $('#garageTile').onclick = garage;
   const bt = $('#boardTile'); if (bt) bt.onclick = openBoard;
-  $('#badgeTile').onclick = badgesModal; $('#badgeCount').textContent = badgeCount() + ' badge' + (badgeCount() === 1 ? '' : 's');
+  $('#badgeTile').onclick = badgesModal; $('#badgeCount').textContent = 'Badges · ' + badgeCount();
   ensureWords([...plan.flat().map(it => it.text), ...S.review]); // fetch any extra voices this homework needs, in the background
   if (S.name && !S.nameRec) loadClip('n_' + nameKey(S.name));
 }
