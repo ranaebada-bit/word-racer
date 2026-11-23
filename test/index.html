@@ -833,7 +833,7 @@ const skel = w => { const s = sp(w); return s[0] + s.slice(1).replace(/[aeiouy]/
 let hwWords = new Set();   // today's homework words: hearing one of THESE instead is a real mistake
 // "th" is the sound speech recognisers get wrong most (and young children often say it as f/v/d).
 // So for words with "th" we also accept the usual mishearings: thin -> fin/tin/thing, this -> dis/vis/these, with -> wif/wiv.
-const TH_ALIAS = { thin: ['fin', 'finn', 'fen', 'tin', 'thing', 'think', 'thins', 'sin', 'thinn'], this: ['dis', 'diss', 'these', 'vis', 'fis', 'fiss', 'thiss', 'tis', 'thus', 'thes'],
+const TH_ALIAS = { thin: ['fin', 'finn', 'fen', 'tin', 'thing', 'think', 'thins', 'sin', 'thinn'], this: ['yes', 'guess', 'dis', 'diss', 'these', 'vis', 'fis', 'fiss', 'thiss', 'tis', 'thus', 'thes'],
   that: ['dat', 'vat', 'fat', 'thats'], then: ['den', 'ven', 'than', 'them'], them: ['dem', 'vem', 'then'], the: ['da', 'de', 'duh'], with: ['wif', 'wiv', 'wid', 'wit', 'width'],
   thick: ['fick', 'tick', 'sick'], thing: ['fing', 'ting', 'think', 'thin'], think: ['fink', 'tink', 'thing', 'sink'], moth: ['mof', 'moff', 'mouth', 'mott'], bath: ['baf', 'barf', 'bat'],
   path: ['paf', 'pat'], three: ['free', 'tree', 'fee'], thank: ['fank', 'tank'], cloth: ['clof', 'clot'], teeth: ['teef'], tooth: ['toof'], they: ['day', 'dey'], there: ['dare', 'their'] };
@@ -1732,7 +1732,7 @@ function bindFeedback() {
     const msg = $('#fbTx').value.trim(); if (!msg) return toast('Write something first');
     go.disabled = true; $('#fbRes').textContent = 'Sending…';
     const info = { name: S.name || '', cls: S.lb.cls || '', version: APP_VERSION + (IS_TEST ? ' (test)' : ''), phone: navigator.userAgent.slice(0, 180),
-      mic: SR ? (micBlocked ? 'blocked' : 'ok') : 'none', heard: (S.heard || []).slice(0, 5).map(x => `${x.t}>${x.h}`).join(' | ') };
+      mic: SR ? (micBlocked ? 'blocked' : 'ok') : 'none', heard: (S.heard || []).slice(0, 5).map(x => `${x.t}: ${x.h}${x.ok ? ' (ok)' : ' (no)'}`).join(' | ') };
     try {
       const r = await (await fetch(LB_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'feedback', message: msg.slice(0, 2000), info }) })).json();
       if (r && r.ok) { $('#fbTx').value = ''; $('#fbRes').innerHTML = ic('check', 16) + ' Thank you! We got it.'; }
