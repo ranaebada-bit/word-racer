@@ -175,6 +175,15 @@ input,select,textarea{font-family:var(--ui);font-size:16px;-webkit-user-select:t
 .gear{opacity:.8}
 .mic .ic{color:#fff}
 .nmbtns .btn{white-space:nowrap;font-size:16px}
+.settings{gap:0;padding:6px 14px}
+details.sec{border-bottom:1px solid #eef0f7}details.sec:last-child{border-bottom:0}
+details.sec summary{list-style:none;display:flex;align-items:center;gap:10px;padding:14px 2px;cursor:pointer;font-weight:800;font-size:17px;color:var(--ink)}
+details.sec summary::-webkit-details-marker{display:none}
+details.sec summary .st{flex:1}
+details.sec summary .sv{font-weight:700;font-size:14px;color:#777;max-width:45%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+details.sec summary::after{content:'';width:9px;height:9px;border-right:3px solid #aab;border-bottom:3px solid #aab;transform:rotate(45deg);margin:0 4px 4px 2px;transition:transform .2s}
+details.sec[open] summary::after{transform:rotate(-135deg);margin-bottom:-4px}
+details.sec .sb{padding:0 2px 14px;display:flex;flex-direction:column;gap:8px}
 .panel{background:#fff;border-radius:22px;padding:14px;display:flex;flex-direction:column;gap:10px}
 .tabs{display:flex;gap:6px}
 .tabs button{flex:1;padding:10px 6px;border-radius:14px;background:#ffffff22;color:#fff;font-weight:800;font-size:16px}
@@ -1302,27 +1311,33 @@ function pProgress() {
     ${rows.length ? `<table><tr><th>Day</th><th>Races</th><th>Coins</th><th>Goal</th></tr>${rows.join('')}</table>` : '<p class="hint">No races yet.</p>'}
   </div>`;
 }
+let secOpen = new Set(['child']);   // which Settings sections are open (kept while the page is open)
 function pSettings() {
   const t = S.settings.tries, n = todayPlan().length;
   const opt = (v, cur, label) => `<option value="${v}" ${String(cur) === String(v) ? 'selected' : ''}>${label ?? v}</option>`;
-  $('#pbody').innerHTML = `<div class="panel">
-    ${nameBlock()}
-    ${classBlock()}
-    ${linkBlock()}
-    <h3 style="margin:0">Help steps (tries at each step)</h3>
-    <div class="set"><label>Words 1: read it alone</label><select id="tRead">${[1, 2, 3].map(v => opt(v, t.read)).join('')}</select></div>
-    <div class="set"><label>Words 2: "Fred Talk it" (no hints)</label><select id="tFred">${[1, 2, 3].map(v => opt(v, t.fred)).join('')}</select></div>
-    <div class="set"><label>Words 3: sounds light up</label><select id="tSounds">${[1, 2, 3].map(v => opt(v, t.sounds)).join('')}</select></div>
-    <p class="hint">After that the game says the sounds and the word, your child repeats it, and it comes back a few items later.</p>
-    <div class="set"><label>Times a missed item comes back</label><select id="sCome">${[0, 1, 2, 3].map(v => opt(v, S.settings.comebacks)).join('')}</select></div>
-    <div class="set"><label>Daily goal (for the streak)</label><select id="sGoal">${opt('all', S.settings.goal, 'All races')}${Array.from({ length: Math.max(0, n - 1) }, (_, i) => opt(i + 1, S.settings.goal, `${i + 1} race${i ? 's' : ''}`)).join('')}</select></div>
-    <div class="set"><label>Microphone checking</label><select id="sStrict"><option value="0" ${S.settings.strict ? '' : 'selected'}>Relaxed (recommended)</option><option value="1" ${S.settings.strict ? 'selected' : ''}>Strict</option></select></div>
-    <p class="hint">Relaxed: if the phone mishears a vowel (e.g. writes “hell” or “heal” for <i>hill</i>), it still counts, unless the word it heard is also on the homework list.</p>
-    <div class="set"><label>Sound dots under words</label><select id="sDots">${opt('1', S.settings.dots ? 1 : 0, 'Always')}${opt('0', S.settings.dots ? 1 : 0, 'Only when helping')}</select></div>
-    ${micTestBlock()}
-    <div class="note">${SR ? 'This browser can listen to your child.' : '<b>This browser can’t listen.</b> On iPhone, open the game in Safari.'}${micBlocked ? ' The microphone was blocked on this page.' : ''}</div>
-    <button class="btn r" id="resetAll" style="margin-top:6px">Reset coins, streak and stats</button>
+  const sec = (id, icon, title, sum, body) => `<details class="sec" data-sec="${id}" ${secOpen.has(id) ? 'open' : ''}><summary>${icon}<span class="st">${title}</span><span class="sv">${sum}</span></summary><div class="sb">${body}</div></details>`;
+  const goalLabel = S.settings.goal === 'all' ? 'All races' : `${S.settings.goal} race${S.settings.goal > 1 ? 's' : ''}`;
+  $('#pbody').innerHTML = `<div class="panel settings">
+    ${sec('child', ic('star', 26), 'Child', esc(S.name || 'Not set'), nameBlock())}
+    ${sec('class', ic('trophy', 26), 'Class list', S.lb.cls ? esc(S.lb.cls) + (S.lb.on ? ' · on list' : ' · off') : 'Off', classBlock())}
+    ${sec('phone', ic('link', 26), 'Another phone', 'Link phones', linkBlock())}
+    ${sec('game', ic('flag', 26), 'Races and help', `Goal: ${goalLabel}`, `
+      <div class="set"><label>Daily goal (for the streak)</label><select id="sGoal">${opt('all', S.settings.goal, 'All races')}${Array.from({ length: Math.max(0, n - 1) }, (_, i) => opt(i + 1, S.settings.goal, `${i + 1} race${i ? 's' : ''}`)).join('')}</select></div>
+      <p class="hint" style="margin:6px 0 0"><b>Tries before each help step</b></p>
+      <div class="set"><label>1. Read it alone</label><select id="tRead">${[1, 2, 3].map(v => opt(v, t.read)).join('')}</select></div>
+      <div class="set"><label>2. "Fred Talk it"</label><select id="tFred">${[1, 2, 3].map(v => opt(v, t.fred)).join('')}</select></div>
+      <div class="set"><label>3. Sounds light up</label><select id="tSounds">${[1, 2, 3].map(v => opt(v, t.sounds)).join('')}</select></div>
+      <p class="hint">Then the game says it and your child repeats it.</p>
+      <div class="set"><label>Missed words come back</label><select id="sCome">${[0, 1, 2, 3].map(v => opt(v, S.settings.comebacks, v + (v === 1 ? ' time' : ' times'))).join('')}</select></div>
+      <div class="set"><label>Sound dots under words</label><select id="sDots">${opt('1', S.settings.dots ? 1 : 0, 'Always')}${opt('0', S.settings.dots ? 1 : 0, 'When helping')}</select></div>`)}
+    ${sec('mic', ic('mic', 26), 'Microphone', S.settings.strict ? 'Strict' : 'Relaxed', `
+      <div class="set"><label>Word checking</label><select id="sStrict"><option value="0" ${S.settings.strict ? '' : 'selected'}>Relaxed (recommended)</option><option value="1" ${S.settings.strict ? 'selected' : ''}>Strict</option></select></div>
+      <p class="hint">Relaxed: small mishearings like “hell” for <i>hill</i> still count.</p>
+      ${micTestBlock()}
+      ${SR ? '' : '<div class="note"><b>This browser can’t listen.</b> On iPhone, open the game in Safari.</div>'}${micBlocked ? '<div class="note">The microphone was blocked on this page.</div>' : ''}`)}
+    ${sec('reset', ic('trash', 26), 'Start over', '', `<p class="hint">Clears coins, streak, cars and stats on this phone. The homework and name stay.</p><button class="btn r" id="resetAll">Reset coins, streak and stats</button>`)}
   </div>`;
+  document.querySelectorAll('details.sec').forEach(d => d.addEventListener('toggle', () => { d.open ? secOpen.add(d.dataset.sec) : secOpen.delete(d.dataset.sec); }));
   const bind = (id, fn) => $(id).onchange = e => { fn(e.target.value); save(); toast('Saved ✓'); };
   bind('#tRead', v => t.read = +v); bind('#tFred', v => t.fred = +v); bind('#tSounds', v => t.sounds = +v);
   bind('#sCome', v => S.settings.comebacks = +v); bind('#sGoal', v => S.settings.goal = v === 'all' ? 'all' : +v);
@@ -1410,8 +1425,8 @@ function pHelp() {
     ['A word has a robot voice', 'The game has a natural voice for about 4,600 words. For others it uses the phone’s own voice. The Homework tab lists those words so you can tell us.'],
     [`What are the daily goal and the ${ic('flame', 18)} streak?`, 'The goal is finishing today’s races (change it in <b>Settings</b>). Each day the goal is met adds 1 to the streak. Missing a day starts it again.'],
     ['What is “Done today”?', 'If you entered a class code, children who finished all of today’s races appear with their first name and car. No scores or ranking. Choose <b>No</b> for “Show my child on the list” to stay off it; your child then doesn’t see the list either.'],
-    ['My child plays on two phones', `Open <b>Settings</b> on the first phone and copy the code under “Same child on another phone?”. Type it on the second phone and tap <b>${ic('link', 16)} Link</b>. After that, coins, medals, streaks and badges are added up across both phones, and they show once on the class list. Both phones need internet now and then to share.`],
-    ['Will we lose progress?', 'Progress is saved on the phone and, when online, a copy is kept in the class sheet. If you clear Safari/Chrome website data, use <b>Same child on another phone</b> with the code you wrote down to get it back, so it’s worth noting the code in Settings.'],
+    ['My child plays on two phones', `Open <b>Settings</b> on the first phone and copy the code under <b>Another phone</b>. Type it on the second phone and tap <b>${ic('link', 16)} Link</b>. After that, coins, medals, streaks and badges are added up across both phones, and they show once on the class list. Both phones need internet now and then to share.`],
+    ['Will we lose progress?', 'Progress is saved on the phone and, when online, a copy is kept in the class sheet. If you clear Safari/Chrome website data, use <b>Another phone</b> in Settings with the code you wrote down to get it back, so it’s worth noting the code in Settings.'],
     ['Does it work without internet?', 'Yes, after the first visit. Only the “Done today” list needs internet.'],
   ];
   $('#pbody').innerHTML = `<div class="panel">
@@ -1526,8 +1541,7 @@ function sync() {   // push this phone, then pull the others; refresh the home s
 }
 /* same child on two phones: share one player code so they count as one */
 function linkBlock() {
-  return `<div class="set" style="flex-wrap:wrap;border-bottom:0"><label>Same child on another phone?</label></div>
-    <div class="hint">This phone's code: <b style="font-size:20px;letter-spacing:2px;color:var(--ink)">${esc(S.lb.player)}</b><br>On the other phone, open ${ic('gear', 16)} Settings and type this code below, so your child shows up once on the list. After linking, coins, medals, streaks and badges are added up across both phones.</div>
+  return `<div class="hint">This phone's code: <b style="font-size:20px;letter-spacing:2px;color:var(--ink)">${esc(S.lb.player)}</b><br>On the other phone, open ${ic('gear', 16)} Settings and type this code below, so your child shows up once on the list. After linking, coins, medals, streaks and badges are added up across both phones.</div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 12px"><input type="text" id="lnkIn" placeholder="Other phone’s code" autocapitalize="off" autocomplete="off" spellcheck="false" style="flex:1;min-width:160px;border:2px solid #dfe3f2;border-radius:10px;padding:8px;font-size:18px"><button class="btn w" id="lnkGo" style="padding:8px 14px">${ic('link', 22)} Link</button></div>`;
 }
 function bindLink() {
