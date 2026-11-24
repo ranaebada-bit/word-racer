@@ -291,6 +291,7 @@ table{width:100%;border-collapse:collapse;font-size:15px}td,th{padding:6px 4px;b
   <img src="icon-512.png" alt="" style="width:150px;height:150px;border-radius:34px;box-shadow:0 10px 30px #0006">
   <div style="font:800 38px 'Baloo 2',system-ui;color:#fff">Word Racer</div>
   <div style="width:160px;height:8px;border-radius:4px;background:#ffffff33;overflow:hidden"><i style="display:block;height:100%;width:40%;background:#ffd23f;border-radius:4px;animation:load 1s ease-in-out infinite alternate"></i></div>
+  <div style="position:absolute;bottom:max(28px,env(safe-area-inset-bottom));left:20px;right:20px;text-align:center;font:600 14px system-ui;color:#ffffffbb">Nadine ElHosseiny, thank you for the creative idea 💛</div>
 </div>
 <style>@keyframes load{from{margin-left:0}to{margin-left:60%}}</style>
 <div class="bg"></div>
@@ -1780,7 +1781,6 @@ function pHelp() {
     ${micTestBlock()}
     ${feedbackBlock()}
     <div class="faq">${qa.map(([q, a]) => `<details><summary>${q}</summary><p>${a}</p></details>`).join('')}</div>
-    <p style="text-align:center;font-size:13px;color:var(--muted);margin:18px 0 4px">Nadine ElHosseiny, thank you for the creative idea 💛</p>
   </div>`;
   bindMicTest(); bindFeedback();
 }
@@ -1936,8 +1936,8 @@ $('#parentBtn').innerHTML = ic('gear', 32); $('#helpBtn').innerHTML = ic('speake
 $('#boardBack').innerHTML = ic('home', 30); $('#parentBack').innerHTML = ic('back', 26); $('#boardRefresh').innerHTML = ic('refresh', 26);
 $('#boardBack').nextElementSibling.innerHTML = `<span style="display:inline-flex;align-items:center;gap:8px">${ic('trophy', 32)} Done today</span>`;
 renderHome(); show('home');
-// splash screen: until the game's voices are ready (at most 3 seconds)
-Promise.race([allAudio, sleep(3000)]).then(() => { const sp = $('#splash'); if (sp) { sp.style.opacity = 0; setTimeout(() => sp.remove(), 450); } });
+// splash screen: until the game's voices are ready (at least 1.5s so the thank-you can be read, at most 3s)
+Promise.all([Promise.race([allAudio, sleep(3000)]), sleep(1500)]).then(() => { const sp = $('#splash'); if (sp) { sp.style.opacity = 0; setTimeout(() => sp.remove(), 450); } });
 sync();
 document.addEventListener('visibilitychange', () => { if (!document.hidden) sync(); });
 // keep the game and voices on the phone: faster opening, less data, works offline
