@@ -424,7 +424,7 @@ function seeded(seed) { let x = seed || 1; return () => { x ^= x << 13; x ^= x >
 // and never writes to the class list or shared progress, so trying things out can't affect the families.
 const IS_TEST = /\/test\/?($|index\.html)/.test(location.pathname);
 const BASE = IS_TEST ? '../' : '';
-const APP_VERSION = '2026-11-23';
+const APP_VERSION = '2026-11-24b';
 const KEY = IS_TEST ? 'wordRacer.test' : 'wordRacer.v2';
 const DEFAULT_HW = `Speed sounds: n, e, p, a, h, g, t, c, b, r, o, f, j, v, k, l, y, u, w
 Words: red, jog, vet, run, jet, yes, rat, jam, yet, yum, win, web, wet, yap, van
@@ -685,7 +685,7 @@ async function getBuf(key) {
   return bufCache[key] = new Promise(res => { try { c.decodeAudioData(u.buffer, b => res(b), () => res(null)); } catch (e) { res(null); } });
 }
 let curSrc = null;
-function stopAudio() { try { curSrc && curSrc.stop(); } catch (e) {} curSrc = null; try { player.pause(); } catch (e) {} if (curDone) curDone(); try { speechSynthesis.cancel(); } catch (e) {} }
+function stopAudio() { try { curSrc && curSrc.stop(); } catch (e) {} curSrc = null; try { if (!player.paused) player.pause(); } catch (e) {} if (curDone) curDone(); try { if (speechSynthesis.speaking || speechSynthesis.pending) speechSynthesis.cancel(); } catch (e) {} }
 // Voice clips play through one normal <audio> player: on iPhone it ignores the silent switch
 // and keeps working after the microphone has been used. Web Audio is only a backup.
 function setSession(type) { try { if (navigator.audioSession) navigator.audioSession.type = type; } catch (e) {} }
@@ -785,7 +785,7 @@ function listen(maxMs, isDone, onReady) {
   setSession('play-and-record');   // let the mic in; switched back to loudspeaker 'playback' before the next clip
   if (!SR) return Promise.resolve({ error: 'unsupported', texts: [] });
   return new Promise(resolve => {
-    const all = []; let finished = false, ready = false, timer, safety, quiet, rec = null, restarts = 0, t0 = Date.now(), firstErr = null;
+    const all = []; let finished = false, ready = false, timer, safety, quiet, rec = null, restarts = 0, early = 0, t0 = Date.now(), firstErr = null;
     const handle = { abort: () => finish({ error: 'aborted', texts: [] }, true) };
     const finish = (r, hard) => {
       if (finished) return; finished = true; clearTimeout(timer); clearTimeout(safety); clearTimeout(quiet); currentRec = null;
@@ -823,6 +823,8 @@ function listen(maxMs, isDone, onReady) {
         endDone();
         if (finished || rec !== r) return;
         if (ready && Date.now() - t0 < maxMs - 700 && restarts < 4) { restarts++; start(false); return; }   // stopped early: listen again
+        // iPhone sometimes aborts the mic right as it opens: quietly try again instead of saying "I didn't hear you"
+        if (!ready && !all.length && early < 2 && !['not-allowed', 'service-not-allowed'].includes(firstErr)) { early++; firstErr = null; setTimeout(() => { if (!finished) start(true); }, 250); return; }
         done();
       };
       try { r.start(); } catch (e) { endDone(); if (first) finish({ error: 'start-failed', texts: [] }); else done(); }
@@ -989,8 +991,10 @@ function closeModal() { $('#modalBg').classList.remove('on'); }
 $('#modalBg').addEventListener('click', e => { if (e.target.id === 'modalBg') closeModal(); });
 let unlocked = false, welcomed = false;
 const SILENT = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAIA+AAACABAAZGF0YQAAAAA=';
-document.addEventListener('pointerdown', () => {
-  ac(); setSession('playback');
+document.addEventListener('pointerdown', e => {
+  // Not on the mic button: switching to loudspeaker / waking the sound engine as the mic opens makes iPhone abort the mic.
+  const onMicBtn = e.target && e.target.closest && e.target.closest('[data-a="mic"],[data-a="retry"]');
+  if (!onMicBtn) { ac(); setSession('playback'); }
   if (!unlocked) {
     unlocked = true;
     try { player.muted = true; player.src = SILENT; const p = player.play(); if (p) p.then(() => { player.pause(); player.muted = false; }).catch(() => { player.muted = false; unlocked = false; }); } catch (e) { player.muted = false; }
