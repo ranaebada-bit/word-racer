@@ -424,7 +424,7 @@ function seeded(seed) { let x = seed || 1; return () => { x ^= x << 13; x ^= x >
 // and never writes to the class list or shared progress, so trying things out can't affect the families.
 const IS_TEST = /\/test\/?($|index\.html)/.test(location.pathname);
 const BASE = IS_TEST ? '../' : '';
-const APP_VERSION = '2026-11-24b';
+const APP_VERSION = '2026-11-24c';
 const KEY = IS_TEST ? 'wordRacer.test' : 'wordRacer.v2';
 const DEFAULT_HW = `Speed sounds: n, e, p, a, h, g, t, c, b, r, o, f, j, v, k, l, y, u, w
 Words: red, jog, vet, run, jet, yes, rat, jam, yet, yum, win, web, wet, yap, van
@@ -481,7 +481,7 @@ function raceSlots(size = 22, justNow = false) {   // returns { html, left, tota
 }
 const nextReadingCar = () => CARS.findIndex((c, i) => !c.special && !hasCar(i));
 function fresh() {
-  return { homework: '', name: '', nameRec: null, setupDone: false, review: [], lb: { cls: '', on: true, player: Math.random().toString(36).slice(2, 12) },
+  return { homework: '', name: '', nameRec: null, setupDone: false, review: [], lb: { cls: '', on: false, v: 2, player: Math.random().toString(36).slice(2, 12) },
     settings: { tries: { read: 1, fred: 1, sounds: 1, sound: 2 }, comebacks: 2, goal: 'all', useMic: true, dots: true },
     coins: 0, streak: 0, best: 0, lastGoalDay: null, days: {}, stats: {}, car: 0 };
 }
@@ -490,7 +490,9 @@ function load() {
   return fresh();
 }
 let S = load();
-if (!S.lb || !S.lb.player) S.lb = { cls: '', on: true, player: Math.random().toString(36).slice(2, 12), ...(S.lb || {}) };
+if (!S.lb || !S.lb.player) S.lb = { cls: '', on: false, player: Math.random().toString(36).slice(2, 12), ...(S.lb || {}) };
+// one list for everyone now: only children whose grown-up said Yes before (with a class code) stay on it
+if (S.lb.v !== 2) { S.lb.on = !!(S.lb.on && S.lb.cls); S.lb.v = 2; }
 if (!S.lb.phone) S.lb.phone = 'p' + Math.random().toString(36).slice(2, 11);   // this phone (one child can have several)
 function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
 try { navigator.storage && navigator.storage.persist && navigator.storage.persist(); } catch (e) {}
@@ -1063,7 +1065,7 @@ function renderHome() {
       <button class="mtile" id="bonusTile">${ic('star', 36)}<b>Bonus</b></button>
       <button class="mtile" id="garageTile"><span class="gcarmini">${carSVG(S.car, 56)}</span><b>Garage</b></button>
       <button class="mtile" id="badgeTile">${ic('ribbon', 36)}<b id="badgeCount">Badges</b></button>
-      ${lbActive() ? `<button class="mtile" id="boardTile">${ic('trophy', 36)}<b>Done today</b></button>` : ''}
+      ${lbActive() && S.lb.on ? `<button class="mtile" id="boardTile">${ic('trophy', 36)}<b>Done today</b></button>` : ''}
     </div>`;
   document.querySelectorAll('[data-r]').forEach(b => b.onclick = () => { const i = +b.dataset.r; startRace(todayPlan()[i], { race: i, intro: 'race' + (i % RACES.length) }); });
   $('#bonusTile').onclick = bonusLap; $('#garageTile').onclick = garage;
@@ -1645,7 +1647,7 @@ function pSettings() {
   const goalLabel = S.settings.goal === 'all' ? 'All races' : `${S.settings.goal} race${S.settings.goal > 1 ? 's' : ''}`;
   $('#pbody').innerHTML = `<div class="panel settings">
     ${sec('child', ic('star', 26), 'Child', esc(S.name || 'Not set'), nameBlock())}
-    ${sec('class', ic('trophy', 26), 'Class list', S.lb.cls ? esc(S.lb.cls) + (S.lb.on ? ' · on list' : ' · off') : 'Off', classBlock())}
+    ${sec('class', ic('trophy', 26), 'Done today list', S.lb.on ? 'On' : 'Off', classBlock())}
     ${sec('phone', ic('link', 26), 'Another phone', 'Link phones', linkBlock())}
     ${sec('game', ic('flag', 26), 'Races and help', `Goal: ${goalLabel}`, `
       <div class="set"><label>Daily goal (for the streak)</label><select id="sGoal">${opt('all', S.settings.goal, 'All races')}${Array.from({ length: Math.max(0, n - 1) }, (_, i) => opt(i + 1, S.settings.goal, `${i + 1} race${i ? 's' : ''}`)).join('')}</select></div>
@@ -1773,11 +1775,11 @@ function pHelp() {
     ['How do I add this week’s homework?', 'Open <b>Homework</b>, paste the words (commas between them) and each sentence on its own line, then tap <b>Save homework</b>. The game builds the races by itself.'],
     ['A word has a robot voice', 'The game has a natural voice for about 4,600 words. For others it uses the phone’s own voice. The Homework tab lists those words so you can tell us.'],
     [`What are the daily goal and the ${ic('flame', 18)} streak?`, 'The goal is finishing today’s races (change it in <b>Settings</b>). Each day the goal is met adds 1 to the streak. One missed day a week is saved by a shield (shown on the home screen), so the streak carries on. Missing two days in a row, or two in one week, starts it again.'],
-    ['What is “Done today”?', 'If you entered a class code, children who finished all of today’s races appear with their first name and car. No scores or ranking. Choose <b>No</b> for “Show my child on the list” to stay off it; your child then doesn’t see the list either.'],
-    ['My child plays on two phones', `Open <b>Settings</b> on the first phone and copy the code under <b>Another phone</b>. Type it on the second phone and tap <b>${ic('link', 16)} Link</b>. After that, coins, medals, streaks and badges are added up across both phones, and they show once on the class list. Both phones need internet now and then to share.`],
+    ['What is “Done today”?', 'If you chose <b>Yes</b> for “Show my child on the Done today list”, children who finished all of today’s races appear with their first name and car. Everyone who chose Yes sees the same list. No scores or ranking. Choose <b>No</b> to stay off it; your child then doesn’t see the list either.'],
+    ['My child plays on two phones', `Open <b>Settings</b> on the first phone and copy the code under <b>Another phone</b>. Type it on the second phone and tap <b>${ic('link', 16)} Link</b>. After that, coins, medals, streaks and badges are added up across both phones, and they show once on the Done today list. Both phones need internet now and then to share.`],
     ['Will we lose progress?', 'Progress is saved on the phone and, when online, a copy is kept in the class sheet. If you clear Safari/Chrome website data, use <b>Another phone</b> in Settings with the code you wrote down to get it back, so it’s worth noting the code in Settings.'],
     ['How do badges work?', 'There are 3 badges: <b>Bookworm</b> (words read), <b>Super Streak</b> (days in a row with all races done) and <b>Gold Star</b> (gold medals). Each has 4 levels: bronze, silver, gold and rainbow. The home screen shows the next one and how close your child is; tapping it, or any badge, says how to win it.'],
-    ['What does the game share, and with whom?', 'Most things stay on this phone. When online, a copy of your child’s progress (coins, medals, words read and which words were tricky) is saved in a private Google Sheet kept by the parent who made this game. It is saved under a random code, not your child’s name. If you enter a class code, your child’s first name and car show on the class list when they finish today’s races (choose <b>No</b> in Settings to stay off). If you send feedback, it includes your child’s first name, class code, phone type and the last few words the microphone heard. The game never records or keeps your child’s reading, and the name recording stays on this phone. The phone’s own speech service (Apple or Google) turns speech into text, like voice typing. Nothing is sold or used for ads.'],
+    ['What does the game share, and with whom?', 'Most things stay on this phone. When online, a copy of your child’s progress (coins, medals, words read and which words were tricky) is saved in a private Google Sheet kept by the parent who made this game. It is saved under a random code, not your child’s name. If you choose <b>Yes</b> for the Done today list, your child’s first name and car show on it when they finish today’s races (choose <b>No</b> in Settings to stay off). If you send feedback, it includes your child’s first name, phone type and the last few words the microphone heard. The game never records or keeps your child’s reading, and the name recording stays on this phone. The phone’s own speech service (Apple or Google) turns speech into text, like voice typing. Nothing is sold or used for ads.'],
     ['Does it work without internet?', 'Yes, after the first visit. Only the “Done today” list needs internet.'],
   ];
   $('#pbody').innerHTML = `<div class="panel">
@@ -1796,7 +1798,7 @@ function loadTestData() {
   S = { ...fresh(), name: 'Tester', homework: DEFAULT_HW, setupDone: true, firstMicDone: true, coins: 1400, car: 3, raceCount: 30, turbos: 4, best: 6, days,
     stats: { egg: { seen: 5, first: 2, miss: 3 }, hill: { seen: 4, first: 2, miss: 2 }, yell: { seen: 3, first: 2, miss: 1 }, red: { seen: 6, first: 6, miss: 0 } },
     heard: [{ t: 'hill', h: 'till', ok: false, at: '17:02' }, { t: 'egg', h: 'leg', ok: false, at: '17:01' }, { t: 'red', h: 'red', ok: true, at: '17:00' }],
-    lb: { cls: '', on: true, player: 'test' + Math.random().toString(36).slice(2, 8), phone: 'ptest' } };
+    lb: { cls: '', on: true, v: 2, player: 'test' + Math.random().toString(36).slice(2, 8), phone: 'ptest' } };
   refreshRed(); checkBadges(); save(); closeModal(); renderHome(); show('home'); toast('Test data loaded ✓');
 }
 function setupWizard(step = 0) {
@@ -1811,7 +1813,7 @@ function setupWizard(step = 0) {
 Sentences:
 get a hat
 get a pen">${esc(S.homework)}</textarea>${nav()}`,
-    () => `<h2 style="display:flex;align-items:center;gap:8px">${ic('trophy', 34)} Class list (optional)</h2><p class="hint">If your teacher gave you a class code, enter it to see who finished today. No code? Just tap Next.</p>
+    () => `<h2 style="display:flex;align-items:center;gap:8px">${ic('trophy', 34)} Done today list (optional)</h2><p class="hint">See which friends finished their races today. Choose Yes to join.</p>
       <div class="panel" style="padding:0">${classBlock()}</div>${nav()}`,
     () => `<h2 style="display:flex;align-items:center;gap:8px">${ic('mic', 34)} Last step</h2>${micTestBlock()}<div style="height:8px"></div>${homeTip()}${nav(0, `Let's race! ${ic('flag', 22)}`)}`,
   ];
@@ -1830,10 +1832,13 @@ get a pen">${esc(S.homework)}</textarea>${nav()}`,
 
 /* ---- class leaderboard (Google Sheet) ---- */
 const LB_URL = 'https://script.google.com/macros/s/AKfycby9VJJwcEd1syIe-3SuG4LYih2gHZfXIzFmFPTwpIZqtkqADomYTDlBNttWQ4srIDk/exec';
-const lbActive = () => !IS_TEST && !!(LB_URL.startsWith('https://') && S.lb.cls);
+// For now everyone shares one list (no class groups). The sheet still wants a class code, so all phones send the same one.
+// Keep 2021 in the sheet's Classes tab.
+const LB_CLASS = '2021';
+const lbActive = () => !IS_TEST && LB_URL.startsWith('https://');
 function countRead(it) { const d = dayRec(); d.words = (d.words || 0) + (it.type === 'sentence' ? norm(plain(it.text)).split(' ').length : 1); }
 async function lbCall(params) {
-  const q = new URLSearchParams({ class: S.lb.cls, day: today(), player: S.lb.player, ...params });
+  const q = new URLSearchParams({ class: LB_CLASS, day: today(), player: S.lb.player, ...params });
   const ctl = new AbortController(); const t = setTimeout(() => ctl.abort(), 15000);
   try { const r = await fetch(LB_URL + '?' + q.toString(), { signal: ctl.signal }); return await r.json(); } catch (e) { return null; } finally { clearTimeout(t); }
 }
@@ -1845,7 +1850,7 @@ function lbSubmit() {
 async function openBoard() {
   show('board'); stopAudio();
   if (!S.lb.on) { // opted out: they don't see the list and aren't on it
-    $('#boardBody').innerHTML = `<div class="lboff"><div>${ic('lock', 80)}</div><p><b>${esc(S.name || 'This racer')} is not on the class list.</b></p><p>A grown-up chose "No" for "Show my child on the list". To see who finished today, a grown-up can tap ${ic('gear', 20)}, open <b>Settings</b> and choose <b>Yes</b>.</p></div>`;
+    $('#boardBody').innerHTML = `<div class="lboff"><div>${ic('lock', 80)}</div><p><b>${esc(S.name || 'This racer')} is not on the "Done today" list.</b></p><p>A grown-up chose "No" for "Show my child on the list". To see who finished today, a grown-up can tap ${ic('gear', 20)}, open <b>Settings</b> and choose <b>Yes</b>.</p></div>`;
     return;
   }
   $('#boardBody').innerHTML = `<div style="text-align:center;padding:40px" class="bounce">${carSVG(S.car, 150)}</div>`;
@@ -1921,18 +1926,18 @@ function bindLink() {
   };
 }
 function classBlock() {
-  return `<div class="set" style="flex-wrap:wrap"><label>Class code (for the "done today" list)</label><input type="text" id="clsIn" value="${esc(S.lb.cls)}" placeholder="optional" autocapitalize="characters" style="width:150px;border:2px solid #dfe3f2;border-radius:10px;padding:8px;font-size:18px"></div>
-    <div class="set"><label>Show my child on the list</label><select id="clsOn"><option value="1" ${S.lb.on ? 'selected' : ''}>Yes</option><option value="0" ${S.lb.on ? '' : 'selected'}>No</option></select></div>
-    <div class="hint">When your child finishes all of today's races, their first name and car appear on the class list with a ${ic('trophy', 16)}. No scores and no ranking. Choose "No" to stay off the list. Children who are off the list don't see it either.</div>
+  return `<div class="set"><label>Show my child on the "Done today" list</label><select id="clsOn"><option value="1" ${S.lb.on ? 'selected' : ''}>Yes</option><option value="0" ${S.lb.on ? '' : 'selected'}>No</option></select></div>
+    <div class="hint">When your child finishes all of today's races, their first name and car appear on the list with a ${ic('trophy', 16)}. Everyone who chose Yes sees the same list. No scores and no ranking. Choose "No" to stay off the list. Children who are off the list don't see it either.</div>
     <div id="lbDup"></div>`;
 }
 function bindClass() {
   const ni = $('#nmIn'); if (ni) ni.addEventListener('change', () => checkDupName());
-  $('#clsIn').onchange = e => { S.lb.cls = e.target.value.trim().toUpperCase(); save(); };
-  $('#clsOn').onchange = e => {
+    $('#clsOn').onchange = e => {
     const on = e.target.value === '1';
-    if (!on && S.lb.on && S.lb.cls && LB_URL.startsWith('https://')) lbCall({ action: 'leave' });
+    if (!on && S.lb.on && lbActive()) lbCall({ action: 'leave' });
     S.lb.on = on; save(); toast(on ? 'On the list ✓' : 'Removed from the list');
+    if (on) { if (view().goal) lbSubmit(); checkDupName(); }
+    if ($('#home').classList.contains('on')) renderHome();
   };
 }
 
