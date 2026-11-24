@@ -217,6 +217,9 @@ details.sec .sb{padding:0 2px 14px;display:flex;flex-direction:column;gap:8px}
 .slot.pop{animation:pop .8s 2}
 .res .slots .slot{background:#e4e7f2;border-color:#cfd5ea}.res .slots .slot.on{background:#ffd23f;border-color:#1b1b3a44}
 .bring{position:relative;width:48px;height:48px;display:grid;place-items:center}.bring>svg:first-child{position:absolute;inset:0}.bring .dot{position:absolute;top:0;right:0;width:12px;height:12px;border-radius:50%;background:#ef3e36;border:2px solid #fff}
+.tskip{display:flex;flex-direction:column;gap:6px;margin-left:10px}
+.tskip button{background:#ef3e36;color:#fff;font-weight:800;font-size:13px;border:0;border-radius:999px;padding:6px 10px}
+.tskip button:disabled{opacity:.4}
 .testbadge{position:fixed;top:0;left:50%;transform:translateX(-50%);z-index:90;background:#ef3e36;color:#fff;font-weight:800;font-size:12px;padding:2px 10px;border-radius:0 0 8px 8px;pointer-events:none}
 /* small phones (iPhone SE / mini): keep the top bar, tabs and garage inside the screen */
 .top .chip{flex:none;font-size:21px;padding:4px 12px}
@@ -288,6 +291,7 @@ table{width:100%;border-collapse:collapse;font-size:15px}td,th{padding:6px 4px;b
   <img src="icon-512.png" alt="" style="width:150px;height:150px;border-radius:34px;box-shadow:0 10px 30px #0006">
   <div style="font:800 38px 'Baloo 2',system-ui;color:#fff">Word Racer</div>
   <div style="width:160px;height:8px;border-radius:4px;background:#ffffff33;overflow:hidden"><i style="display:block;height:100%;width:40%;background:#ffd23f;border-radius:4px;animation:load 1s ease-in-out infinite alternate"></i></div>
+  <div style="position:absolute;bottom:max(28px,env(safe-area-inset-bottom));left:20px;right:20px;text-align:center;font:600 14px system-ui;color:#ffffffbb">Made by Rana · Idea by Nadine 💛</div>
 </div>
 <style>@keyframes load{from{margin-left:0}to{margin-left:60%}}</style>
 <div class="bg"></div>
@@ -1315,10 +1319,11 @@ function renderCard() {
 function renderControls() {
   const st = stageName(), box = $('#controls');
   const hear = st === 'model' ? `<button class="round" data-a="hear" aria-label="Hear again">${ic('speaker', 40)}</button>` : '';
+  const tskip = IS_TEST ? '<span class="tskip"><button data-a="tskip">Skip word</button><button data-a="tlast">To last</button></span>' : '';   // test copy only
   const light = st === 'sounds' ? `<button class="round" data-a="light" aria-label="Light the sounds again">${ic('refresh', 38)}</button>` : '';
-  if (micOn()) box.innerHTML = `${light}${hear}<button class="mic" id="micBtn" data-a="mic" aria-label="Read">${ic('mic', 70)}</button>`;
+  if (micOn()) box.innerHTML = `${light}${hear}<button class="mic" id="micBtn" data-a="mic" aria-label="Read">${ic('mic', 70)}</button>${tskip}`;
   else box.innerHTML = `<div style="display:flex;flex-direction:column;align-items:center;gap:10px;color:#fff;text-align:center">
-    <div style="display:flex;gap:14px;align-items:center">${hear}<button class="mic" data-a="retry" aria-label="Try the microphone again">${ic('refresh', 60)}</button></div>
+    <div style="display:flex;gap:14px;align-items:center">${hear}<button class="mic" data-a="retry" aria-label="Try the microphone again">${ic('refresh', 60)}</button>${tskip}</div>
     <div style="background:#ffffff1f;border-radius:14px;padding:8px 12px;font-size:14px;line-height:1.35;max-width:340px">${SR
       ? '<b>Grown-ups:</b> the microphone is off for this page. On iPhone: Settings → Apps → Safari → Microphone → Allow, and Settings → General → Keyboard → Enable Dictation. Then tap ' + ic('refresh', 16) + '.'
       : '<b>Grown-ups:</b> this browser can’t listen. On iPhone, open the game in <b>Safari</b>.'}</div></div>`;
@@ -1331,6 +1336,11 @@ $('#race').addEventListener('click', e => {
   if (a === 'yes') return handleResult(true, {});
   if (a === 'no') return handleResult(false, {});
   if (a === 'light') return lightSounds(false);
+  if (IS_TEST && (a === 'tskip' || a === 'tlast') && R && !R.dead) {   // test copy: skip this word, or jump to the last one
+    stopAudio();
+    if (a === 'tlast' && R.idx < R.queue.length - 1) { R.idx = R.queue.length - 1; R.rival = Math.max(R.rival, R.idx * .6); moveCars(); return nextItem(); }
+    return advance();
+  }
   if (a === 'retry') { micBlocked = false; renderControls(); return onMic(); }
 });
 function setBusy(v) {
@@ -1539,6 +1549,7 @@ $('#exitRace').onclick = () => {
 
 /* ============ PARENT ============ */
 $('#parentBtn').onclick = () => {
+  if (IS_TEST) { ptab = 'homework'; show('parent'); renderParent(); return; }   // test copy: no sum
   const a = rand(12, 39), b = rand(11, 28);
   modal(`<h2>Grown-ups only</h2><p>What is ${a} + ${b}?</p><input id="gateIn" type="number" inputmode="numeric" style="width:100%;font-size:24px;padding:10px;border:2px solid #ddd;border-radius:12px"><div style="display:flex;gap:10px;margin-top:12px"><button class="btn w" style="flex:1" onclick="closeModal()">Cancel</button><button class="btn" style="flex:1" id="gateGo">Enter</button></div>`);
   const go = () => { if (+$('#gateIn').value === a + b) { closeModal(); ptab = 'homework'; show('parent'); renderParent(); } else { toast('Not quite'); $('#gateIn').value = ''; } };
@@ -1925,8 +1936,8 @@ $('#parentBtn').innerHTML = ic('gear', 32); $('#helpBtn').innerHTML = ic('speake
 $('#boardBack').innerHTML = ic('home', 30); $('#parentBack').innerHTML = ic('back', 26); $('#boardRefresh').innerHTML = ic('refresh', 26);
 $('#boardBack').nextElementSibling.innerHTML = `<span style="display:inline-flex;align-items:center;gap:8px">${ic('trophy', 32)} Done today</span>`;
 renderHome(); show('home');
-// splash screen: until the game's voices are ready (at most 3 seconds)
-Promise.race([allAudio, sleep(3000)]).then(() => { const sp = $('#splash'); if (sp) { sp.style.opacity = 0; setTimeout(() => sp.remove(), 450); } });
+// splash screen: until the game's voices are ready (at least 1.5s so the thank-you can be read, at most 3s)
+Promise.all([Promise.race([allAudio, sleep(3000)]), sleep(1500)]).then(() => { const sp = $('#splash'); if (sp) { sp.style.opacity = 0; setTimeout(() => sp.remove(), 450); } });
 sync();
 document.addEventListener('visibilitychange', () => { if (!document.hidden) sync(); });
 // keep the game and voices on the phone: faster opening, less data, works offline
