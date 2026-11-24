@@ -481,7 +481,7 @@ function raceSlots(size = 22, justNow = false) {   // returns { html, left, tota
 }
 const nextReadingCar = () => CARS.findIndex((c, i) => !c.special && !hasCar(i));
 function fresh() {
-  return { homework: '', name: '', nameRec: null, setupDone: false, review: [], lb: { cls: '', on: false, v: 2, player: Math.random().toString(36).slice(2, 12) },
+  return { homework: '', name: '', nameRec: null, setupDone: false, review: [], lb: { cls: '', on: true, player: Math.random().toString(36).slice(2, 12) },
     settings: { tries: { read: 1, fred: 1, sounds: 1, sound: 2 }, comebacks: 2, goal: 'all', useMic: true, dots: true },
     coins: 0, streak: 0, best: 0, lastGoalDay: null, days: {}, stats: {}, car: 0 };
 }
@@ -490,9 +490,7 @@ function load() {
   return fresh();
 }
 let S = load();
-if (!S.lb || !S.lb.player) S.lb = { cls: '', on: false, player: Math.random().toString(36).slice(2, 12), ...(S.lb || {}) };
-// one list for everyone now: only children whose grown-up said Yes before (with a class code) stay on it
-if (S.lb.v !== 2) { S.lb.on = !!(S.lb.on && S.lb.cls); S.lb.v = 2; }
+if (!S.lb || !S.lb.player) S.lb = { cls: '', on: true, player: Math.random().toString(36).slice(2, 12), ...(S.lb || {}) };
 if (!S.lb.phone) S.lb.phone = 'p' + Math.random().toString(36).slice(2, 11);   // this phone (one child can have several)
 function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
 try { navigator.storage && navigator.storage.persist && navigator.storage.persist(); } catch (e) {}
@@ -1798,7 +1796,7 @@ function loadTestData() {
   S = { ...fresh(), name: 'Tester', homework: DEFAULT_HW, setupDone: true, firstMicDone: true, coins: 1400, car: 3, raceCount: 30, turbos: 4, best: 6, days,
     stats: { egg: { seen: 5, first: 2, miss: 3 }, hill: { seen: 4, first: 2, miss: 2 }, yell: { seen: 3, first: 2, miss: 1 }, red: { seen: 6, first: 6, miss: 0 } },
     heard: [{ t: 'hill', h: 'till', ok: false, at: '17:02' }, { t: 'egg', h: 'leg', ok: false, at: '17:01' }, { t: 'red', h: 'red', ok: true, at: '17:00' }],
-    lb: { cls: '', on: true, v: 2, player: 'test' + Math.random().toString(36).slice(2, 8), phone: 'ptest' } };
+    lb: { cls: '', on: true, player: 'test' + Math.random().toString(36).slice(2, 8), phone: 'ptest' } };
   refreshRed(); checkBadges(); save(); closeModal(); renderHome(); show('home'); toast('Test data loaded ✓');
 }
 function setupWizard(step = 0) {
