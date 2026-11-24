@@ -312,7 +312,6 @@ table{width:100%;border-collapse:collapse;font-size:15px}td,th{padding:6px 4px;b
     <div class="week" id="week"></div>
   </div>
   <div id="tiles" style="display:flex;flex-direction:column;gap:14px"></div>
-  <div class="thanks" style="text-align:center;font-size:13px;color:#ffffffaa;margin:18px 0 6px">Nadine ElHosseiny, thank you for the creative idea 💛</div>
 </section>
 
 <section id="race" class="screen">
@@ -1781,6 +1780,7 @@ function pHelp() {
     ${micTestBlock()}
     ${feedbackBlock()}
     <div class="faq">${qa.map(([q, a]) => `<details><summary>${q}</summary><p>${a}</p></details>`).join('')}</div>
+    <p style="text-align:center;font-size:13px;color:var(--muted);margin:18px 0 4px">Nadine ElHosseiny, thank you for the creative idea 💛</p>
   </div>`;
   bindMicTest(); bindFeedback();
 }
